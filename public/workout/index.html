@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Training</title>
+
+<!-- iOS home screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<meta name="theme-color" content="#14201c">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADNklEQVR42u3cTUrDUBSG4au4BMUiFnSs+yhY3IQ6UrejI+smRMF96NiBIIp7uHFmRfxDbpN7kucdZJhAePud7zRtlla3NhPwFctuAcgBcoAcIAfIAXKAHCAHyAFyAOQAOUAOkAPkADlADpAD5AA5AHKAHCAHyAFygBwgB8gBcoAcADlADpAD5EAbrLgFi+DubJJSWt+7KH7ml5uj3ZNbcgSmaZrRdPZ8fVj8zKPpLKUxOWLL8X40VvBJjvmRHJAc+KMcH47kgOSAzgF2kIMb5OigkDbvR3JAIYWxAslBDslBDoWUHFXZMT+SAzoHdA5IDnKoHOSQHOQgBzkUUnKwgxwKKTl0DnJA54DkgORA8ULqkT16va70X467s8ki3pORUlrbHuscsVnfu1jEezJSSq8Pj9/5QY5gu4NCSo4vyO3LoZCGSY5slSVHRWNF5yCH5NA5hmnHQJKj9St+OJLDWNE5yKFz9K1zZMlBDmOFHAopOSQHOVroHKKDHJKDHBE6h1U2jBzZI3tyVNM5JIfOoXOQQ3IopHZZncNYIYexEkuO+/PJgs68c3yrkMaWI+dmNJ0VP+2v/1ny6/MAcoyms6erg+Kn3di/TKfjujqHL8H+Fx46Bzlq+RDrHIGSIw9BDo/sw4yV3HSjo+So/kPcyVjpQ3AMpJD69Tk5FFKFNMCKZJUNtMoqpMaKQkqOACuSVzBYZXWO8MmRczc66hwBthXJYVupqpB6ZK+QSo7wncM3pOT4+XNMDp2jjv3Z7zn+c9M62Vb8kdpYqalzKKRhxorOITmssuSIIIfk0Dn6vKx00DkG8tcEj+wjbJXJC+OMlaqM1DnCrLKerUiOmrYVhTSOHN3oKDlsKwpp5OTQOchRUXJ4ZB9jq0we2VtlKyukOofOoXMUlcO2Qo66xorkMFbq6RwKqc5hrFhlB2qHzsEN24pCqnN8E1ftF9L5kRzGiuSIusrqHOSQHEVZWt3abPN6rw+Pxc+5tj1u/6JdXffXiwaWA4FYdgtADpAD5AA5QA6QA+QAOUAOkAMgB8gBcoAcIAfIAXKAHCAHyAGQA+QAOUAOkAPkADlADpAD5ADIAXKAHCjIG29wYlBvuv2UAAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADNklEQVR42u3cTUrDUBSG4au4BMUiFnSs+yhY3IQ6UrejI+smRMF96NiBIIp7uHFmRfxDbpN7kucdZJhAePud7zRtlla3NhPwFctuAcgBcoAcIAfIAXKAHCAHyAFyAOQAOUAOkAPkADlADpAD5AA5AHKAHCAHyAFygBwgB8gBcoAcADlADpAD5EAbrLgFi+DubJJSWt+7KH7ml5uj3ZNbcgSmaZrRdPZ8fVj8zKPpLKUxOWLL8X40VvBJjvmRHJAc+KMcH47kgOSAzgF2kIMb5OigkDbvR3JAIYWxAslBDslBDoWUHFXZMT+SAzoHdA5IDnKoHOSQHOQgBzkUUnKwgxwKKTl0DnJA54DkgORA8ULqkT16va70X467s8ki3pORUlrbHuscsVnfu1jEezJSSq8Pj9/5QY5gu4NCSo4vyO3LoZCGSY5slSVHRWNF5yCH5NA5hmnHQJKj9St+OJLDWNE5yKFz9K1zZMlBDmOFHAopOSQHOVroHKKDHJKDHBE6h1U2jBzZI3tyVNM5JIfOoXOQQ3IopHZZncNYIYexEkuO+/PJgs68c3yrkMaWI+dmNJ0VP+2v/1ny6/MAcoyms6erg+Kn3di/TKfjujqHL8H+Fx46Bzlq+RDrHIGSIw9BDo/sw4yV3HSjo+So/kPcyVjpQ3AMpJD69Tk5FFKFNMCKZJUNtMoqpMaKQkqOACuSVzBYZXWO8MmRczc66hwBthXJYVupqpB6ZK+QSo7wncM3pOT4+XNMDp2jjv3Z7zn+c9M62Vb8kdpYqalzKKRhxorOITmssuSIIIfk0Dn6vKx00DkG8tcEj+wjbJXJC+OMlaqM1DnCrLKerUiOmrYVhTSOHN3oKDlsKwpp5OTQOchRUXJ4ZB9jq0we2VtlKyukOofOoXMUlcO2Qo66xorkMFbq6RwKqc5hrFhlB2qHzsEN24pCqnN8E1ftF9L5kRzGiuSIusrqHOSQHEVZWt3abPN6rw+Pxc+5tj1u/6JdXffXiwaWA4FYdgtADpAD5AA5QA6QA+QAOUAOkAMgB8gBcoAcIAfIAXKAHCAHyAGQA+QAOUAOkAPkADlADpAD5ADIAXKAHCjIG29wYlBvuv2UAAAAAElFTkSuQmCC">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#14201c; --surface:#1c2b25; --surface-2:#24382f;
+    --bronze:#c98f45; --bronze-hot:#e8b563; --patina:#74a98f;
+    --text:#ece6d9; --muted:#8da096;
+    --line:rgba(236,230,217,.10); --line-2:rgba(236,230,217,.18);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--ground)}
+  body{
+    color:var(--text); font-family:'Barlow',system-ui,sans-serif; font-size:16px; line-height:1.45;
+    padding:calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right))
+            calc(44px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+    max-width:640px; margin:0 auto; min-height:100vh;
+  }
+  h1,h2{margin:0}
+
+  .masthead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .masthead h1{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:26px;letter-spacing:.06em;text-transform:uppercase}
+  .masthead .sub{font-size:12px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+  .rotline{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;color:var(--patina);letter-spacing:.03em;margin:0 0 22px}
+
+  .prompt{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .row{display:grid;gap:8px;margin-bottom:10px}
+  .row.three{grid-template-columns:repeat(3,1fr)}
+  .row.two{grid-template-columns:repeat(2,1fr)}
+
+  .pick{
+    appearance:none;border:1px solid var(--line-2);background:var(--surface);color:var(--text);
+    border-radius:3px;padding:16px 8px 13px;cursor:pointer;font-family:inherit;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    transition:background .15s ease,border-color .15s ease,color .15s ease;
+  }
+  .pick .big{font-family:'Anton',Impact,sans-serif;font-size:30px;line-height:1;letter-spacing:.02em}
+  .pick .small{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .pick:hover{background:var(--surface-2)}
+  .pick:focus-visible{outline:2px solid var(--bronze-hot);outline-offset:2px}
+  .pick[aria-pressed="true"]{background:var(--bronze);border-color:var(--bronze-hot);color:#17130b}
+  .pick[aria-pressed="true"] .small{color:rgba(23,19,11,.72)}
+  .pick[disabled]{opacity:.32;cursor:not-allowed}
+
+  .session{margin-top:26px;display:none}
+  .session.on{display:block}
+  .sess-head{border-top:1px solid var(--line-2);padding-top:14px}
+  .sess-head h2{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:21px;letter-spacing:.05em;text-transform:uppercase}
+  .intent{color:var(--muted);font-size:14.5px;margin:5px 0 3px}
+  .format{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;color:var(--patina);letter-spacing:.03em;margin:0 0 16px}
+
+  .meter{height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:18px}
+  .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--bronze),var(--bronze-hot));transition:width .3s ease}
+
+  .ex{
+    background:var(--surface);border:1px solid transparent;border-left:2px solid var(--surface-2);
+    border-radius:2px;padding:11px 12px;margin-bottom:6px;
+    display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;
+    transition:background .15s ease,border-color .15s ease;
+  }
+  .ex.done{background:linear-gradient(90deg,rgba(201,143,69,.16),rgba(201,143,69,.05));border-left-color:var(--bronze)}
+  .idx{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--muted);padding-top:5px}
+  .tap{appearance:none;background:none;border:0;padding:0;margin:0;text-align:left;color:inherit;font-family:inherit;cursor:pointer;display:block;width:100%}
+  .tap:focus-visible{outline:2px solid var(--bronze-hot);outline-offset:3px;border-radius:2px}
+  .nm{font-size:16px;font-weight:600;display:block}
+  .ex.done .nm{color:var(--bronze-hot)}
+  .ex.done .nm::after{content:" ✓";font-size:13px}
+  .nt{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35;display:block}
+  .ex.done .nt{opacity:.5}
+
+  .right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;padding-top:3px}
+  .rx{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--bronze-hot);white-space:nowrap}
+  .ex.done .rx{opacity:.5}
+  .wtwrap{display:flex;align-items:center;gap:5px}
+  .wt{
+    width:62px;background:var(--ground);border:1px solid var(--line-2);border-radius:2px;
+    color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;
+    padding:5px 6px;text-align:right;
+  }
+  .wt:focus{outline:none;border-color:var(--bronze)}
+  .wt::placeholder{color:var(--muted);font-weight:500}
+  .kg{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+  .hist{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);white-space:nowrap;letter-spacing:.01em}
+  .hist .up{color:var(--patina);font-weight:600}
+  .hist .down{color:var(--bronze);font-weight:600}
+
+  .rule{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:14px;padding-top:12px;line-height:1.6}
+
+  .finish{
+    width:100%;appearance:none;cursor:pointer;margin-top:16px;font-family:'Anton',Impact,sans-serif;
+    font-size:17px;letter-spacing:.09em;text-transform:uppercase;padding:15px;border-radius:3px;
+    border:1px solid var(--bronze);background:transparent;color:var(--bronze-hot);
+    transition:background .15s ease,color .15s ease;
+  }
+  .finish:hover{background:var(--bronze);color:#17130b}
+  .finish:focus-visible{outline:2px solid var(--bronze-hot);outline-offset:2px}
+
+  .ledger{margin-top:34px;border-top:1px solid var(--line-2);padding-top:16px}
+  .ltop{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:11px}
+  .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .cnt{font-family:'Anton',Impact,sans-serif;font-size:20px;letter-spacing:.04em}
+  .cnt .of{color:var(--muted);font-size:14px}
+  .strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .strip span{height:34px;border-radius:2px;background:var(--surface);border:1px solid var(--line)}
+  .strip span.cast{background:linear-gradient(160deg,var(--bronze-hot),var(--bronze) 55%,#8a5f28);border-color:var(--bronze-hot)}
+  .last{font-size:13px;color:var(--muted);margin-top:11px}
+  .last b{color:var(--patina);font-weight:600}
+  .undo{appearance:none;background:none;border:0;padding:0;margin-left:8px;color:var(--muted);font-family:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer}
+  .undo:hover{color:var(--text)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .warn{color:var(--bronze);font-size:12.5px;margin-top:10px;display:none}
+  .warn.on{display:block}
+
+  .mood{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .lbl2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .moodbtns{display:flex;gap:6px}
+  .mb{
+    width:40px;height:40px;border-radius:3px;border:1px solid var(--line-2);background:var(--surface);
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .mb[aria-pressed="true"]{background:var(--patina);border-color:var(--patina);color:#0f1a16}
+  .mb:focus-visible{outline:2px solid var(--bronze-hot);outline-offset:2px}
+
+  .gap{margin-top:10px;font-size:13.5px;color:var(--muted)}
+  .gap.amber{color:var(--bronze);font-weight:600}
+
+  .backup{margin-top:20px;border-top:1px solid var(--line);padding-top:12px;display:flex;gap:18px}
+  .lnk{appearance:none;background:none;border:0;padding:0;color:var(--muted);font-family:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer}
+  .lnk:hover{color:var(--text)}
+  .box{display:none;margin-top:10px}
+  .box.on{display:block}
+  .box textarea{
+    width:100%;height:110px;background:var(--surface);border:1px solid var(--line-2);border-radius:3px;
+    color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:8px;resize:vertical;
+  }
+  .go{
+    margin-top:8px;appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--text);
+    font-family:inherit;font-size:13px;padding:9px 14px;border-radius:3px;cursor:pointer;
+  }
+  .msg{font-size:12.5px;color:var(--patina);margin-top:8px;min-height:1.2em}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <h1>Training Card</h1>
+  <span class="sub">Vince</span>
+</div>
+<p class="rotline" id="rotline"></p>
+
+<p class="prompt">How long have you got?</p>
+<div class="row three" id="dur"></div>
+
+<p class="prompt" style="margin-top:16px">Where?</p>
+<div class="row two" id="place"></div>
+<p class="note" id="placenote"></p>
+
+<section class="session" id="session">
+  <div class="sess-head">
+    <h2 id="sname"></h2>
+    <p class="intent" id="sintent"></p>
+    <p class="format" id="sformat"></p>
+  </div>
+  <div class="meter"><i id="meter"></i></div>
+  <div id="list"></div>
+  <p class="rule" id="srule"></p>
+  <div class="mood">
+    <span class="lbl2">Mood after</span>
+    <div class="moodbtns" id="mood"></div>
+  </div>
+  <button class="finish" id="finish">Log this session</button>
+</section>
+
+<section class="ledger">
+  <div class="ltop">
+    <span class="lbl">This week</span>
+    <span class="cnt"><span id="cnt">0</span><span class="of"> / 3</span></span>
+  </div>
+  <div class="strip" id="strip"></div>
+  <p class="last" id="last"></p>
+  <p class="gap" id="gap"></p>
+  <p class="note">Three a week. The only hard rule: never miss two scheduled days in a row.</p>
+  <p class="warn" id="warn">Saving is off in this view, so weights and sessions won't carry over. Everything else works.</p>
+
+  <div class="backup">
+    <button class="lnk" id="doBackup">Back up</button>
+    <button class="lnk" id="doRestore">Restore</button>
+  </div>
+  <div class="box" id="bbox">
+    <textarea id="bta" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+    <button class="go" id="bgo"></button>
+    <p class="msg" id="bmsg"></p>
+  </div>
+</section>
+
+<script>
+/* ---------- movement pool: same slot, three variants, rotates weekly ---------- */
+const V = {
+  warmg:[
+    {n:'Warm-up',t:'Bike, brisk. Enough to break a light sweat.'},
+    {n:'Warm-up',t:'Rower, easy pace, then ten bodyweight squats.'},
+    {n:'Warm-up',t:'Incline walk, then arm circles and ten air squats.'}
+  ],
+  warmh:[
+    {n:'Warm-up',t:'20 jumping jacks, 10 squats, 10 arm circles.'},
+    {n:'Warm-up',t:'30 sec high knees, 10 lunges, 10 shoulder rolls.'},
+    {n:'Warm-up',t:'20 jumping jacks, 10 hip bridges, 10 arm circles.'}
+  ],
+  legs:[
+    {n:'Leg press',t:'Feet mid-platform. Never lock the knees out.',load:1},
+    {n:'Goblet squat',t:'One dumbbell at the chest, elbows inside the knees.',load:1},
+    {n:'Bulgarian split squat',t:'Rear foot on the bench. Halve the weight you think you need.',load:1}
+  ],
+  hinge:[
+    {n:'Romanian deadlift',t:'Bar close to the legs, stop at mid-shin.',load:1},
+    {n:'Barbell hip thrust',t:'Chin tucked, squeeze hard for a second at the top.',load:1},
+    {n:'Dumbbell good morning',t:'Light. Hinge at the hips, back stays flat.',load:1}
+  ],
+  push:[
+    {n:'Incline dumbbell press',t:'Bench at 30 degrees. This builds the upper-chest shelf.',load:1},
+    {n:'Overhead press',t:'Ribs down, squeeze the glutes, press straight up.',load:1},
+    {n:'Flat barbell bench',t:'Elbows about 45 degrees from the body, not flared.',load:1}
+  ],
+  pull:[
+    {n:'Lat pulldown',t:'Wide grip. Pull with the elbows, not the hands.',load:1},
+    {n:'Seated cable row',t:'Chest up, pull to the belly button, no rocking.',load:1},
+    {n:'Chest-supported row',t:'Face down on the incline bench. Zero cheating possible.',load:1}
+  ],
+  delts:[
+    {n:'Dumbbell lateral raise',t:'Light and slow. The single biggest lift for shoulder width.',load:1},
+    {n:'Cable lateral raise',t:'One arm at a time, cable behind the back.',load:1},
+    {n:'Lean-away lateral raise',t:'Hold the rack, lean out, raise the free arm.',load:1}
+  ],
+  arms:[
+    {n:'Cable curl + rope pushdown',t:'Back to back, no rest between the two.',load:1},
+    {n:'Hammer curl + overhead extension',t:'Back to back, no rest between the two.',load:1},
+    {n:'EZ-bar curl + dips',t:'Back to back. Dips bodyweight, add a belt when easy.',load:1}
+  ],
+  cardio:[
+    {n:'Bike',t:'Hard enough that talking is unpleasant.'},
+    {n:'Rower',t:'Steady and strong. Legs drive, arms finish.'},
+    {n:'Incline treadmill walk',t:'Steep incline, no holding the rails.'}
+  ],
+  hpush:[
+    {n:'Push-ups',t:'Slow on the way down, one second at the bottom.'},
+    {n:'Feet-elevated push-ups',t:'Feet on the sofa. Much harder than it looks.'},
+    {n:'Diamond push-ups',t:'Hands together under the chest. Triceps burn.'}
+  ],
+  hlegs:[
+    {n:'Reverse lunge',t:'Step back, knee light on the floor. Controlled.'},
+    {n:'Bulgarian split squat',t:'Rear foot on the sofa. The one that actually hurts.'},
+    {n:'Squat jumps',t:'Land quiet. Quiet landings mean you are controlling it.'}
+  ],
+  hpull:[
+    {n:'Pull-ups',t:'No bar: rows under the kitchen table, 10 reps.'},
+    {n:'Chin-ups',t:'Palms toward you. Easier, more biceps.'},
+    {n:'Towel rows',t:'Towel over a door, lean back, pull. Or table rows.'}
+  ],
+  hdelts:[
+    {n:'Pike push-ups',t:'Hips high, head between the hands. Your shoulder builder.'},
+    {n:'Wall walk',t:'Feet up the wall, walk the hands in, hold five seconds.'},
+    {n:'Elevated pike push-ups',t:'Feet on the sofa, hips stacked over the hands.'}
+  ],
+  hcore:[
+    {n:'Hollow hold',t:'Lower back flat on the floor the whole time.'},
+    {n:'Plank shoulder taps',t:'Hips dead still. If they rock, widen the feet.'},
+    {n:'Leg raises',t:'Slow down, no swinging.'}
+  ]
+};
+
+const SESSIONS = {
+  'gym-15':{
+    name:'Gym · 15 minutes',
+    intent:'The one you do when the day fell apart. It still counts.',
+    format:'CIRCUIT — 4 rounds. No rest inside a round. 30 sec between rounds.',
+    rule:'Same weights as your 30 and 60. Shorter, not lighter.',
+    items:[['warmg','2 min'],['legs','10'],['push','10'],['pull','10'],['delts','15']]
+  },
+  'home-15':{
+    name:'Home · 15 minutes',
+    intent:'No excuses version. Floor, doorframe, done.',
+    format:'CIRCUIT — 4 rounds. Minimal rest. Keep moving.',
+    rule:'No pull-up bar? A doorframe bar is about CHF 25 and it is the one thing that makes home training work.',
+    items:[['warmh','2 min'],['hpush','12'],['hlegs','8 / leg'],['hpull','5'],['hcore','30 sec']]
+  },
+  'gym-30':{
+    name:'Gym · 30 minutes',
+    intent:'Everything the hour does, compressed. This is the one that wrecks you.',
+    format:'SUPERSETS — two lifts back to back, then 60 sec rest.',
+    rule:'When every set hits the top number, add weight next time. That is the whole progression.',
+    items:[['warmg','3 min'],['legs','3 × 10'],['pull','3 × 10'],['push','3 × 10'],['hinge','3 × 8'],['delts','2 × 15'],['cardio','5 min']]
+  },
+  'home-30':{
+    name:'Home · 30 minutes',
+    intent:'Full session without a gym. Harder than it reads.',
+    format:'CIRCUIT — 5 rounds. 60 sec rest between rounds.',
+    rule:'Too easy? Slow every rep down to three seconds on the way down. That fixes it instantly.',
+    items:[['warmh','3 min'],['hpush','12–15'],['hlegs','10 / leg'],['hpull','5–8'],['hdelts','8–10'],['hcore','30 sec']]
+  },
+  'gym-60':{
+    name:'Gym · 60 minutes',
+    intent:'The real session. Everything else on this card is a scaled-down version of it.',
+    format:'STRAIGHT SETS — full body. Weights first, cardio last.',
+    rule:'When every set hits the top number, add weight next time. Log it so the line keeps climbing.',
+    items:[['warmg','5 min'],['legs','3 × 8–10'],['hinge','3 × 8'],['push','3 × 8–10'],['pull','3 × 8–10'],['delts','3 × 12–15'],['arms','3 × 10'],['cardio','15 min']]
+  }
+};
+
+/* ---------- storage: Claude's store when present, browser storage when standalone ---------- */
+const KEY = 'training-state';
+const remote = (typeof window !== 'undefined' && window.storage && typeof window.storage.get === 'function') ? window.storage : null;
+const local = (function(){
+  try{ const t='__probe'; window.localStorage.setItem(t,'1'); window.localStorage.removeItem(t); return window.localStorage; }
+  catch(e){ return null; }
+})();
+let saveTimer = null;
+
+let state = { log:[], active:null, weights:{} };
+let dur = null, place = null;
+
+const $ = id => document.getElementById(id);
+const todayISO = () => new Date().toISOString().slice(0,10);
+
+function mondayOf(d){
+  const x = new Date(d);
+  x.setHours(0,0,0,0);
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+}
+function weekKey(d){ return mondayOf(d).toISOString().slice(0,10); }
+function block(){ return Math.floor(mondayOf(new Date()).getTime() / 604800000) % 3; }
+const BLOCK_NAME = ['A','B','C'];
+
+function daysAgo(iso){
+  const a = new Date(iso + 'T00:00:00').getTime();
+  const b = new Date().setHours(0,0,0,0);
+  const d = Math.round((b - a) / 86400000);
+  return d <= 0 ? 'today' : d === 1 ? 'yesterday' : d + 'd ago';
+}
+
+async function load(){
+  /* ask the browser to treat this data as persistent, not cache it can drop */
+  try{
+    if(navigator.storage && navigator.storage.persist) await navigator.storage.persist();
+  }catch(e){}
+
+  let raw = null;
+  if(remote){
+    try{ const r = await remote.get(KEY, false); if(r && r.value) raw = r.value; }
+    catch(e){ /* nothing saved yet — expected on first run */ }
+  }
+  if(raw === null && local){
+    try{ raw = local.getItem(KEY); }catch(e){}
+  }
+  if(raw){ try{ state = JSON.parse(raw); }catch(e){} }
+  if(!remote && !local) $('warn').classList.add('on');
+
+  if(!Array.isArray(state.log)) state.log = [];
+  if(!state.weights || typeof state.weights !== 'object') state.weights = {};
+
+  /* weekly reset clears the tick marks only — weights are never touched */
+  if(state.active && state.active.week !== weekKey(new Date())) state.active = null;
+
+  if(state.active && typeof state.active.id === 'string'){
+    const parts = state.active.id.split('-');
+    place = parts[0]; dur = parts[1];
+  }
+  paint();
+}
+
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){
+    const json = JSON.stringify(state);
+    if(local){ try{ local.setItem(KEY, json); }catch(e){} }
+    if(remote){ try{ Promise.resolve(remote.set(KEY, json, false)).catch(function(){}); }catch(e){} }
+  }, 350);
+}
+
+function sid(){ return (dur && place) ? place + '-' + dur : null; }
+function checks(){ return (state.active && Array.isArray(state.active.checks)) ? state.active.checks : []; }
+
+/* most recent number carries forward; prev is the last different session */
+function wInfo(name){
+  const h = state.weights[name] || [];
+  if(!h.length) return { value:'', prev:null };
+  const last = h[h.length-1];
+  const isToday = last.d === todayISO();
+  return { value:last.w, prev: isToday ? (h.length > 1 ? h[h.length-2] : null) : last };
+}
+
+function putWeight(name, w){
+  if(!name || !isFinite(w) || w <= 0) return;
+  const day = todayISO();
+  const h = state.weights[name] || (state.weights[name] = []);
+  if(h.length && h[h.length-1].d === day) h[h.length-1].w = w;
+  else h.push({ d:day, w:w });
+  if(h.length > 40) h.splice(0, h.length - 40);
+}
+
+function buildPickers(){
+  $('dur').innerHTML = ['15','30','60'].map(v =>
+    '<button class="pick" data-dur="'+v+'" aria-pressed="false"><span class="big">'+v+'</span><span class="small">min</span></button>').join('');
+  $('place').innerHTML = [['gym','Gym'],['home','Bodyweight']].map(p =>
+    '<button class="pick" data-place="'+p[0]+'" aria-pressed="false"><span class="big" style="font-size:19px">'+p[1]+'</span></button>').join('');
+}
+
+function start(){
+  const k = sid();
+  if(k && (!state.active || state.active.id !== k)){
+    state.active = { id:k, checks:[], week:weekKey(new Date()) };
+    save();
+  }
+  paint();
+}
+
+function paint(){
+  $('rotline').textContent = 'Block ' + BLOCK_NAME[block()] + ' · exercises rotate every Monday';
+
+  document.querySelectorAll('[data-dur]').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.dur === dur)));
+  document.querySelectorAll('[data-place]').forEach(b => {
+    const lock = dur === '60' && b.dataset.place === 'home';
+    b.disabled = lock;
+    b.setAttribute('aria-pressed', String(!lock && b.dataset.place === place));
+  });
+  $('placenote').textContent = dur === '60'
+    ? 'The hour is a gym session. At home, do 30 minutes twice instead.' : '';
+
+  const k = sid(), s = k ? SESSIONS[k] : null;
+  $('session').classList.toggle('on', !!s);
+
+  if(s){
+    const done = checks(), b = block();
+    $('sname').textContent = s.name;
+    $('sintent').textContent = s.intent;
+    $('sformat').textContent = s.format;
+    $('srule').textContent = s.rule;
+
+    $('list').innerHTML = s.items.map((row, i) => {
+      const ex = V[row[0]][b], reps = row[1], on = done.indexOf(i) !== -1;
+      let wcell = '';
+      if(ex.load){
+        const info = wInfo(ex.n);
+        let hist = '';
+        if(info.prev){
+          const d = (info.value !== '' ? Number(info.value) : 0) - info.prev.w;
+          const tag = d > 0 ? '<span class="up">+'+(Math.round(d*10)/10)+'</span>'
+                    : d < 0 ? '<span class="down">'+(Math.round(d*10)/10)+'</span>' : '';
+          hist = '<span class="hist">last '+info.prev.w+' · '+daysAgo(info.prev.d)+' '+tag+'</span>';
+        }
+        wcell =
+          '<div class="wtwrap"><input class="wt" type="number" inputmode="decimal" step="0.5" min="0" '+
+          'data-ex="'+ex.n.replace(/"/g,'&quot;')+'" placeholder="kg" value="'+info.value+'"><span class="kg">kg</span></div>' + hist;
+      }
+      return '<div class="ex'+(on?' done':'')+'">'+
+        '<span class="idx">'+String(i+1).padStart(2,'0')+'</span>'+
+        '<button class="tap" data-i="'+i+'"><span class="nm">'+ex.n+'</span><span class="nt">'+ex.t+'</span></button>'+
+        '<div class="right"><span class="rx">'+reps+'</span>'+wcell+'</div>'+
+      '</div>';
+    }).join('');
+
+    $('meter').style.width = Math.round(done.length / s.items.length * 100) + '%';
+  }
+  ledger();
+}
+
+/* pull whatever is sitting in the fields into today's history */
+function commitFields(){
+  document.querySelectorAll('#list .wt').forEach(f => putWeight(f.dataset.ex, parseFloat(f.value)));
+}
+
+$('list').addEventListener('click', e => {
+  const b = e.target.closest('.tap');
+  if(!b || !state.active) return;
+  commitFields();
+  const i = Number(b.dataset.i), c = state.active.checks, at = c.indexOf(i);
+  if(at === -1) c.push(i); else c.splice(at,1);
+  save(); paint();
+});
+
+$('list').addEventListener('change', e => {
+  const f = e.target.closest('.wt');
+  if(!f) return;
+  putWeight(f.dataset.ex, parseFloat(f.value));
+  save();
+});
+
+$('dur').addEventListener('click', e => {
+  const b = e.target.closest('[data-dur]');
+  if(!b) return;
+  commitFields();
+  dur = b.dataset.dur;
+  if(dur === '60') place = 'gym';
+  start();
+});
+
+$('place').addEventListener('click', e => {
+  const b = e.target.closest('[data-place]');
+  if(!b || b.disabled) return;
+  commitFields();
+  place = b.dataset.place;
+  start();
+});
+
+let moodPick = null;
+$('mood').innerHTML = [1,2,3,4,5].map(v =>
+  '<button class="mb" data-m="'+v+'" aria-pressed="false" aria-label="Mood '+v+' of 5">'+v+'</button>').join('');
+$('mood').addEventListener('click', e => {
+  const b = e.target.closest('[data-m]');
+  if(!b) return;
+  const v = Number(b.dataset.m);
+  moodPick = (moodPick === v) ? null : v;
+  document.querySelectorAll('[data-m]').forEach(x =>
+    x.setAttribute('aria-pressed', String(Number(x.dataset.m) === moodPick)));
+});
+
+$('finish').addEventListener('click', () => {
+  const k = sid();
+  if(!k) return;
+  commitFields();
+  const entry = { d:new Date().toISOString(), id:k };
+  if(moodPick) entry.m = moodPick;
+  state.log.push(entry);
+  state.active = null; dur = null; place = null; moodPick = null;
+  document.querySelectorAll('[data-m]').forEach(x => x.setAttribute('aria-pressed','false'));
+  save(); paint();
+  window.scrollTo({ top:document.body.scrollHeight, behavior:'smooth' });
+});
+
+/* ---------- backup / restore ---------- */
+let boxMode = null;
+function showBox(mode){
+  boxMode = mode;
+  $('bbox').classList.add('on');
+  $('bmsg').textContent = '';
+  if(mode === 'out'){
+    $('bta').value = JSON.stringify(state);
+    $('bgo').textContent = 'Copy to clipboard';
+  }else{
+    $('bta').value = '';
+    $('bgo').textContent = 'Restore from the text above';
+  }
+}
+$('doBackup').addEventListener('click', () => showBox('out'));
+$('doRestore').addEventListener('click', () => showBox('in'));
+$('bgo').addEventListener('click', async () => {
+  if(boxMode === 'out'){
+    try{
+      await navigator.clipboard.writeText($('bta').value);
+      $('bmsg').textContent = 'Copied. Paste it into Notes or mail it to yourself.';
+    }catch(e){
+      $('bta').select();
+      $('bmsg').textContent = 'Select the text above and copy it manually.';
+    }
+    return;
+  }
+  try{
+    const next = JSON.parse($('bta').value);
+    if(!next || !Array.isArray(next.log)) throw new Error('bad shape');
+    state = next;
+    if(!state.weights || typeof state.weights !== 'object') state.weights = {};
+    state.active = null; dur = null; place = null;
+    save(); paint();
+    $('bmsg').textContent = 'Restored. ' + state.log.length + ' sessions back.';
+  }catch(e){
+    $('bmsg').textContent = 'That does not look like a backup. Nothing was changed.';
+  }
+});
+
+function ledger(){
+  const wk = weekKey(new Date());
+  const mine = state.log.filter(x => { try{ return weekKey(new Date(x.d)) === wk; }catch(e){ return false; } });
+  const month = state.log.filter(x => {
+    const d = new Date(x.d), n = new Date();
+    return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+  });
+
+  $('cnt').textContent = mine.length;
+  $('strip').innerHTML = [0,1,2].map(i => '<span class="'+(i < mine.length ? 'cast' : '')+'"></span>').join('');
+
+  if(!state.log.length){
+    $('last').textContent = 'Nothing logged yet. The first block is the hardest one to cast.';
+    $('gap').textContent = '';
+    $('gap').className = 'gap';
+    return;
+  }
+  const last = new Date(state.log[state.log.length-1].d);
+  const d = Math.floor((new Date().setHours(0,0,0,0) - new Date(last).setHours(0,0,0,0)) / 86400000);
+  const when = d <= 0 ? 'today' : d === 1 ? 'yesterday' : d + ' days ago';
+
+  const rated = state.log.filter(x => x.m).slice(-6);
+  const moodBit = rated.length >= 3
+    ? ' · mood ' + (Math.round(rated.reduce((a,b) => a + b.m, 0) / rated.length * 10) / 10) + ' avg'
+    : '';
+
+  $('last').innerHTML = 'Last session <b>'+when+'</b> · '+month.length+' this month'+moodBit+
+    '<button class="undo" id="undo">undo</button>';
+  const u = $('undo');
+  if(u) u.addEventListener('click', () => { state.log.pop(); save(); paint(); });
+
+  const g = $('gap');
+  if(d >= 4){
+    g.className = 'gap amber';
+    g.textContent = d + ' days since the last one. Do a 15 today — it breaks the drift, and that is all it has to do.';
+  }else if(d >= 2){
+    g.className = 'gap amber';
+    g.textContent = d + ' days off. Next one is today, before it becomes two missed in a row.';
+  }else{
+    g.className = 'gap';
+    g.textContent = '';
+  }
+}
+
+buildPickers();
+load();
+</script>
+</body>
+</html>

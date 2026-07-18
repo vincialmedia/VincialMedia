@@ -10,6 +10,14 @@ const nextConfig = {
     ],
   },
   allowedDevOrigins: ['*.daytona.work'],
+  async rewrites() {
+    return [
+      {
+        source: '/workout',
+        destination: '/workout/index.html',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
