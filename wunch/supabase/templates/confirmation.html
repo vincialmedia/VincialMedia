@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<body style="margin:0;background:#fffaf3;font-family:Arial,Helvetica,sans-serif;color:#1e1a16">
+  <div style="max-width:520px;margin:0 auto;padding:32px 24px">
+    <div style="font-size:28px;font-weight:800;color:#c73e1d;line-height:1">wunch</div>
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6b6259;margin-bottom:24px">work + lunch</div>
+    {{ if eq .Data.locale "en" }}
+    <h1 style="font-size:20px">Welcome to wunch!</h1>
+    <p>Please confirm your email address and you are ready to order.</p>
+    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup&amp;redirect_to={{ .RedirectTo }}" style="display:inline-block;background:#c73e1d;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:bold">Confirm email</a></p>
+    <p style="font-size:13px;color:#6b6259">Didn't ask for this? Just ignore this email.</p>
+    {{ else }}
+    <h1 style="font-size:20px">Willkommen bei wunch!</h1>
+    <p>Bitte bestätige kurz Deine E-Mail-Adresse, dann kannst Du bestellen.</p>
+    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=signup&amp;redirect_to={{ .RedirectTo }}" style="display:inline-block;background:#c73e1d;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:bold">E-Mail bestätigen</a></p>
+    <p style="font-size:13px;color:#6b6259">Du hast das nicht angefordert? Dann ignorier diese E-Mail einfach.</p>
+    {{ end }}
+  </div>
+</body>
+</html>

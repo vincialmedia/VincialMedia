@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<body style="margin:0;background:#fffaf3;font-family:Arial,Helvetica,sans-serif;color:#1e1a16">
+  <div style="max-width:520px;margin:0 auto;padding:32px 24px">
+    <div style="font-size:28px;font-weight:800;color:#c73e1d;line-height:1">wunch</div>
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#6b6259;margin-bottom:24px">work + lunch</div>
+    {{ if eq .Data.locale "en" }}
+    <h1 style="font-size:20px">New password</h1>
+    <p>Tap the button to set a new password.</p>
+    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery&amp;redirect_to={{ .RedirectTo }}" style="display:inline-block;background:#c73e1d;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:bold">Reset password</a></p>
+    <p style="font-size:13px;color:#6b6259">Didn't ask for this? Just ignore this email.</p>
+    {{ else }}
+    <h1 style="font-size:20px">Neues Passwort</h1>
+    <p>Tipp auf den Button, um ein neues Passwort zu setzen.</p>
+    <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery&amp;redirect_to={{ .RedirectTo }}" style="display:inline-block;background:#c73e1d;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:bold">Passwort zurücksetzen</a></p>
+    <p style="font-size:13px;color:#6b6259">Du hast das nicht angefordert? Dann ignorier diese E-Mail einfach.</p>
+    {{ end }}
+  </div>
+</body>
+</html>

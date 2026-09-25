@@ -1,0 +1,43 @@
+/*
+ * wunch brand theme: every colour, font and radius lives here.
+ * To drop in a real brand, change these values (and the two fonts in
+ * src/app/fonts.ts). All pairs below pass WCAG AA contrast.
+ */
+:root {
+  --background: #fffaf3; /* warm cream */
+  --foreground: #1e1a16; /* espresso */
+
+  --card: #ffffff;
+  --card-foreground: #1e1a16;
+  --popover: #ffffff;
+  --popover-foreground: #1e1a16;
+
+  --primary: #c73e1d; /* tomato: buttons, links, logo */
+  --primary-foreground: #ffffff;
+
+  --secondary: #f4ede3; /* oat */
+  --secondary-foreground: #1e1a16;
+
+  --muted: #f4ede3;
+  --muted-foreground: #6b6259;
+
+  --accent: #2f6b3b; /* basil: vegetarian/vegan tags, success */
+  --accent-foreground: #ffffff;
+  --accent-soft: #e8f1e6;
+
+  --warning: #8a5a00;
+  --warning-soft: #fdf3dc;
+
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+
+  --border: #e9dfd2;
+  --input: #ddd2c4;
+  --ring: #c73e1d;
+
+  --radius: 0.9rem;
+
+  /* fonts are injected by next/font as CSS variables in the root layout */
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: var(--font-bricolage), var(--font-body);
+}

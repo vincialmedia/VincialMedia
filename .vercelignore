@@ -1,3 +1,6 @@
 
 # Exclude Supabase functions from Vercel build
 supabase/functions/**
+
+# wunch is a separate app parked in this repo until it has its own repository
+wunch/
