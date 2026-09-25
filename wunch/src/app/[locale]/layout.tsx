@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { type Locale, NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
@@ -12,7 +12,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale: param } = await params;
+  const locale: Locale = hasLocale(routing.locales, param) ? param : routing.defaultLocale;
   const t = await getTranslations({ locale, namespace: "meta" });
   return {
     title: { default: t("title"), template: "%s · wunch" },

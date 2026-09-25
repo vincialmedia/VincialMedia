@@ -8,11 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { afterSignIn } from "@/lib/actions/auth";
+import type { AuthErrorKey } from "@/lib/i18n-keys";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "login" | "signup" | "reset";
 
-const KNOWN_ERRORS = [
+const KNOWN_ERRORS: AuthErrorKey[] = [
   "invalid_credentials",
   "user_already_exists",
   "email_exists",
@@ -49,7 +50,7 @@ export function AuthForm({
     `${window.location.origin}/auth/confirm?next=${encodeURIComponent(path)}`;
 
   function showError(code: string | undefined) {
-    setError(t(`errors.${code && KNOWN_ERRORS.includes(code) ? code : "generic"}`));
+    setError(t(`errors.${(code && KNOWN_ERRORS.includes(code as AuthErrorKey) ? code : "generic") as AuthErrorKey}`));
   }
 
   async function finish() {

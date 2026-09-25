@@ -1,6 +1,7 @@
 import { Flame, Leaf, Sprout } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
+import type { DietaryTag } from "@/lib/i18n-keys";
 
 export function DietaryBadges({ tags, className }: { tags: string[]; className?: string }) {
   const t = useTranslations("dietary");
@@ -13,7 +14,7 @@ export function DietaryBadges({ tags, className }: { tags: string[]; className?:
             {tag === "vegan" && <Sprout className="size-3" aria-hidden />}
             {tag === "vegetarian" && <Leaf className="size-3" aria-hidden />}
             {tag === "spicy" && <Flame className="size-3" aria-hidden />}
-            {t(tag)}
+            {t(tag as DietaryTag)}
           </Badge>
         </li>
       ))}

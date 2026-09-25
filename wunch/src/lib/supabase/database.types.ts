@@ -265,7 +265,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "claim_order_action":
+            "apply_refund_total":
+{ Args: { "p_actor_id"?: string,"p_actor_label"?: string,"p_actor_type": string,"p_amount_refunded": number,"p_note"?: string,"p_order_id": string }; Returns: number
+                           },
+"claim_order_action":
 { Args: { "p_order_id": string,"p_seconds"?: number,"p_statuses": (Database["public"]['Enums']["order_status"])[] }; Returns: boolean
                            },
 "create_order":

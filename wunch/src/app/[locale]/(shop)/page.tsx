@@ -5,6 +5,7 @@ import { DatePicker } from "@/components/menu/date-picker";
 import { MealCard } from "@/components/menu/meal-card";
 import { getMenuForDate } from "@/lib/data/menu";
 import { getClosedDates, getSettings, toCalendarSettings } from "@/lib/data/settings";
+import type { Category } from "@/lib/i18n-keys";
 import { getOrderableDates, isBeforeCutoff, shortTime, zurichNow } from "@/lib/schedule";
 
 export default async function MenuPage({ params, searchParams }: PageProps<"/[locale]">) {
@@ -46,7 +47,7 @@ export default async function MenuPage({ params, searchParams }: PageProps<"/[lo
             [...groups.entries()].map(([category, items], gi) => (
               <section key={category} className="mt-8" aria-labelledby={`cat-${category}`}>
                 <h2 id={`cat-${category}`} className="mb-4 text-xl font-bold">
-                  {t(`categories.${category}`)}
+                  {t(`categories.${category as Category}`)}
                 </h2>
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((item, i) => (

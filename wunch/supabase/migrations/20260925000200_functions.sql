@@ -354,6 +354,54 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
+-- Record the refunded total reported by Stripe. Returns how much new money was
+-- refunded by this call (0 when nothing changed), so the admin action and the
+-- charge.refunded webhook can race without double-counting or double emails.
+-- ---------------------------------------------------------------------------
+create or replace function public.apply_refund_total(
+  p_order_id uuid,
+  p_amount_refunded int,
+  p_actor_type text,
+  p_actor_id uuid default null,
+  p_actor_label text default null,
+  p_note text default null
+)
+returns int
+language plpgsql
+set search_path = ''
+as $$
+declare
+  v_order public.orders;
+  v_delta int;
+  v_status public.order_status;
+begin
+  select * into v_order from public.orders where id = p_order_id for update;
+  if not found
+     or v_order.status not in ('accepted', 'delivered', 'partially_refunded', 'refunded')
+     or p_amount_refunded <= v_order.amount_refunded_rappen then
+    return 0;
+  end if;
+
+  v_delta := p_amount_refunded - v_order.amount_refunded_rappen;
+  v_status := case
+    when p_amount_refunded >= v_order.amount_captured_rappen then 'refunded'
+    else 'partially_refunded'
+  end;
+
+  update public.orders
+     set amount_refunded_rappen = p_amount_refunded,
+         status = v_status
+   where id = p_order_id;
+
+  insert into public.order_events (order_id, from_status, to_status, kind, actor_type, actor_id, actor_label, note, data)
+  values (p_order_id, v_order.status, v_status, 'refund', p_actor_type, p_actor_id, p_actor_label, p_note,
+          jsonb_build_object('refunded_now', v_delta, 'refunded_total', p_amount_refunded));
+
+  return v_delta;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
 -- Short-lived lock so that an admin click and the cron job never call Stripe
 -- for the same order at the same time.
 -- ---------------------------------------------------------------------------
@@ -419,6 +467,7 @@ revoke execute on function public.release_order_reservations(uuid) from public, 
 revoke execute on function public.claim_order_action(uuid, public.order_status[], int) from public, anon, authenticated;
 revoke execute on function public.release_order_action(uuid) from public, anon, authenticated;
 revoke execute on function public.rate_limit_hit(text, int, int) from public, anon, authenticated;
+revoke execute on function public.apply_refund_total(uuid, int, text, uuid, text, text) from public, anon, authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 revoke execute on function public.handle_user_email_change() from public, anon, authenticated;
 
@@ -428,6 +477,7 @@ grant execute on function public.release_order_reservations(uuid) to service_rol
 grant execute on function public.claim_order_action(uuid, public.order_status[], int) to service_role;
 grant execute on function public.release_order_action(uuid) to service_role;
 grant execute on function public.rate_limit_hit(text, int, int) to service_role;
+grant execute on function public.apply_refund_total(uuid, int, text, uuid, text, text) to service_role;
 
 grant execute on function public.is_admin() to anon, authenticated, service_role;
 grant execute on function public.slot_order_counts(date, date) to anon, authenticated, service_role;

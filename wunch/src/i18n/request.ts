@@ -4,7 +4,7 @@ import * as rootParams from "next/root-params";
 import { routing } from "./routing";
 
 export default getRequestConfig(async ({ locale }) => {
-  if (!locale) {
+  if (!hasLocale(routing.locales, locale)) {
     let param: string | undefined;
     try {
       param = await rootParams.locale();

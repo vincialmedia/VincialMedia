@@ -13,6 +13,7 @@ import { getMeal, getMenuForDate } from "@/lib/data/menu";
 import { getClosedDates, getSettings, toCalendarSettings } from "@/lib/data/settings";
 import { formatDayLong, formatDayShort } from "@/lib/format";
 import { formatCHF } from "@/lib/money";
+import type { Allergen } from "@/lib/i18n-keys";
 import { getOrderableDates, zurichNow } from "@/lib/schedule";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -78,7 +79,7 @@ export default async function MealPage({ params, searchParams }: PageProps<"/[lo
                 {meal.allergens.map((a) => (
                   <li key={a}>
                     <Badge variant="outline" className="bg-card">
-                      {tAll(a)}
+                      {tAll(a as Allergen)}
                     </Badge>
                   </li>
                 ))}
