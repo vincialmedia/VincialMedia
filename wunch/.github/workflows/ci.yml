@@ -1,0 +1,63 @@
+# CI for the wunch repository. (While wunch lives in a subfolder of another
+# repo this file is inactive; it runs once wunch has its own repository.)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    name: Lint, types, unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx next typegen
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+  e2e:
+    name: Database and end-to-end tests
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Start local Supabase (migrations + seed)
+        run: npx supabase start -x vector,logflare,imgproxy,supavisor,postgres-meta,studio,edge-runtime
+      - name: Write .env.local for the local stack and the Stripe emulator
+        run: |
+          eval "$(npx supabase status -o env | sed 's/^/SB_/')"
+          cat > .env.local <<ENV
+          NEXT_PUBLIC_SITE_URL=http://localhost:3000
+          NEXT_PUBLIC_SUPABASE_URL=${SB_API_URL}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${SB_PUBLISHABLE_KEY}
+          SUPABASE_SECRET_KEY=${SB_SECRET_KEY}
+          STRIPE_SECRET_KEY=sk_test_emulator
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_emulator
+          STRIPE_WEBHOOK_SECRET=whsec_emulator_ci
+          STRIPE_API_BASE_URL=http://localhost:12111
+          MAILPIT_URL=${SB_MAILPIT_URL}
+          ADMIN_EMAILS=admin@wunch.test
+          CRON_SECRET=ci-cron-secret-0123456789abcdef
+          ENV
+      - run: npm run db:seed-images
+      - run: npm run test:db
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
