@@ -20,7 +20,7 @@ import { type PlaceOrderResponse, emulatorConfirm, placeOrder, quoteCheckout } f
 import { formatDayShort, formatSlot, formatVatRate } from "@/lib/format";
 import type { ErrorKey } from "@/lib/i18n-keys";
 import { formatCHF, parseCHF, rappenToInput } from "@/lib/money";
-import type { Quote, QuoteError } from "@/lib/orders/quote";
+import type { Quote, QuoteError, SlotOption } from "@/lib/orders/quote";
 import { cn } from "@/lib/utils";
 import { type DeliveryDetails, deliveryDetailsSchema } from "@/lib/validation";
 
@@ -38,6 +38,8 @@ function getStripeJs(key: string) {
 export function CheckoutForm({
   userEmail,
   profile,
+  initialDates,
+  initialSlots,
   postcodes,
   tipPercentages,
   emulator,
@@ -45,6 +47,8 @@ export function CheckoutForm({
 }: {
   userEmail: string | null;
   profile: Details | null;
+  initialDates: string[];
+  initialSlots: SlotOption[];
   postcodes: string[];
   tipPercentages: number[];
   emulator: boolean;
@@ -118,8 +122,8 @@ export function CheckoutForm({
     return () => clearTimeout(timer);
   }, [hydrated, date, slotId, items, couponCode, tip, translateError]);
 
-  if (!hydrated) return <div className="h-64 animate-pulse rounded-xl bg-secondary" />;
-  if (!cart.lines.length || !date) {
+  // Before the browser cart is read, render the form with server data; the summary fills in after.
+  if (hydrated && (!cart.lines.length || !date)) {
     return (
       <div className="rounded-xl bg-secondary p-8 text-center">
         <p className="mb-4">{t("emptyCart")}</p>
@@ -210,7 +214,7 @@ export function CheckoutForm({
           <fieldset className="mb-5">
             <legend className="mb-2 text-sm font-medium">{t("date")}</legend>
             <div className="flex flex-wrap gap-2">
-              {(quote?.dates ?? [date]).map((d) => (
+              {(quote?.dates ?? initialDates).map((d) => (
                 <label
                   key={d}
                   className={cn(
@@ -227,7 +231,7 @@ export function CheckoutForm({
           <fieldset>
             <legend className="mb-2 text-sm font-medium">{t("slot")}</legend>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {(quote?.slots ?? []).map((s) => {
+              {(quote?.slots ?? initialSlots).map((s) => {
                 const disabled = s.availability !== "available";
                 return (
                   <label

@@ -2,7 +2,7 @@
 
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -149,19 +149,26 @@ function SlotRow({ slot, onSaved }: { slot?: Tables<"delivery_slots">; onSaved?:
   const [endsAt, setEndsAt] = useState(slot ? shortTime(slot.ends_at) : "13:45");
   const [maxOrders, setMaxOrders] = useState(slot?.max_orders?.toString() ?? "");
   const [isActive, setIsActive] = useState(slot?.is_active ?? true);
+  const id = useId();
   return (
     <li className="grid grid-cols-2 items-end gap-2 border-b pb-3 last:border-0 sm:grid-cols-[1fr_1fr_1fr_auto_auto]">
       <div className="space-y-1">
-        <Label className="text-xs">{t("slotStart")}</Label>
-        <Input type="time" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
+        <Label htmlFor={`${id}-start`} className="text-xs">
+          {t("slotStart")}
+        </Label>
+        <Input id={`${id}-start`} type="time" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
       </div>
       <div className="space-y-1">
-        <Label className="text-xs">{t("slotEnd")}</Label>
-        <Input type="time" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} />
+        <Label htmlFor={`${id}-end`} className="text-xs">
+          {t("slotEnd")}
+        </Label>
+        <Input id={`${id}-end`} type="time" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} />
       </div>
       <div className="space-y-1">
-        <Label className="text-xs">{t("slotMax")}</Label>
-        <Input type="number" min={1} value={maxOrders} placeholder="∞" onChange={(e) => setMaxOrders(e.target.value)} />
+        <Label htmlFor={`${id}-max`} className="text-xs">
+          {t("slotMax")}
+        </Label>
+        <Input id={`${id}-max`} type="number" min={1} value={maxOrders} placeholder="∞" onChange={(e) => setMaxOrders(e.target.value)} />
       </div>
       <label className="flex h-11 items-center gap-2 text-sm">
         <Checkbox checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />

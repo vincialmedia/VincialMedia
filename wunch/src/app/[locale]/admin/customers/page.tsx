@@ -62,7 +62,7 @@ export default async function CustomersPage({ params, searchParams }: PageProps<
       {rows.length === 0 ? (
         <p className="rounded-xl bg-secondary p-6 text-center">{t("empty")}</p>
       ) : (
-        <Table>
+        <Table label={t("title")}>
           <THead>
             <tr>
               <TH>{t("col.name")}</TH>

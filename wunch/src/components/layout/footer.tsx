@@ -15,17 +15,17 @@ export async function Footer() {
           <p className="max-w-sm text-muted-foreground">{t("area", { postcodes: settings.delivery_postcodes.join(", ") })}</p>
           <p className="text-xs text-muted-foreground">{t("cookies")}</p>
         </div>
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2 sm:flex-col sm:items-end">
-          <Link href="/orders" className="hover:text-primary">
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-1 sm:flex-col sm:items-end">
+          <Link href="/orders" className="inline-block py-1.5 hover:text-primary">
             {nav("orders")}
           </Link>
-          <Link href="/impressum" className="hover:text-primary">
+          <Link href="/impressum" className="inline-block py-1.5 hover:text-primary">
             {t("impressum")}
           </Link>
-          <Link href="/agb" className="hover:text-primary">
+          <Link href="/agb" className="inline-block py-1.5 hover:text-primary">
             {t("agb")}
           </Link>
-          <Link href="/datenschutz" className="hover:text-primary">
+          <Link href="/datenschutz" className="inline-block py-1.5 hover:text-primary">
             {t("privacy")}
           </Link>
         </nav>

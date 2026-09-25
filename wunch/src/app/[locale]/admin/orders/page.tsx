@@ -103,7 +103,7 @@ export default async function AdminOrdersPage({ params, searchParams }: PageProp
       {!orders?.length ? (
         <p className="rounded-xl bg-secondary p-6 text-center">{t("empty")}</p>
       ) : (
-        <Table>
+        <Table label={t("title")}>
           <THead>
             <tr>
               <TH>{t("col.number")}</TH>

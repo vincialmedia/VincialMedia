@@ -1,9 +1,10 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export function Table({ className, ...props }: React.ComponentProps<"table">) {
+/** Horizontally scrollable on phones; the wrapper is focusable so keyboard users can scroll it. */
+export function Table({ className, label, ...props }: React.ComponentProps<"table"> & { label?: string }) {
   return (
-    <div className="relative w-full overflow-x-auto rounded-xl border bg-card">
+    <div className="relative w-full overflow-x-auto rounded-xl border bg-card" tabIndex={0} role="region" aria-label={label ?? "Table"}>
       <table className={cn("w-full caption-bottom text-sm", className)} {...props} />
     </div>
   );

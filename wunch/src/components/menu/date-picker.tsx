@@ -37,7 +37,7 @@ export async function DatePicker({
                 )}
               >
                 <span className="text-sm font-semibold">{label}</span>
-                <span className={cn("text-xs", active ? "text-primary-foreground/85" : "text-muted-foreground")}>
+                <span className={cn("text-xs", active ? "text-primary-foreground" : "text-muted-foreground")}>
                   {formatDayShort(date, locale)}
                 </span>
               </Link>

@@ -47,7 +47,7 @@ export default async function AdminCouponsPage({ params }: PageProps<"/[locale]/
       {!coupons?.length ? (
         <p className="rounded-xl bg-secondary p-6 text-center">{t("empty")}</p>
       ) : (
-        <Table>
+        <Table label={t("title")}>
           <THead>
             <tr>
               <TH>{t("code")}</TH>

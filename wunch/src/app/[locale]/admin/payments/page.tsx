@@ -87,7 +87,7 @@ export default async function PaymentsPage({ params, searchParams }: PageProps<"
         <>
           <section className="space-y-2">
             <h2 className="text-lg font-bold">{t("totals")}</h2>
-            <Table>
+            <Table label={t("totals")}>
               <THead>
                 <tr>
                   <TH>{t("col.period")}</TH>
@@ -119,7 +119,7 @@ export default async function PaymentsPage({ params, searchParams }: PageProps<"
 
           <section className="space-y-2">
             <h2 className="text-lg font-bold">{t("payments")}</h2>
-            <Table>
+            <Table label={t("payments")}>
               <THead>
                 <tr>
                   <TH>{t("col.date")}</TH>

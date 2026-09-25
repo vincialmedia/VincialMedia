@@ -21,7 +21,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           locale={l}
           aria-current={l === locale ? "true" : undefined}
           className={cn(
-            "rounded-full px-2.5 py-1.5 uppercase",
+            "inline-flex min-h-9 min-w-9 items-center justify-center rounded-full px-2.5 uppercase",
             l === locale ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground",
           )}
         >
