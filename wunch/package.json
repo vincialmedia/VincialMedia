@@ -1,0 +1,63 @@
+{
+  "name": "wunch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "wunch (work + lunch): lunch ordering for offices in Schlieren",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset && npm run db:seed-images",
+    "db:seed-images": "tsx scripts/seed-images.ts",
+    "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts",
+    "stripe:emulator": "tsx dev/stripe-emulator/server.ts",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
+  },
+  "dependencies": {
+    "@date-fns/tz": "^1.5.0",
+    "@stripe/react-stripe-js": "^6.12.0",
+    "@stripe/stripe-js": "^9.17.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.48.0",
+    "next": "^16.3.6",
+    "next-intl": "^4.14.7",
+    "radix-ui": "^1.6.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "resend": "^6.30.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.35.4",
+    "sonner": "^2.0.8",
+    "stripe": "^22.6.2",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.20.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.6",
+    "supabase": "^2.118.0",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "~5.9",
+    "vitest": "^5.0.2"
+  }
+}
