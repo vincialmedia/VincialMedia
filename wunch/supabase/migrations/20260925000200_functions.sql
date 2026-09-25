@@ -384,8 +384,8 @@ begin
 
   v_delta := p_amount_refunded - v_order.amount_refunded_rappen;
   v_status := case
-    when p_amount_refunded >= v_order.amount_captured_rappen then 'refunded'
-    else 'partially_refunded'
+    when p_amount_refunded >= v_order.amount_captured_rappen then 'refunded'::public.order_status
+    else 'partially_refunded'::public.order_status
   end;
 
   update public.orders
