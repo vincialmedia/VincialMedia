@@ -8,6 +8,9 @@ export default async function globalSetup() {
   if (!ADMIN_EMAIL) throw new Error("Set ADMIN_EMAILS in .env.local");
   const { data: list } = await db.auth.admin.listUsers({ perPage: 1000 });
   const existing = list.users.find((u) => u.email?.toLowerCase() === ADMIN_EMAIL);
+  let id = existing?.id;
   if (existing) await db.auth.admin.updateUserById(existing.id, { password: PASSWORD });
-  else await db.auth.admin.createUser({ email: ADMIN_EMAIL, password: PASSWORD, email_confirm: true });
+  else id = (await db.auth.admin.createUser({ email: ADMIN_EMAIL, password: PASSWORD, email_confirm: true })).data.user?.id;
+  // Admin rights need a proven email address (normally by opening an email link once)
+  await db.from("profiles").update({ email_verified_for: ADMIN_EMAIL }).eq("id", id!);
 }

@@ -49,7 +49,7 @@ jobs:
           STRIPE_WEBHOOK_SECRET=whsec_emulator_ci
           STRIPE_API_BASE_URL=http://localhost:12111
           MAILPIT_URL=${SB_MAILPIT_URL}
-          ADMIN_EMAILS=admin@wunch.test
+          ADMIN_EMAILS=admin@wunch.test,kitchen@wunch.test
           CRON_SECRET=ci-cron-secret-0123456789abcdef
           ENV
       - run: npm run db:seed-images

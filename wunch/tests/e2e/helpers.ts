@@ -8,7 +8,8 @@ export const db = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, 
 });
 
 export const PASSWORD = "e2e-password-123";
-export const ADMIN_EMAIL = (process.env.ADMIN_EMAILS ?? "").split(",")[0].trim().toLowerCase();
+export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+export const ADMIN_EMAIL = ADMIN_EMAILS[0] ?? "";
 export const EMULATOR = process.env.STRIPE_API_BASE_URL ?? "http://localhost:12111";
 
 export async function createCustomer(): Promise<{ id: string; email: string }> {

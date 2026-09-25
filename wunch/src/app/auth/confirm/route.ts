@@ -1,6 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionUser, syncAdminRole } from "@/lib/auth";
+import { getSessionUser, recordVerifiedEmail, syncAdminRole } from "@/lib/auth";
 import { safeNextPath } from "@/lib/safe-redirect";
 import { createClient } from "@/lib/supabase/server";
 
@@ -46,7 +46,11 @@ export async function GET(request: NextRequest) {
   }
 
   const user = await getSessionUser();
-  if (user) await syncAdminRole(user);
+  if (user) {
+    // opening this link proves the user owns the address
+    await recordVerifiedEmail(user);
+    await syncAdminRole(user);
+  }
   const target = type === "recovery" ? `${next.startsWith("/en") ? "/en" : ""}/reset-password` : next;
   return NextResponse.redirect(new URL(target, origin));
 }

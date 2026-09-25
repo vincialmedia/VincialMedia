@@ -75,6 +75,9 @@ create table public.profiles (
   delivery_note text check (length(delivery_note) <= 500),
   locale text not null default 'de' check (locale in ('de', 'en')),
   role text not null default 'customer' check (role in ('customer', 'admin')),
+  -- The email address this user proved they own by opening an email link
+  -- (magic link, confirmation, password reset). Admin rights require it.
+  email_verified_for text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

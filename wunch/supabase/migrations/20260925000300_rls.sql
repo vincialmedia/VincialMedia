@@ -118,8 +118,14 @@ create policy "admins read stripe events" on public.stripe_events
 revoke all on all tables in schema public from anon, authenticated;
 
 -- public menu data
-grant select on public.settings, public.meals, public.menu_days, public.delivery_slots, public.closed_dates
+grant select on public.meals, public.menu_days, public.delivery_slots, public.closed_dates
   to anon, authenticated;
+-- settings: everything the shop shows, but not the private notification address
+-- (the admin reads and writes settings through the server)
+grant select (id, same_day_cutoff, max_days_ahead, delivery_weekdays, delivery_postcodes,
+  min_order_rappen, delivery_fee_rappen, tip_percentages, vat_rate_bp, vat_number,
+  business_name, business_address, business_email, updated_at)
+  on public.settings to anon, authenticated;
 
 -- signed-in reads (rows filtered by RLS)
 grant select on public.profiles, public.coupons, public.coupon_redemptions, public.orders,
@@ -131,7 +137,7 @@ grant insert, update, delete on public.meals, public.delivery_slots, public.clos
   to authenticated;
 grant update on public.settings to authenticated;
 grant insert (menu_date, meal_id, portion_limit, source) on public.menu_days to authenticated;
-grant update (portion_limit) on public.menu_days to authenticated;
+grant update (portion_limit, source) on public.menu_days to authenticated;
 grant delete on public.menu_days to authenticated;
 
 -- customers may only change their own contact fields, never role or email

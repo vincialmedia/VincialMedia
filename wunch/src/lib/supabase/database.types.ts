@@ -209,13 +209,13 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "city": string | null,"company": string | null,"created_at": string,"delivery_note": string | null,"email": string,"floor_room": string | null,"full_name": string | null,"id": string,"locale": string,"phone": string | null,"postcode": string | null,"role": string,"street": string | null,"updated_at": string
+                    "city": string | null,"company": string | null,"created_at": string,"delivery_note": string | null,"email": string,"email_verified_for": string | null,"floor_room": string | null,"full_name": string | null,"id": string,"locale": string,"phone": string | null,"postcode": string | null,"role": string,"street": string | null,"updated_at": string
                   }
                   Insert: {
-                    "city"?: string | null,"company"?: string | null,"created_at"?: string,"delivery_note"?: string | null,"email": string,"floor_room"?: string | null,"full_name"?: string | null,"id": string,"locale"?: string,"phone"?: string | null,"postcode"?: string | null,"role"?: string,"street"?: string | null,"updated_at"?: string
+                    "city"?: string | null,"company"?: string | null,"created_at"?: string,"delivery_note"?: string | null,"email": string,"email_verified_for"?: string | null,"floor_room"?: string | null,"full_name"?: string | null,"id": string,"locale"?: string,"phone"?: string | null,"postcode"?: string | null,"role"?: string,"street"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "city"?: string | null,"company"?: string | null,"created_at"?: string,"delivery_note"?: string | null,"email"?: string,"floor_room"?: string | null,"full_name"?: string | null,"id"?: string,"locale"?: string,"phone"?: string | null,"postcode"?: string | null,"role"?: string,"street"?: string | null,"updated_at"?: string
+                    "city"?: string | null,"company"?: string | null,"created_at"?: string,"delivery_note"?: string | null,"email"?: string,"email_verified_for"?: string | null,"floor_room"?: string | null,"full_name"?: string | null,"id"?: string,"locale"?: string,"phone"?: string | null,"postcode"?: string | null,"role"?: string,"street"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -286,6 +286,9 @@ isOneToOne: false
 { Args: { "s": Database["public"]['Enums']["order_status"] }; Returns: boolean
                            },
 "rate_limit_hit":
+{ Args: { "p_key": string,"p_max": number,"p_window_seconds": number }; Returns: boolean
+                           },
+"rate_limit_peek":
 { Args: { "p_key": string,"p_max": number,"p_window_seconds": number }; Returns: boolean
                            },
 "release_order_action":

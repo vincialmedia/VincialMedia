@@ -80,6 +80,14 @@ async function unclaim(orderId: string) {
   await db().rpc("release_order_action", { p_order_id: orderId });
 }
 
+/** Thrown to make Stripe retry a webhook later (the route answers 500). */
+export class RetryLaterError extends Error {}
+
+/** An admin click or the cron job is calling Stripe for this order right now. */
+function isBeingProcessed(order: Order): boolean {
+  return !!order.action_lock_until && new Date(order.action_lock_until).getTime() > Date.now();
+}
+
 function stripeMessage(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
@@ -127,9 +135,9 @@ export async function markAuthorized(piRef: Pick<Stripe.PaymentIntent, "id" | "m
   if (order.status !== "pending_payment") {
     if (order.status === "expired" || order.status === "payment_failed") {
       // The checkout was given up on (portions released) but the bank said yes late: release the hold.
-      if ((await cancelPaymentIntent(piRef.id)) === "canceled") {
-        await addNote(order.id, actor, "Late authorisation for an abandoned checkout: hold released.");
-      }
+      const result = await cancelPaymentIntent(piRef.id);
+      if (result === "error") throw new RetryLaterError(`could not release late hold ${piRef.id}`);
+      if (result === "canceled") await addNote(order.id, actor, "Late authorisation for an abandoned checkout: hold released.");
     }
     return;
   }
@@ -154,6 +162,7 @@ export async function markAuthorized(piRef: Pick<Stripe.PaymentIntent, "id" | "m
       authorized_at: new Date().toISOString(),
       capture_before: captureBefore ? new Date(captureBefore * 1000).toISOString() : null,
       stripe_charge_id: charge?.id ?? null,
+      stripe_payment_intent_id: pi.id,
     },
   });
   if (updated) {
@@ -180,6 +189,9 @@ export async function markCanceledByStripe(pi: Stripe.PaymentIntent, actor: Acto
   if (order.status === "pending_payment") {
     await transition(order.id, ["pending_payment"], "expired", actor, { note: `PaymentIntent canceled (${pi.cancellation_reason ?? "no reason"})` });
   } else if (order.status === "new") {
+    // Our own reject/auto-cancel is mid-way (it cancelled the payment and is about
+    // to record why): let it finish, Stripe will retry this event.
+    if (isBeingProcessed(order)) throw new RetryLaterError(`order ${order.id} is being processed`);
     const updated = await transition(order.id, ["new"], "auto_cancelled", actor, {
       note: `Hold released by Stripe (${pi.cancellation_reason ?? "no reason"})`,
       patch: { cancelled_at: new Date().toISOString() },
@@ -192,6 +204,7 @@ export async function markCanceledByStripe(pi: Stripe.PaymentIntent, actor: Acto
 export async function markSucceededByStripe(pi: Stripe.PaymentIntent, actor: Actor): Promise<void> {
   const order = await getOrderForPaymentIntent(pi);
   if (!order || order.status !== "new") return;
+  if (isBeingProcessed(order)) throw new RetryLaterError(`order ${order.id} is being processed`);
   const s = await fetchSettlement(pi.id);
   const updated = await transition(order.id, ["new"], "accepted", actor, {
     note: "Captured outside wunch",
@@ -290,7 +303,12 @@ export async function rejectOrder(orderId: string, reason: string, actor: Actor)
     const result = await cancelPaymentIntent(order.stripe_payment_intent_id);
     if (result !== "canceled") {
       await unclaim(orderId);
-      return { ok: false, error: result === "captured" ? "already_captured" : "stripe_error" };
+      if (result === "captured") {
+        // the money was already taken (e.g. an earlier accept crashed halfway): show it as accepted
+        await markSucceededByStripe(await getStripe().paymentIntents.retrieve(order.stripe_payment_intent_id), actor);
+        return { ok: false, error: "already_captured" };
+      }
+      return { ok: false, error: "stripe_error" };
     }
   }
   const updated = await transition(orderId, ["new"], "rejected", actor, {
@@ -349,6 +367,10 @@ export async function autoCancelOrder(orderId: string, why: string, actor: Actor
     const result = await cancelPaymentIntent(order.stripe_payment_intent_id);
     if (result !== "canceled") {
       await unclaim(orderId);
+      if (result === "captured") {
+        // already captured (accept crashed after capture, webhook lost): record the acceptance
+        await markSucceededByStripe(await getStripe().paymentIntents.retrieve(order.stripe_payment_intent_id), actor);
+      }
       return { ok: false, error: result };
     }
   }
@@ -363,12 +385,19 @@ export async function autoCancelOrder(orderId: string, why: string, actor: Actor
 /** A checkout that never got authorised: release portions (after one last look at Stripe). */
 export async function expirePendingOrder(order: Order, actor: Actor, note: string): Promise<void> {
   if (order.stripe_payment_intent_id) {
-    const pi = await getStripe().paymentIntents.retrieve(order.stripe_payment_intent_id).catch(() => null);
-    if (pi?.status === "requires_capture") {
+    // if Stripe can't be reached, don't guess: the next run tries again
+    const pi = await getStripe().paymentIntents.retrieve(order.stripe_payment_intent_id);
+    if (pi.status === "requires_capture") {
       await markAuthorized(pi, actor); // the webhook got lost: treat it as authorised
       return;
     }
-    if (pi && pi.status !== "canceled" && pi.status !== "succeeded") await cancelPaymentIntent(pi.id);
+    if (pi.status === "succeeded") {
+      await markSucceededByStripe(pi, actor);
+      return;
+    }
+    if (pi.status !== "canceled" && (await cancelPaymentIntent(pi.id)) === "error") {
+      throw new Error(`could not cancel ${pi.id}`);
+    }
   }
   await transition(order.id, ["pending_payment"], "expired", actor, { note });
 }

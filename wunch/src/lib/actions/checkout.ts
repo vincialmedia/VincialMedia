@@ -6,7 +6,7 @@ import { getSettings } from "../data/settings";
 import { env } from "../env";
 import { expirePendingOrder } from "../orders/lifecycle";
 import { type Quote, type QuoteError, buildQuote, quoteInputSchema } from "../orders/quote";
-import { LIMITS, rateLimit } from "../rate-limit";
+import { LIMITS, rateLimit, underLimit } from "../rate-limit";
 import { clientIp } from "../request";
 import { formatSlot } from "../format";
 import { getStripe, isEmulator } from "../stripe/server";
@@ -24,15 +24,24 @@ export async function quoteCheckout(raw: unknown): Promise<QuoteResponse> {
     return { ok: false, error: { code: "rate_limited" } };
   }
   const user = await getSessionUser();
-  const quote = await buildQuote(parsed.data, user?.id ?? null);
-
-  // Guessing coupon codes is rate limited: count unknown codes per IP and per user
-  if (quote.couponError?.code === "coupon_not_found") {
-    const okIp = await rateLimit(`coupon-fail:ip:${ip}`, LIMITS.couponFailuresPerIp.max, LIMITS.couponFailuresPerIp.window);
-    const okUser = user ? await rateLimit(`coupon-fail:user:${user.id}`, LIMITS.couponFailuresPerUser.max, LIMITS.couponFailuresPerUser.window) : true;
-    if (!okIp || !okUser) return { ok: false, error: { code: "rate_limited" } };
+  // Guessing coupon codes: after too many unknown codes, no code is looked up at all
+  if (parsed.data.couponCode && !(await couponGuessingAllowed(ip, user?.id ?? null))) {
+    return { ok: false, error: { code: "rate_limited" } };
   }
+  const quote = await buildQuote(parsed.data, user?.id ?? null);
+  if (quote.couponError?.code === "coupon_not_found") await countCouponMiss(ip, user?.id ?? null);
   return { ok: true, quote };
+}
+
+async function couponGuessingAllowed(ip: string, userId: string | null): Promise<boolean> {
+  const okIp = await underLimit(`coupon-fail:ip:${ip}`, LIMITS.couponFailuresPerIp.max, LIMITS.couponFailuresPerIp.window);
+  const okUser = userId ? await underLimit(`coupon-fail:user:${userId}`, LIMITS.couponFailuresPerUser.max, LIMITS.couponFailuresPerUser.window) : true;
+  return okIp && okUser;
+}
+
+async function countCouponMiss(ip: string, userId: string | null): Promise<void> {
+  await rateLimit(`coupon-fail:ip:${ip}`, LIMITS.couponFailuresPerIp.max, LIMITS.couponFailuresPerIp.window);
+  if (userId) await rateLimit(`coupon-fail:user:${userId}`, LIMITS.couponFailuresPerUser.max, LIMITS.couponFailuresPerUser.window);
 }
 
 const placeOrderSchema = quoteInputSchema.extend({
@@ -91,7 +100,9 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResponse> {
     return { ok: false, error: { code: "postcode_not_served", params: { postcodes: settings.delivery_postcodes.join(", ") } }, fields: ["postcode"] };
   }
 
+  if (input.couponCode && !(await couponGuessingAllowed(ip, user.id))) return { ok: false, error: { code: "rate_limited" } };
   const quote = await buildQuote(input, user.id);
+  if (quote.couponError?.code === "coupon_not_found") await countCouponMiss(ip, user.id);
   if (quote.error) return { ok: false, error: quote.error, quote };
   if (input.couponCode && quote.couponError) return { ok: false, error: quote.couponError, quote };
   const b = quote.breakdown!;
@@ -177,8 +188,19 @@ export async function placeOrder(raw: unknown): Promise<PlaceOrderResponse> {
       },
       { idempotencyKey: `order-${orderId}` },
     );
+    // Only attach the payment while this order is still the open checkout; a
+    // parallel checkout (second tab) may have replaced it in the meantime.
+    const { data: attached, error: attachError } = await db
+      .from("orders")
+      .update({ stripe_payment_intent_id: pi.id })
+      .eq("id", orderId)
+      .eq("status", "pending_payment")
+      .select("id");
+    if (attachError || !attached?.length) {
+      await getStripe().paymentIntents.cancel(pi.id).catch(() => undefined);
+      return { ok: false, error: { code: "payment_setup_failed" } };
+    }
     clientSecret = pi.client_secret;
-    await db.from("orders").update({ stripe_payment_intent_id: pi.id }).eq("id", orderId);
   } catch (e) {
     console.error("PaymentIntent create failed", e);
     const { data: order } = await db.from("orders").select("*").eq("id", orderId).single();

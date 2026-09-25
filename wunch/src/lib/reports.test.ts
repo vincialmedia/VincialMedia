@@ -44,6 +44,12 @@ describe("reports", () => {
       ["10.2026", 1912],
     ]);
   });
+  it("neutralises spreadsheet formulas typed by customers", () => {
+    const csv = paymentsCsv([order(8, "2026-09-28T10:00:00Z", { customer_name: '=HYPERLINK("https://evil","Rechnung")', company: "+41 Treuhand" })]);
+    expect(csv).toContain(`"'=HYPERLINK(""https://evil"",""Rechnung"")"`);
+    expect(csv).toContain(";'+41 Treuhand;");
+    expect(csv).not.toMatch(/;=HYPERLINK/);
+  });
   it("writes Excel-friendly CSV", () => {
     const csv = paymentsCsv([order(7, "2026-09-28T10:00:00Z")]);
     expect(csv.startsWith("﻿Datum;Bestellung")).toBe(true);

@@ -118,7 +118,9 @@ export function groupPayments(rows: PaymentRow[], by: GroupBy): Group[] {
 }
 
 function csvCell(value: string | number | null): string {
-  const s = value === null ? "" : String(value);
+  let s = value === null ? "" : String(value);
+  // A customer could type "=HYPERLINK(...)" as their name: stop spreadsheets from running it
+  if (typeof value === "string" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

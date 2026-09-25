@@ -35,7 +35,7 @@ export async function setMenuItem(date: string, mealId: string, limit: string | 
     const supabase = await createClient();
     const { data: existing } = await supabase.from("menu_days").select("source").eq("menu_date", date).eq("meal_id", mealId).maybeSingle();
     const { error } = existing
-      ? await supabase.from("menu_days").update({ portion_limit: portionLimit }).eq("menu_date", date).eq("meal_id", mealId)
+      ? await supabase.from("menu_days").update({ portion_limit: portionLimit, source: "planned" }).eq("menu_date", date).eq("meal_id", mealId)
       : await supabase.from("menu_days").insert({ menu_date: date, meal_id: mealId, portion_limit: portionLimit, source: "planned" });
     if (error?.code === "23514") return { ok: false, error: "below_reserved" };
     if (error) throw new Error(error.message);

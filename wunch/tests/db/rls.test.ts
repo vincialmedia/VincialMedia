@@ -87,6 +87,18 @@ describe("row level security", () => {
     expect((await a.client.from("profiles").select("id")).data).toHaveLength(1);
   });
 
+  it("the shop settings are public, the private notification address is not", async () => {
+    expect((await anon.from("settings").select("delivery_postcodes").single()).data?.delivery_postcodes).toContain("8952");
+    expect((await anon.from("settings").select("notify_email").single()).error).not.toBeNull();
+    expect((await users[0].client.from("settings").select("*").single()).error).not.toBeNull();
+  });
+
+  it("customers cannot mark their own email as verified", async () => {
+    const [a] = users;
+    const r = await a.client.from("profiles").update({ email_verified_for: a.email }).eq("id", a.id);
+    expect(r.error).not.toBeNull();
+  });
+
   it("menu data is public, coupons are not", async () => {
     expect((await anon.from("meals").select("id").limit(1)).data?.length).toBe(1);
     expect((await anon.from("delivery_slots").select("id").limit(1)).data?.length).toBe(1);

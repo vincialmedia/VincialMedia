@@ -294,7 +294,7 @@ $$;
 -- Status transition with history. Returns the updated order, or null when the
 -- order was not in one of the expected statuses (which makes every caller
 -- idempotent: webhooks, cron, admin clicks).
--- p_patch may set: reject_reason, stripe_charge_id, capture_before,
+-- p_patch may set: reject_reason, stripe_payment_intent_id, stripe_charge_id, capture_before,
 -- amount_captured_rappen, amount_refunded_rappen, stripe_fee_rappen,
 -- stripe_net_rappen, authorized_at, accepted_at, delivered_at, cancelled_at.
 -- ---------------------------------------------------------------------------
@@ -328,6 +328,7 @@ begin
   update public.orders set
     status = p_to,
     reject_reason = v_new.reject_reason,
+    stripe_payment_intent_id = v_new.stripe_payment_intent_id,
     stripe_charge_id = v_new.stripe_charge_id,
     capture_before = v_new.capture_before,
     amount_captured_rappen = v_new.amount_captured_rappen,
@@ -457,6 +458,21 @@ begin
 end;
 $$;
 
+-- Read-only check: is this key still under its limit? (doesn't count a hit)
+create or replace function public.rate_limit_peek(p_key text, p_max int, p_window_seconds int)
+returns boolean
+language sql
+stable
+set search_path = ''
+as $$
+  select coalesce((
+    select count <= p_max
+      from public.rate_limits
+     where key = p_key
+       and window_start = to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds)
+  ), true);
+$$;
+
 -- ---------------------------------------------------------------------------
 -- Function privileges: only the server (service role) may call the write
 -- functions. is_admin and slot_order_counts are safe for everyone.
@@ -467,6 +483,7 @@ revoke execute on function public.release_order_reservations(uuid) from public, 
 revoke execute on function public.claim_order_action(uuid, public.order_status[], int) from public, anon, authenticated;
 revoke execute on function public.release_order_action(uuid) from public, anon, authenticated;
 revoke execute on function public.rate_limit_hit(text, int, int) from public, anon, authenticated;
+revoke execute on function public.rate_limit_peek(text, int, int) from public, anon, authenticated;
 revoke execute on function public.apply_refund_total(uuid, int, text, uuid, text, text) from public, anon, authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 revoke execute on function public.handle_user_email_change() from public, anon, authenticated;
@@ -477,6 +494,7 @@ grant execute on function public.release_order_reservations(uuid) to service_rol
 grant execute on function public.claim_order_action(uuid, public.order_status[], int) to service_role;
 grant execute on function public.release_order_action(uuid) to service_role;
 grant execute on function public.rate_limit_hit(text, int, int) to service_role;
+grant execute on function public.rate_limit_peek(text, int, int) to service_role;
 grant execute on function public.apply_refund_total(uuid, int, text, uuid, text, text) to service_role;
 
 grant execute on function public.is_admin() to anon, authenticated, service_role;

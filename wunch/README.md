@@ -59,9 +59,12 @@ STRIPE_WEBHOOK_SECRET=whsec_emulator_local_secret
 STRIPE_API_BASE_URL=http://localhost:12111
 ```
 
-Also set `ADMIN_EMAILS=you@example.com` and a random `CRON_SECRET` (`openssl rand -hex 24`).
+Also set `ADMIN_EMAILS=you@example.com` and a random `CRON_SECRET` (`openssl rand -hex 24`). The end-to-end tests need a second address in the list (e.g. `you@example.com,kitchen@example.com`).
 
-**Admin login:** sign up at `/login` with an email from `ADMIN_EMAILS`, then open `/admin`. Local sign-up needs no email confirmation.
+**Admin login:**
+1. Go to `/login`, enter an email from `ADMIN_EMAILS` and choose "Login-Link per E-Mail".
+2. Open the link from Mailpit. Admin rights need proof that you own the address; without that, anyone could sign up with it first.
+3. Later you can set a password with "Passwort vergessen?" and use it from then on.
 
 **Emails:** open Mailpit at <http://127.0.0.1:54324>. Every order email and every login link lands there.
 
@@ -273,7 +276,7 @@ It needs a Chromium: `npx playwright install chromium`.
 - [ ] Paid plan (Pro) for production. Free projects pause after a week of inactivity, and a paused database means the shop is down. Pro also gives daily backups.
 
 **App**
-- [ ] `ADMIN_EMAILS` set to your email(s)
+- [ ] `ADMIN_EMAILS` set to your email(s); log in once with the email link to activate admin access
 - [ ] `NEXT_PUBLIC_SITE_URL=https://wunch.ch`, and `STRIPE_API_BASE_URL` empty
 - [ ] `CRON_SECRET` set (and the same value in Vault)
 - [ ] Impressum, AGB and Datenschutz written (placeholders in `src/app/[locale]/(shop)/impressum|agb|datenschutz`)
@@ -311,12 +314,16 @@ Portions and coupon uses are released for rejected, auto-cancelled, failed and e
 **Security:**
 - RLS is on every table, with explicit grants: customers only see their own profile and orders, menu data is public, and coupons aren't.
 - Customers can't change their role or write orders directly. Orders, payments and emails are written only by the server with the secret key, after checks.
-- Admin pages and actions check the role on the server. `ADMIN_EMAILS` is the source of truth, mirrored into `profiles.role` so RLS and Realtime can use it.
+- Admin pages and actions check the role on the server, with a live session check against Supabase Auth.
+- `ADMIN_EMAILS` decides who is admin, but only once the account has proven it owns the address by opening an email link. So nobody can sign up with an admin address before its owner does.
+- The first time an admin address is proven, any earlier password is replaced and all other sessions end.
+- The role is mirrored into `profiles.role` so RLS and Realtime can use it.
 - Card data only ever goes through Stripe Elements.
 
 **Rate limits:**
 - Login, sign-up and magic links use Supabase Auth's per-IP limits (`[auth.rate_limit]` in `config.toml`, and the dashboard in production).
-- Checkout and failed coupon guesses use a Postgres-backed limiter per user and per IP.
+- Checkout uses a Postgres-backed limiter per user and per IP.
+- Coupons: after 10 unknown codes in 10 minutes from one IP or account, no coupon is checked at all.
 
 **Privacy:** essential cookies only (the Supabase session), no tracking. Stripe.js is loaded only on the payment step.
 

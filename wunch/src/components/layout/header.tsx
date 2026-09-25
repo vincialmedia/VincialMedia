@@ -3,14 +3,14 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { CartButton } from "@/components/cart/cart-button";
 import { Link } from "@/i18n/navigation";
-import { getSessionUser, isAdminEmail } from "@/lib/auth";
+import { getProfile, getSessionUser } from "@/lib/auth";
 import { LanguageSwitcher } from "./language-switcher";
 import { Logo } from "./logo";
 
 export async function Header() {
   const t = await getTranslations("nav");
   const user = await getSessionUser();
-  const admin = user ? isAdminEmail(user.email) : false;
+  const admin = user ? (await getProfile(user.id))?.role === "admin" : false;
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
