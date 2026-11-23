@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
 <style>
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0}
 /* Layout: one phone-width column, one question card at a time, answers under the thumb. Deliberately dark: a candlelit bedroom. */
@@ -204,6 +205,21 @@ em{font-style:italic}
 .danger{color:var(--yes)}
 .me-chip{padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14px;white-space:nowrap;flex-shrink:0}
 .loading{padding-top:20vh;text-align:center;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px}
+.panel .eyebrow{margin:0}
+.panel h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1;margin:0;text-wrap:balance}
+.panel p{margin:0;color:var(--muted);font-size:14px}
+.panel .link{align-self:flex-start}
+.mood.on{border-color:color-mix(in srgb, var(--yes) 50%, var(--line))}
+.mood.both{background:linear-gradient(140deg, #c2214f 0%, #7d1236 100%);border-color:var(--yes);animation:glow 2.6s ease-in-out infinite}
+.mood.both h2{font-size:40px;color:#fff}
+.mood.both p,.mood.both .eyebrow,.mood.both .link{color:#ffe3ec}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(255,79,126,.0)}50%{box-shadow:0 0 34px 2px rgba(255,79,126,.45)}}
+.q-text{font-family:var(--display);font-weight:400;font-size:clamp(28px,7.6vw,36px);line-height:1.12;margin:0;text-wrap:pretty}
+.timer{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.timer-out{font-family:var(--display);font-size:52px;line-height:1;color:var(--gold);font-variant-numeric:tabular-nums}
+.timer-out.big{font-size:min(30vw,120px)}
+@media (prefers-reduced-motion: reduce){ .mood.both{animation:none} }
 </style>
 </head>
 <body>
@@ -346,6 +362,56 @@ const ITEMS = [
 const SB_URL = "https://ygordxdugdnykmazpgtf.supabase.co";
 const SB_KEY = "sb_publishable__gzD8F1bTx_K9gl47Lvr9g_rQr_5CaU";
 const LS_TOKEN = "doubleyes.token";
+const LS_Q36 = "doubleyes.q36";
+
+// 36 questions in three sets that get deeper, inspired by Arthur Aron's 1997
+// closeness study and rewritten for a couple who already know each other.
+const Q36 = [
+  "If you could have dinner with anyone, living or not, who would it be and what would you ask?",
+  "What small thing can turn a bad day around for you?",
+  "Describe your perfect lazy Sunday, from waking up to falling asleep.",
+  "Which song do you know every single word to, even if you'd never admit it?",
+  "If you could relive one ordinary day from your childhood, which one would it be?",
+  "What were you completely obsessed with as a kid?",
+  "What's the best meal you've ever had, and who were you with?",
+  "Name three things the two of you share that most people wouldn't guess.",
+  "What are you most thankful for this year?",
+  "What's one thing about how you grew up that you'd do differently one day?",
+  "Tell your life story in four minutes. The other one just listens.",
+  "If you could master one skill overnight, which would you pick?",
+  "If you could know one thing about your future for certain, what would you want to know?",
+  "What's a dream you've had for years and still haven't chased? What's stopping you?",
+  "What are you proudest of so far?",
+  "What do you need most from the people closest to you?",
+  "What's your favorite memory of the two of you?",
+  "What's a hard moment that shaped who you are today?",
+  "If you knew you had one year left, what would you change about how you live now?",
+  "When do you feel most loved by the other person?",
+  "What does a really good relationship look like to you, ten years from now?",
+  "Take turns naming things you love about each other until you've each said five.",
+  "How did your family show love when you were growing up?",
+  "How do you feel about your relationship with your parents today?",
+  "Each make three true sentences that start with \"We\", like \"We both feel… right now.\"",
+  "Finish this: \"Something I wish I could share with someone more often is…\"",
+  "What's something about you that you'd like the other person to understand better?",
+  "Say what you love about the other person, the honest version, not the polite one.",
+  "What's an embarrassing moment you've never told anyone about?",
+  "When did you last cry, and what was it about?",
+  "What does the other person do that makes you feel safe?",
+  "Is there anything too serious to joke about, for you?",
+  "What's something you never said to someone and wish you had?",
+  "If your home caught fire and everyone was safe, what one thing would you go back for?",
+  "What worries you most about the future, and how could the other person help?",
+  "Share something you're struggling with and ask how the other would handle it. Then ask how they think you feel about it."
+];
+const Q36_SETS = [["Set I", "Warming up"], ["Set II", "Getting deeper"], ["Set III", "Closest"]];
+
+// "In the mood tonight?" is one answer per night, keyed by date. A night runs
+// from 6 in the morning to 6 the next morning.
+function moodKey(){
+  const d = new Date(Date.now() - 6 * 3600 * 1000);
+  return "mood_" + d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+}
 const S = {
   token: null,
   meName: "", partnerName: "", hasPartner: false, partnerCount: 0,
@@ -356,6 +422,9 @@ const S = {
   clearArmed: false, deleteArmed: false, busy: false
 };
 let dirty = false, inflight = false, saveTimer = null, advanceTimer = null, lastCardKey = null, loaded = false;
+let timer = null, wakeLock = null;
+S.q36 = Math.max(0, Math.min(36, parseInt(lsGet(LS_Q36), 10) || 0));
+const LIVE = v => v === "home" || v === "matches";
 
 /* ---------- helpers ---------- */
 const $view = document.getElementById("view");
@@ -494,6 +563,21 @@ function setAnswer(key, val){
   dirty = true;
   scheduleSave(600);
 }
+// Send all answers, dropping "in the mood" taps from earlier nights.
+function answersPayload(){
+  const k = moodKey(), out = {};
+  for (const key in S.answers) if (!key.startsWith("mood_") || key === k) out[key] = S.answers[key];
+  return out;
+}
+function setMood(on){
+  const next = {};
+  for (const k in S.answers) if (!k.startsWith("mood_")) next[k] = S.answers[k];
+  if (on) next[moodKey()] = "y";
+  S.answers = next;
+  dirty = true;
+  render();
+  saveNow();
+}
 function scheduleSave(ms){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, ms); }
 async function saveNow(){
   if (!S.token || !dirty) return;
@@ -501,10 +585,10 @@ async function saveNow(){
   inflight = true; dirty = false;
   setStatus("saving");
   try {
-    const st = await api("save", { token: S.token, answers: Object.assign({}, S.answers) });
+    const st = await api("save", { token: S.token, answers: answersPayload() });
     apply(st, true);
     setStatus(dirty ? "saving" : "synced");
-    if (S.view !== "play") render();
+    if (LIVE(S.view)) render();
   } catch(e){
     dirty = true;
     handleError(e);
@@ -518,7 +602,7 @@ async function refresh(){
     apply(st, dirty || inflight);
     if (!dirty) setStatus("synced");
     if (S.view === "loading") S.view = "home";
-    if (S.view !== "play") render();
+    if (LIVE(S.view)) render();
   } catch(e){
     if (S.view === "loading" && e.status !== 401){ S.view = "home"; render(); }
     handleError(e);
@@ -592,6 +676,7 @@ function viewHome(){
     <p>Send this link. It works once, for one person.</p>
     ${copyField("invite-link", pageUrl() + "#join=" + S.invite, "Invite link")}
   </section>` : ""}
+  ${viewMood()}
   <section class="score">
     <div class="score-top">
       <span class="big">${both}</span>
@@ -611,6 +696,13 @@ function viewHome(){
   ${next
     ? `<button class="btn primary block" data-act="continue">${pm.done ? "Keep answering" : "Start answering"}</button>`
     : `<p class="score-sub">You've answered everything. Tap a category to change an answer.</p>`}
+
+  <section class="panel">
+    <p class="eyebrow">Date night</p>
+    <h2>36 Questions</h2>
+    <p>Three rounds of questions that get deeper as you go, inspired by Arthur Aron's 1997 closeness study. Sit together with one phone and take turns. Plan about 45 minutes.</p>
+    <button class="btn block" data-act="q36">${S.q36 === 0 ? "Start" : S.q36 >= 36 ? "Continue to the last step" : "Continue at question " + (S.q36 + 1)}</button>
+  </section>
 
   <h2 class="section-h">Categories</h2>
   <ul class="cats">
@@ -659,6 +751,96 @@ function viewHome(){
   <footer class="foot">
     <p class="fine">A match is a starting point to talk, not a promise. Either of you can change your mind any time.</p>
   </footer>`;
+}
+
+function viewMood(){
+  if (!S.hasPartner) return "";
+  const k = moodKey();
+  const mine = S.answers[k] === "y";
+  const both = mine && S.matches.some(m => m.k === k && m.l === "y");
+  const p = esc(S.partnerName || "Your partner");
+  if (both) return `<section class="panel mood both">
+    <p class="eyebrow">Tonight</p>
+    <h2>You're both in the mood.</h2>
+    <p>This resets tomorrow morning.</p>
+    <button class="link" data-act="mood-off">Take mine back</button>
+  </section>`;
+  if (mine) return `<section class="panel mood on">
+    <p class="eyebrow">Tonight</p>
+    <h2>You're in the mood.</h2>
+    <p>If ${p} taps it too tonight, you'll both see it here. If not, nobody ever knows.</p>
+    <button class="link" data-act="mood-off">Take it back</button>
+  </section>`;
+  return `<section class="panel mood">
+    <p class="eyebrow">Tonight</p>
+    <h2>In the mood?</h2>
+    <p>Tap it quietly. ${p} only finds out if they tap it too.</p>
+    <button class="btn primary block" data-act="mood-on">I'm in the mood</button>
+  </section>`;
+}
+
+function viewQ36(){
+  const i = S.q36;
+  if (i >= 36) return `${bar()}
+  <div class="play-head"><button class="back" data-act="home">‹ Home</button><span class="count">Last step</span></div>
+  <section class="who" style="padding-top:2vh">
+    <p class="eyebrow">The finish</p>
+    <h1 class="brand" style="font-size:clamp(48px,13vw,76px)">Four minutes</h1>
+    <p class="lede">Put the phone down where you can both see it. Look into each other's eyes for four minutes, without talking.</p>
+    <div class="timer"><span class="timer-out big" id="timer-out">4:00</span></div>
+    <button class="btn primary block" data-act="timer" data-sec="240">Start the timer</button>
+    <div class="play-nav">
+      <button class="btn ghost" data-act="q-prev">Back</button>
+      <button class="btn ghost" data-act="q-restart">Start over</button>
+    </div>
+  </section>`;
+  const set = Q36_SETS[Math.floor(i / 12)];
+  const first = i % 2 === 0 ? (S.meName || "You") : (S.partnerName || "Your partner");
+  return `${bar()}
+  <div class="play-head">
+    <button class="back" data-act="home">‹ Home</button>
+    <span class="count">${i + 1} / 36</span>
+  </div>
+  <div class="track"><i style="width:${Math.round(100 * i / 36)}%"></i></div>
+  <article class="card enter">
+    <div class="meta"><span>${set[0]}</span><span>${set[1]}</span></div>
+    <h2 class="q-text">${esc(Q36[i])}</h2>
+    <p class="fine">You both answer. ${esc(first)} goes first.</p>
+    ${i === 10 ? `<div class="timer"><span class="timer-out" id="timer-out">4:00</span><button class="btn" data-act="timer" data-sec="240">Start 4-minute timer</button></div>` : ""}
+  </article>
+  <div class="play-nav">
+    <button class="btn ghost" data-act="q-prev" ${i === 0 ? "disabled" : ""}>Back</button>
+    <button class="btn" data-act="q-next">${i === 35 ? "Last step" : "Next question"}</button>
+  </div>`;
+}
+function setQ36(i){
+  S.q36 = Math.max(0, Math.min(36, i));
+  lsSet(LS_Q36, String(S.q36));
+  stopTimer();
+  render();
+  window.scrollTo(0, 0);
+}
+function stopTimer(){
+  clearInterval(timer); timer = null;
+  if (wakeLock){ wakeLock.release().catch(() => {}); wakeLock = null; }
+}
+async function startTimer(seconds, button){
+  stopTimer();
+  if (button) button.hidden = true;
+  const end = Date.now() + seconds * 1000;
+  const fmt = s => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+  const tick = () => {
+    const left = Math.max(0, Math.round((end - Date.now()) / 1000));
+    const out = document.getElementById("timer-out");
+    if (out) out.textContent = left ? fmt(left) : "Time's up";
+    if (!left){
+      stopTimer();
+      try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch(e){}
+    }
+  };
+  tick();
+  timer = setInterval(tick, 250);
+  try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request("screen"); } catch(e){}
 }
 
 function viewPlay(){
@@ -775,6 +957,7 @@ function render(){
     case "home":    html = viewHome(); break;
     case "play":    html = viewPlay(); break;
     case "matches": html = viewMatches(); break;
+    case "q36":     html = viewQ36(); break;
     default:        html = `<p class="loading">Loading…</p>`;
   }
   $view.innerHTML = html;
@@ -782,6 +965,7 @@ function render(){
 }
 function go(view){
   clearTimeout(advanceTimer);
+  stopTimer();
   if (view !== "home"){ S.clearArmed = false; S.deleteArmed = false; }
   S.view = view;
   render();
@@ -860,6 +1044,13 @@ document.addEventListener("click", e => {
     case "rmq":
       saveCustom(S.custom.filter(c => c.id !== b.dataset.id));
       break;
+    case "mood-on": setMood(true); break;
+    case "mood-off": setMood(false); break;
+    case "q36": go("q36"); break;
+    case "q-next": setQ36(S.q36 + 1); break;
+    case "q-prev": setQ36(S.q36 - 1); break;
+    case "q-restart": setQ36(0); break;
+    case "timer": startTimer(parseInt(b.dataset.sec, 10) || 240, b); break;
   }
 });
 
@@ -903,7 +1094,7 @@ document.addEventListener("submit", async e => {
 
 /* ---------- live updates ---------- */
 setInterval(() => {
-  if (document.visibilityState === "visible" && S.token && S.view !== "play") refresh();
+  if (document.visibilityState === "visible" && S.token && LIVE(S.view)) refresh();
 }, 8000);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && S.token) refresh();
