@@ -240,7 +240,9 @@ const CATS = [
   { id:"power",   name:"Power & roles",    blurb:"Who's in charge and how you talk." },
   { id:"rough",   name:"Rough",            blurb:"Spanking, biting, slapping, pinning." },
   { id:"deep",    name:"Anal & beyond",    blurb:"Prostate, anal, DP, fisting." },
-  { id:"places",  name:"Places & cameras", blurb:"Where you do it, and filming it." },
+  { id:"taboo",   name:"Taboo",            blurb:"Enemas, watersports, sounding, doctor games." },
+  { id:"mind",    name:"Mind & words",     blurb:"Saying exactly what you feel, and other head games." },
+  { id:"places",  name:"Places & cameras", blurb:"Where you do it, filming it, and from afar." },
   { id:"fantasy", name:"Fantasy talk",     blurb:"Some to talk about, some for real." },
   { id:"custom",  name:"Your own",         blurb:"Questions you two added." }
 ];
@@ -352,7 +354,110 @@ const ITEMS = [
   { id:"three",    c:"fantasy", h:3, n:"Threesome, for real", d:"Actually invite a third person." },
   { id:"watched",  c:"fantasy", h:3, n:"Being watched", d:"Have sex while someone else watches." },
   { id:"club",     c:"fantasy", h:3, n:"Sex club or play party", d:"Go to one, even if it's only to watch." },
-  { id:"share",    c:"fantasy", h:3, n:"Watching with someone else", give:"Watch {p} with someone else", get:"Be with someone else while {p} watches" }
+  { id:"share",    c:"fantasy", h:3, n:"Watching with someone else", give:"Watch {p} with someone else", get:"Be with someone else while {p} watches" },
+
+  // ---- Added later. New ids only: existing answers stay attached to the questions above. ----
+
+  // Taboo
+  { id:"enema",    c:"taboo", h:3, n:"Enema", give:"Give {p} an enema", get:"Get an enema from {p}", note:"Plain lukewarm water, a small amount and a lubed tip. Never force it, and stop if it hurts or bleeds." },
+  { id:"pee",      c:"taboo", h:3, n:"Watersports", d:"In the shower.", give:"Pee on {p}", get:"Get peed on by {p}", note:"Keep it in the shower and on the outside of the body. Skip it if either of you has a urinary infection." },
+  { id:"doctor",   c:"taboo", h:2, n:"Doctor and patient", d:"A full exam roleplay, gloves and all." },
+  { id:"sounding", c:"taboo", h:3, n:"Sounding", d:"A smooth, thin rod slid slowly into the urethra, the opening you pee from.", give:"Use a sound on {p}", get:"Have {p} use a sound on you", note:"Only a toy made for this, with a flared end. Everything clean, sterile lube, very slow, never forced. Infections and small tears are the main risks." },
+  { id:"speculum", c:"taboo", h:3, n:"Speculum", d:"The medical tool that holds the vagina open, to look and touch inside.", give:"Open {p} up with a speculum", get:"Be opened up with a speculum by {p}", note:"Warm it, lube it and go slowly. Answer No on any side that doesn't fit your body." },
+
+  // Hands & mouths
+  { id:"oilwrestle",c:"touch", h:2, n:"Oil wrestling", d:"The winner decides the rest of the night." },
+  { id:"squirt",   c:"touch", h:3, n:"Squirting", give:"Try to make {p} squirt", get:"Have {p} try to make you squirt" },
+  { id:"facial",   c:"touch", h:3, n:"Finish on the face", give:"Finish on {p}'s face", get:"Have {p} finish on your face" },
+  { id:"swallow",  c:"touch", h:3, n:"Swallowing", give:"Finish in {p}'s mouth", get:"Swallow when {p} finishes in your mouth" },
+  { id:"roughoral",c:"touch", h:3, n:"Rough oral", give:"Set the pace while {p} goes down on you", get:"Let {p} set the pace while you go down on them" },
+  { id:"deepthroat",c:"touch",h:3, n:"Deepthroat", give:"Deepthroat {p}", get:"Have {p} deepthroat you" },
+  { id:"inside",   c:"touch", h:3, n:"Finishing inside", give:"Finish inside {p}", get:"Have {p} finish inside you", note:"Only with contraception you both trust." },
+  { id:"cleanup",  c:"touch", h:3, n:"Clean-up with the mouth", give:"Go down on {p} after you finished inside them", get:"Have {p} go down on you after they finished inside you" },
+  { id:"snowball", c:"touch", h:3, n:"Snowballing", d:"Passing cum from mouth to mouth in a kiss." },
+  { id:"marathon", c:"touch", h:2, n:"Orgasm marathon", give:"Give {p} as many orgasms as you can in one night", get:"Get as many orgasms as {p} can give you in one night" },
+  { id:"wakeoral", c:"touch", h:2, n:"Wake-up oral", give:"Wake {p} up with oral", get:"Be woken up with oral by {p}", note:"A yes here means you've both agreed to it in advance." },
+  { id:"lapdance", c:"touch", h:2, n:"Lap dance", give:"Give {p} a lap dance at home", get:"Get a lap dance from {p}" },
+
+  // Senses
+  { id:"shave",    c:"senses", h:2, n:"Shaving", give:"Shave {p}", get:"Get shaved by {p}", note:"Fresh blade, lots of foam, go slowly." },
+  { id:"hotcold",  c:"senses", h:2, n:"Hot and cold oral", d:"Warm tea in the mouth, then ice.", give:"Go down on {p} hot, then cold", get:"Have {p} go down on you hot, then cold" },
+  { id:"tickle",   c:"senses", h:2, n:"Tickle torture", give:"Tickle {p} while they're tied up", get:"Get tickled while tied up by {p}" },
+  { id:"overload", c:"senses", h:3, n:"Sensory overload", give:"Tie up and blindfold {p}, then keep a vibrator on them", get:"Be tied up and blindfolded with a vibrator on you" },
+  { id:"guesstouch",c:"senses",h:1, n:"Guess what's touching you", give:"Blindfold {p} and make them guess what's touching them", get:"Guess what's touching you, blindfolded" },
+
+  // Food play
+  { id:"messy",    c:"food", h:2, n:"Messy play", d:"Oil, chocolate or slime all over, together." },
+
+  // Toys
+  { id:"clamps",   c:"toys", h:3, n:"Nipple clamps", give:"Put nipple clamps on {p}", get:"Wear nipple clamps for {p}", note:"Start loose and don't leave them on too long. Taking them off stings the most." },
+  { id:"estim",    c:"toys", h:3, n:"Electro-stim", d:"A small box sends mild pulses through pads or toys: tingling at first, then muscles twitching as it goes up.", give:"Use an electro-stim toy on {p}", get:"Have {p} use an electro-stim toy on you", note:"Only toys made for it, only below the waist, and never with a pacemaker or heart problems." },
+  { id:"suction",  c:"toys", h:2, n:"Suction toys and pumps", d:"Pulls blood to the nipples or genitals so they swell and get extra sensitive.", give:"Use a suction toy on {p}", get:"Have {p} use a suction toy on you" },
+  { id:"machine",  c:"toys", h:3, n:"Sex machine", d:"A motorized machine that thrusts a toy at the speed you set.", give:"Use a sex machine on {p}", get:"Have {p} use a sex machine on you" },
+  { id:"sybian",   c:"toys", h:3, n:"Sybian", d:"A saddle with a vibrating, moving attachment that you ride.", give:"Put {p} on a Sybian and control the speed", get:"Ride a Sybian while {p} controls it" },
+  { id:"doubletoy",c:"toys", h:3, n:"Double-ended toy", d:"One toy, both ends used at the same time." },
+  { id:"swing",    c:"toys", h:2, n:"Sex swing", d:"Hung from a door or the ceiling, so you're held in the air." },
+  { id:"strapsuck",c:"toys", h:3, n:"Oral on the strap-on", give:"Go down on {p}'s strap-on", get:"Have {p} go down on your strap-on" },
+  { id:"reversal", c:"toys", h:3, n:"Strap-on role reversal", d:"She wears it and takes the lead, the way he usually does.", give:"Take the lead with a strap-on, the way {p} usually does", get:"Let {p} take the lead with a strap-on" },
+  { id:"glasstoy", c:"toys", h:2, n:"Warm or chilled glass toy", give:"Use a warmed or chilled glass toy on {p}", get:"Have {p} use a warmed or chilled glass toy on you", note:"Warm water or the fridge, never boiling or the freezer, and test it on your wrist first." },
+  { id:"cockring", c:"toys", h:2, n:"Cock ring", d:"A stretchy ring at the base that keeps it harder for longer. Some vibrate for the other partner too.", give:"Put a cock ring on {p}", get:"Wear a cock ring for {p}", note:"Answer No on any side that doesn't fit your body." },
+  { id:"benwa",    c:"toys", h:2, n:"Ben Wa balls", d:"Weighted balls worn inside the vagina. Every step gives a little jolt.", give:"Have {p} wear Ben Wa balls on a date", get:"Wear Ben Wa balls on a date for {p}", note:"Answer No on any side that doesn't fit your body." },
+  { id:"latex",    c:"toys", h:2, n:"Latex or leather", d:"Dressing up in latex or leather outfits." },
+
+  // Power & roles
+  { id:"denial",   c:"power", h:3, n:"Orgasm denial for days", give:"Keep {p} from coming for a few days", get:"Not be allowed to come until {p} says so" },
+  { id:"chastity", c:"power", h:3, n:"Chastity device", give:"Lock {p} in a chastity device", get:"Wear a chastity device {p} holds the key to", note:"Get one that fits properly, and take it off if anything goes numb or hurts." },
+  { id:"ruined",   c:"power", h:3, n:"Ruined orgasm", d:"Stopping everything right as they start to come.", give:"Ruin {p}'s orgasm", get:"Have {p} ruin your orgasm" },
+  { id:"gag",      c:"power", h:3, n:"Gag", give:"Gag {p}", get:"Get gagged by {p}", note:"Agree a hand signal to stop, since you can't say the safe word." },
+  { id:"freeuse",  c:"power", h:3, n:"Free use for a day", give:"Have {p} available whenever you want for a day", get:"Be available to {p} whenever they want for a day", note:"A yes here sets it up in advance. Either of you can still say stop." },
+  { id:"struggle", c:"power", h:3, n:"Struggle roleplay", give:"Take {p} while they pretend to resist", get:"Pretend to resist while {p} takes you", note:"Plan it together beforehand and agree a safe word that stops everything instantly." },
+  { id:"servant",  c:"power", h:2, n:"Servant for an evening", give:"Have {p} do whatever you say for an evening", get:"Do whatever {p} says for an evening" },
+  { id:"shibari",  c:"power", h:3, n:"Rope bondage (shibari)", d:"Learning a proper rope harness and tying each other.", give:"Tie {p} in a rope harness", get:"Be tied in a rope harness by {p}", note:"Keep safety scissors close, and loosen it if skin goes cold, numb or changes color." },
+  { id:"spreadeagle",c:"power",h:3, n:"Spread-eagle", give:"Tie {p} spread-eagle to the bed for a whole session", get:"Be tied spread-eagle to the bed by {p}", note:"Keep safety scissors close, and loosen it if skin goes cold, numb or changes color." },
+  { id:"breastbond",c:"power",h:3, n:"Breast bondage", d:"Rope wrapped around the breasts so they're squeezed and extra sensitive.", give:"Tie {p}'s breasts with rope", get:"Have your breasts tied by {p}", note:"Untie right away if the skin goes cold, numb or changes color." },
+  { id:"spreaderbar",c:"power",h:2, n:"Spreader bar", d:"A bar strapped between the ankles or wrists that keeps them apart.", give:"Put {p} in a spreader bar", get:"Be put in a spreader bar by {p}" },
+  { id:"mummy",    c:"power", h:3, n:"Mummification", d:"Wrapped head to toe in cling film or bondage tape so you can't move, with some parts left uncovered.", give:"Wrap {p} up completely", get:"Be wrapped up completely by {p}", note:"The face always stays free, scissors within reach, and never leave them alone." },
+  { id:"vacbed",   c:"power", h:3, n:"Vacbed", d:"Two latex sheets with the air sucked out, so you're held completely still.", give:"Put {p} in a vacbed", get:"Lie in a vacbed {p} controls", note:"Always a breathing tube, and someone stays right there the whole time." },
+  { id:"bodywrite",c:"power", h:2, n:"Writing on the body", give:"Write dirty words on {p}'s body", get:"Have {p} write dirty words on your body" },
+
+  // Rough
+  { id:"countspank",c:"rough",h:3, n:"Counted spanks", give:"Give {p} spanks they count out loud and say thank you for", get:"Count your spanks out loud and say thank you" },
+  { id:"crop",     c:"rough", h:3, n:"Riding crop or light cane", give:"Use a riding crop or light cane on {p}", get:"Feel a riding crop or light cane from {p}" },
+  { id:"clothespins",c:"rough",h:3, n:"Clothespins", give:"Put clothespins on {p}'s skin", get:"Wear clothespins {p} puts on you" },
+  { id:"balls",    c:"rough", h:3, n:"Light ball play", d:"Squeezing and tapping.", give:"Play with {p}'s balls, squeezing and tapping", get:"Have {p} squeeze and tap your balls", note:"Start very gently. Answer No on any side that doesn't fit your body." },
+  { id:"cbt",      c:"rough", h:3, n:"Cock and ball bondage", d:"A strap or ring that tightens or stretches the balls.", give:"Put {p} in cock and ball bondage", get:"Wear cock and ball bondage for {p}", note:"Loosen it if the skin goes cold, numb or changes color. Answer No on any side that doesn't fit your body." },
+  { id:"legslap",  c:"rough", h:3, n:"Slaps between the legs", give:"Lightly slap {p} between the legs", get:"Get lightly slapped between the legs by {p}", note:"Flat fingers and light taps, building up slowly." },
+
+  // Anal & beyond
+  { id:"beads",    c:"deep", h:2, n:"Anal beads", give:"Use anal beads on {p}", get:"Have {p} use anal beads on you" },
+  { id:"bothplugs",c:"deep", h:3, n:"Both plugged", d:"Both of you wearing anal toys at the same time." },
+  { id:"milking",  c:"deep", h:3, n:"Prostate milking", d:"Stimulating the prostate until he leaks or comes, without the penis being touched.", give:"Milk {p}'s prostate", get:"Get your prostate milked by {p}", note:"Answer No on any side that doesn't fit your body." },
+  { id:"hook",     c:"deep", h:3, n:"Anal hook", d:"A smooth metal hook with a ball on the end, tied off with rope so every move tugs on it.", give:"Put an anal hook in {p} and tie it off", get:"Wear an anal hook {p} ties off", note:"Never tie it to anything that could yank suddenly." },
+  { id:"stretch",  c:"deep", h:3, n:"Stretch training", d:"Slightly bigger plugs over days or weeks.", give:"Train {p} with bigger and bigger plugs", get:"Be trained with bigger and bigger plugs by {p}" },
+  { id:"analweek", c:"deep", h:3, n:"Anal-only week", d:"For a whole week, only anal, no vaginal sex." },
+
+  // Places & cameras
+  { id:"phonesex", c:"places", h:1, n:"Phone sex", d:"While you're apart." },
+  { id:"videostrip",c:"places",h:2, n:"Video-call striptease", give:"Strip for {p} on a video call", get:"Watch {p} strip on a video call" },
+  { id:"textdares",c:"places", h:2, n:"Dares by text", give:"Text {p} dares during the day", get:"Do the dares {p} texts you during the day" },
+  { id:"undertable",c:"places",h:2, n:"Under the table", d:"Hands under the table at a restaurant." },
+
+  // Romance
+  { id:"stripdice",c:"romance", h:1, n:"Strip poker or sex dice", d:"A game night where losing is the fun part." },
+
+  // Mind & words
+  { id:"narrate",  c:"mind", h:2, n:"Narrate it", give:"Make {p} say exactly what they feel, and where, while you touch them", get:"Say exactly what you feel, and where, while {p} touches you" },
+  { id:"instruct", c:"mind", h:2, n:"Instructions only", give:"Tell {p} what to do, step by step, without touching them", get:"Follow {p}'s instructions step by step, without being touched" },
+  { id:"stillness",c:"mind", h:2, n:"Don't move", give:"Touch {p} while they're not allowed to move at all", get:"Stay perfectly still while {p} touches you" },
+  { id:"bodymap",  c:"mind", h:1, n:"Body map", give:"Touch every inch of {p} while they rate each spot from 1 to 10", get:"Rate every spot {p} touches from 1 to 10, out loud" },
+  { id:"actout",   c:"mind", h:2, n:"Act it out", give:"Act out {p}'s fantasy with your hands while they describe it", get:"Describe a fantasy in detail while {p} acts it out with their hands" },
+  { id:"askexact", c:"mind", h:2, n:"Ask for it", give:"Only do what {p} asks for out loud, in exact words", get:"Ask out loud, in exact words, for everything you want" },
+  { id:"slowmo",   c:"mind", h:1, n:"Slow motion", d:"A whole session at half speed." },
+  { id:"nohands",  c:"mind", h:1, n:"No hands", d:"Only mouths and bodies allowed." },
+  { id:"voiceonly",c:"mind", h:3, n:"Voice only", give:"Bring {p} close to coming using only your voice", get:"Be brought close to coming by {p}'s voice alone" },
+  { id:"debrief",  c:"mind", h:1, n:"Morning-after debrief", d:"Each of you names the three best moments from last night." },
+  { id:"breathe",  c:"mind", h:1, n:"Breathe in sync", d:"Foreheads together, breathing in rhythm, before anything starts." },
+  { id:"copyme",   c:"mind", h:2, n:"Show and copy", give:"Copy exactly what {p} shows you on themselves", get:"Show {p} on yourself how you like it, then let them copy it" }
 ];
 
 
