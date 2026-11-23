@@ -341,7 +341,10 @@ const ITEMS = [
 
 
 /* ---------- state ---------- */
-const API = "/api/secret-game";
+// Supabase project "vincialmedia-game". The publishable key is meant to be public:
+// it can only call the sg_* functions, which check each player's private token.
+const SB_URL = "https://ygordxdugdnykmazpgtf.supabase.co";
+const SB_KEY = "sb_publishable__gzD8F1bTx_K9gl47Lvr9g_rQr_5CaU";
 const LS_TOKEN = "doubleyes.token";
 const S = {
   token: null,
@@ -405,14 +408,43 @@ function progressMine(cat){
 }
 
 /* ---------- api ---------- */
+const PARAMS = {
+  create: ["name"], peek: ["invite"], join: ["invite", "name"], state: ["token"],
+  save: ["token", "answers"], custom: ["token", "custom"], delete: ["token"]
+};
+const MESSAGES = {
+  400: "That didn't work. Check what you typed and try again.",
+  401: "This game doesn't exist anymore.",
+  404: "This invite link was already used or doesn't exist.",
+  429: "No room for new games right now.",
+  503: "The game's server can't be reached right now."
+};
 async function api(action, payload){
+  const body = {};
+  for (const k of PARAMS[action]) body["p_" + k] = (payload || {})[k];
   let r;
   try {
-    r = await fetch(API, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(Object.assign({ action }, payload || {})), cache:"no-store" });
+    r = await fetch(SB_URL + "/rest/v1/rpc/sg_" + action, {
+      method: "POST",
+      headers: { "apikey": SB_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store"
+    });
   } catch(e){ const err = new Error("You seem to be offline."); err.status = 0; throw err; }
   let data = null;
   try { data = await r.json(); } catch(e){}
-  if (!r.ok){ const err = new Error((data && data.error) || "Something went wrong."); err.status = r.status; throw err; }
+  if (!r.ok){
+    const hint = data && data.hint, code = data && data.code;
+    let status = r.status >= 500 ? 503 : r.status;
+    if (hint === "gone" || code === "PT401") status = 401;
+    else if (hint === "used" || code === "PT404") status = 404;
+    else if (hint === "full" || code === "PT429") status = 429;
+    else if (hint === "invalid" || code === "PT400") status = 400;
+    const known = hint === "gone" || hint === "used" || hint === "full" || hint === "invalid";
+    const err = new Error((known && data.message) || MESSAGES[status] || MESSAGES[503]);
+    err.status = status;
+    throw err;
+  }
   return data;
 }
 function apply(st, keepAnswers){
@@ -447,7 +479,7 @@ const STATUS = {
   saving:     ["Saving…", ""],
   offline:    ["Offline", "warn"],
   unsaved:    ["Not saved", "warn"],
-  setup:      ["Not set up", "warn"]
+  setup:      ["Server asleep", "warn"]
 };
 const statusPill = () => { const s = STATUS[S.status] || STATUS.connecting; return `<span class="pill ${s[1]}" data-status>${s[0]}</span>`; };
 function setStatus(s){
@@ -710,7 +742,7 @@ function viewMatches(){
     : `Your partner hasn't joined yet. Send the invite link from the home screen.`}</p>
   ${both.length ? list(both, "yes") : `<div class="empty">${S.hasPartner && S.partnerCount ? "No double yeses yet. Keep going." : "Nothing yet."}</div>`}
   ${chat.length ? `<h2 class="section-h">Worth talking about</h2><p class="score-sub">One of you said yes, the other said maybe.</p>${list(chat, "")}` : ""}
-  <p class="legend">Arrows point from whoever does it to whoever gets it. The server compares your answers and only sends back matches, so neither of you can see the other's other answers.</p>`;
+  <p class="legend">Arrows point from whoever does it to whoever gets it. The database compares your answers and only sends back matches, so neither of you can see the other's other answers.</p>`;
 }
 
 function keepForm(){
@@ -862,7 +894,7 @@ document.addEventListener("submit", async e => {
     go("home");
   } catch(err){
     S.busy = false;
-    S.formError = err.status === 503 ? "The game isn't connected to its storage yet. Try again later."
+    S.formError = err.status === 503 ? "The game's server can't be reached right now. Try again in a minute."
       : err.status === 0 ? "You seem to be offline. Check your connection and try again."
       : err.message;
     render();
