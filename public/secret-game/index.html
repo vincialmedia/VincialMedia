@@ -363,7 +363,7 @@ const ITEMS = [
   { id:"pee",      c:"taboo", h:3, n:"Watersports", d:"In the shower.", give:"Pee on {p}", get:"Get peed on by {p}", note:"Keep it in the shower and on the outside of the body. Skip it if either of you has a urinary infection." },
   { id:"doctor",   c:"taboo", h:2, n:"Doctor and patient", d:"A full exam roleplay, gloves and all." },
   { id:"sounding", c:"taboo", h:3, n:"Sounding", d:"A smooth, thin rod slid slowly into the urethra, the opening you pee from.", give:"Use a sound on {p}", get:"Have {p} use a sound on you", note:"Only a toy made for this, with a flared end. Everything clean, sterile lube, very slow, never forced. Infections and small tears are the main risks." },
-  { id:"speculum", c:"taboo", h:3, n:"Speculum", d:"The medical tool that holds the vagina open, to look and touch inside.", give:"Open {p} up with a speculum", get:"Be opened up with a speculum by {p}", note:"Warm it, lube it and go slowly. Answer No on any side that doesn't fit your body." },
+  { id:"speculum", c:"taboo", h:3, n:"Speculum", d:"For whoever has a vagina: the medical tool that holds it open, to look and touch inside.", note:"Warm it, lube it and go slowly." },
 
   // Hands & mouths
   { id:"oilwrestle",c:"touch", h:2, n:"Oil wrestling", d:"The winner decides the rest of the night." },
@@ -398,10 +398,10 @@ const ITEMS = [
   { id:"doubletoy",c:"toys", h:3, n:"Double-ended toy", d:"One toy, both ends used at the same time." },
   { id:"swing",    c:"toys", h:2, n:"Sex swing", d:"Hung from a door or the ceiling, so you're held in the air." },
   { id:"strapsuck",c:"toys", h:3, n:"Oral on the strap-on", give:"Go down on {p}'s strap-on", get:"Have {p} go down on your strap-on" },
-  { id:"reversal", c:"toys", h:3, n:"Strap-on role reversal", d:"She wears it and takes the lead, the way he usually does.", give:"Take the lead with a strap-on, the way {p} usually does", get:"Let {p} take the lead with a strap-on" },
+  { id:"reversal", c:"toys", h:3, n:"Strap-on role reversal", d:"One of you wears it and takes charge, the other receives.", give:"Wear a strap-on and take the lead with {p}", get:"Let {p} wear a strap-on and take the lead with you" },
   { id:"glasstoy", c:"toys", h:2, n:"Warm or chilled glass toy", give:"Use a warmed or chilled glass toy on {p}", get:"Have {p} use a warmed or chilled glass toy on you", note:"Warm water or the fridge, never boiling or the freezer, and test it on your wrist first." },
-  { id:"cockring", c:"toys", h:2, n:"Cock ring", d:"A stretchy ring at the base that keeps it harder for longer. Some vibrate for the other partner too.", give:"Put a cock ring on {p}", get:"Wear a cock ring for {p}", note:"Answer No on any side that doesn't fit your body." },
-  { id:"benwa",    c:"toys", h:2, n:"Ben Wa balls", d:"Weighted balls worn inside the vagina. Every step gives a little jolt.", give:"Have {p} wear Ben Wa balls on a date", get:"Wear Ben Wa balls on a date for {p}", note:"Answer No on any side that doesn't fit your body." },
+  { id:"cockring", c:"toys", h:2, n:"Cock ring", d:"For whoever has a cock: a stretchy ring at the base that keeps it harder for longer. Some vibrate for the other partner too." },
+  { id:"benwa",    c:"toys", h:2, n:"Ben Wa balls", d:"For whoever has a vagina: weighted balls worn inside, for example on a date. Every step gives a little jolt." },
   { id:"latex",    c:"toys", h:2, n:"Latex or leather", d:"Dressing up in latex or leather outfits." },
 
   // Power & roles
@@ -414,7 +414,7 @@ const ITEMS = [
   { id:"servant",  c:"power", h:2, n:"Servant for an evening", give:"Have {p} do whatever you say for an evening", get:"Do whatever {p} says for an evening" },
   { id:"shibari",  c:"power", h:3, n:"Rope bondage (shibari)", d:"Learning a proper rope harness and tying each other.", give:"Tie {p} in a rope harness", get:"Be tied in a rope harness by {p}", note:"Keep safety scissors close, and loosen it if skin goes cold, numb or changes color." },
   { id:"spreadeagle",c:"power",h:3, n:"Spread-eagle", give:"Tie {p} spread-eagle to the bed for a whole session", get:"Be tied spread-eagle to the bed by {p}", note:"Keep safety scissors close, and loosen it if skin goes cold, numb or changes color." },
-  { id:"breastbond",c:"power",h:3, n:"Breast bondage", d:"Rope wrapped around the breasts so they're squeezed and extra sensitive.", give:"Tie {p}'s breasts with rope", get:"Have your breasts tied by {p}", note:"Untie right away if the skin goes cold, numb or changes color." },
+  { id:"breastbond",c:"power",h:3, n:"Breast bondage", d:"For whoever has breasts: rope wrapped around them so they're squeezed and extra sensitive.", note:"Untie right away if the skin goes cold, numb or changes color." },
   { id:"spreaderbar",c:"power",h:2, n:"Spreader bar", d:"A bar strapped between the ankles or wrists that keeps them apart.", give:"Put {p} in a spreader bar", get:"Be put in a spreader bar by {p}" },
   { id:"mummy",    c:"power", h:3, n:"Mummification", d:"Wrapped head to toe in cling film or bondage tape so you can't move, with some parts left uncovered.", give:"Wrap {p} up completely", get:"Be wrapped up completely by {p}", note:"The face always stays free, scissors within reach, and never leave them alone." },
   { id:"vacbed",   c:"power", h:3, n:"Vacbed", d:"Two latex sheets with the air sucked out, so you're held completely still.", give:"Put {p} in a vacbed", get:"Lie in a vacbed {p} controls", note:"Always a breathing tube, and someone stays right there the whole time." },
@@ -424,14 +424,14 @@ const ITEMS = [
   { id:"countspank",c:"rough",h:3, n:"Counted spanks", give:"Give {p} spanks they count out loud and say thank you for", get:"Count your spanks out loud and say thank you" },
   { id:"crop",     c:"rough", h:3, n:"Riding crop or light cane", give:"Use a riding crop or light cane on {p}", get:"Feel a riding crop or light cane from {p}" },
   { id:"clothespins",c:"rough",h:3, n:"Clothespins", give:"Put clothespins on {p}'s skin", get:"Wear clothespins {p} puts on you" },
-  { id:"balls",    c:"rough", h:3, n:"Light ball play", d:"Squeezing and tapping.", give:"Play with {p}'s balls, squeezing and tapping", get:"Have {p} squeeze and tap your balls", note:"Start very gently. Answer No on any side that doesn't fit your body." },
-  { id:"cbt",      c:"rough", h:3, n:"Cock and ball bondage", d:"A strap or ring that tightens or stretches the balls.", give:"Put {p} in cock and ball bondage", get:"Wear cock and ball bondage for {p}", note:"Loosen it if the skin goes cold, numb or changes color. Answer No on any side that doesn't fit your body." },
+  { id:"balls",    c:"rough", h:3, n:"Light ball play", d:"For whoever has balls: squeezing and tapping them.", note:"Start very gently." },
+  { id:"cbt",      c:"rough", h:3, n:"Cock and ball bondage", d:"For whoever has them: a strap or ring that tightens or stretches the balls.", note:"Loosen it if the skin goes cold, numb or changes color." },
   { id:"legslap",  c:"rough", h:3, n:"Slaps between the legs", give:"Lightly slap {p} between the legs", get:"Get lightly slapped between the legs by {p}", note:"Flat fingers and light taps, building up slowly." },
 
   // Anal & beyond
   { id:"beads",    c:"deep", h:2, n:"Anal beads", give:"Use anal beads on {p}", get:"Have {p} use anal beads on you" },
   { id:"bothplugs",c:"deep", h:3, n:"Both plugged", d:"Both of you wearing anal toys at the same time." },
-  { id:"milking",  c:"deep", h:3, n:"Prostate milking", d:"Stimulating the prostate until he leaks or comes, without the penis being touched.", give:"Milk {p}'s prostate", get:"Get your prostate milked by {p}", note:"Answer No on any side that doesn't fit your body." },
+  { id:"milking",  c:"deep", h:3, n:"Prostate milking", d:"For whoever has a prostate: stimulating it until they leak or come, without the penis being touched." },
   { id:"hook",     c:"deep", h:3, n:"Anal hook", d:"A smooth metal hook with a ball on the end, tied off with rope so every move tugs on it.", give:"Put an anal hook in {p} and tie it off", get:"Wear an anal hook {p} ties off", note:"Never tie it to anything that could yank suddenly." },
   { id:"stretch",  c:"deep", h:3, n:"Stretch training", d:"Slightly bigger plugs over days or weeks.", give:"Train {p} with bigger and bigger plugs", get:"Be trained with bigger and bigger plugs by {p}" },
   { id:"analweek", c:"deep", h:3, n:"Anal-only week", d:"For a whole week, only anal, no vaginal sex." },
