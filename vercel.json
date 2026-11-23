@@ -16,6 +16,19 @@
           "value": "nosniff"
         }
       ]
+    },
+    {
+      "source": "/secret-game(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
+      ]
     }
   ],
   "cleanUrls": true,
