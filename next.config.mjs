@@ -16,6 +16,10 @@ const nextConfig = {
         source: '/workout',
         destination: '/workout/index.html',
       },
+      {
+        source: '/secret-game',
+        destination: '/secret-game/index.html',
+      },
     ];
   },
 };

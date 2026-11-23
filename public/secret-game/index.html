@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1a0c15">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Double Yes">
+<title>Double Yes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+/* Layout: one phone-width column, one question card at a time, answers under the thumb. Deliberately dark: a candlelit bedroom. */
+:root{
+  color-scheme: dark;
+  --bg:#1a0c15;
+  --glow:#3d1429;
+  --surface:#26121f;
+  --surface-2:#331a2a;
+  --line:#4a2a3c;
+  --ink:#f8eaf0;
+  --muted:#bf9fb0;
+  --faint:#8d6f7f;
+  --yes:#ff4f7e;
+  --yes-ink:#2b0613;
+  --maybe:#f4a85c;
+  --maybe-ink:#2b1604;
+  --no:#6e5866;
+  --gold:#f0c47f;
+  --display:"Instrument Serif","Iowan Old Style",Georgia,serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:18px;
+}
+html,body{min-height:100%}
+body{
+  background:radial-gradient(ellipse 110% 55% at 50% -8%, var(--glow) 0%, transparent 70%) no-repeat, var(--bg);
+  background-color:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.app{
+  max-width:560px;margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:14px 48px;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:10px}
+em{font-style:italic}
+.view{display:flex;flex-direction:column;gap:20px}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:10px;min-height:44px}
+.bar-brand{font-family:var(--display);font-size:24px;line-height:1;letter-spacing:.2px;padding:6px 0;white-space:nowrap}
+.bar-brand em{color:var(--yes)}
+.bar-space{flex:1}
+.pill{font-size:12px;font-weight:600;letter-spacing:.4px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.ok{color:var(--ink)}
+.pill.ok::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#7fd6a4;margin-right:6px;vertical-align:1px}
+.pill.warn{color:var(--maybe);border-color:color-mix(in srgb, var(--maybe) 45%, var(--line))}
+.bar-me{display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;padding:6px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14px}
+.bar-me span{color:var(--muted);font-weight:500}
+
+.banner{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--muted)}
+
+/* who */
+.who{display:flex;flex-direction:column;gap:18px;padding-top:6vh;text-align:left}
+.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin:0}
+.brand{font-family:var(--display);font-weight:400;font-size:clamp(56px,16vw,88px);line-height:.92;margin:0;text-wrap:balance}
+.brand em{color:var(--yes)}
+.lede{color:var(--muted);font-size:17px;margin:0;max-width:34ch}
+.who-btns{display:grid;gap:12px;margin-top:8px}
+.who-btn{display:flex;align-items:baseline;gap:10px;padding:18px 20px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);font-family:var(--display);font-size:34px;line-height:1;text-align:left;transition:border-color .15s, background .15s}
+.who-btn span{font-family:var(--body);font-size:14px;color:var(--muted);letter-spacing:.3px}
+.who-btn:hover{border-color:var(--yes);background:var(--surface-2)}
+.fine{font-size:13px;color:var(--faint);margin:0}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 18px;border-radius:14px;font-weight:600;font-size:16px;border:1px solid var(--line);background:var(--surface)}
+.btn.primary{background:var(--yes);border-color:var(--yes);color:var(--yes-ink)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent}
+.btn.ghost:hover{background:var(--surface)}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.45;cursor:default}
+
+/* home */
+.score{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px}
+.score-top{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.big{font-family:var(--display);font-size:72px;line-height:.8;color:var(--yes);font-variant-numeric:tabular-nums}
+.score-lbl{font-size:16px;color:var(--ink);padding-bottom:4px;max-width:22ch}
+.score-sub{font-size:14px;color:var(--muted);margin:0}
+.progs{display:grid;gap:10px}
+.prog{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:12px;font-size:14px}
+.prog .who-name{color:var(--muted)}
+.prog .n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.track{height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.track i{display:block;height:100%;background:var(--yes);border-radius:999px;transition:width .3s}
+.track.partner i{background:var(--gold)}
+
+.section-h{font-family:var(--display);font-weight:400;font-size:30px;margin:8px 0 -6px}
+.cats{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.cat-btn{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;text-align:left;padding:14px 16px;border-radius:14px;background:var(--surface);border:1px solid transparent;transition:border-color .15s}
+.cat-btn:hover{border-color:var(--line)}
+.cat-name{font-weight:600}
+.cat-blurb{grid-column:1;font-size:13px;color:var(--muted)}
+.cat-count{grid-row:1 / span 2;grid-column:2;align-self:center;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.cat-count.done{color:var(--yes)}
+
+.add{background:var(--surface);border-radius:var(--r);border:1px solid var(--line)}
+.add summary{padding:14px 16px;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+.add summary::-webkit-details-marker{display:none}
+.add summary::after{content:"+";color:var(--muted);font-weight:400;font-size:20px;line-height:1}
+.add[open] summary::after{content:"–"}
+.add-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.field input[type=text],.field select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--ink);cursor:pointer}
+.radios input{accent-color:var(--yes)}
+.custom-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.custom-list li{display:flex;align-items:center;gap:10px;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
+.custom-list li span{flex:1;min-width:0}
+.link{color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-size:13px;padding:4px}
+
+.foot{display:flex;flex-direction:column;gap:10px;padding-top:8px;border-top:1px solid var(--line)}
+
+/* play */
+.play-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{color:var(--muted);font-size:15px;padding:8px 0}
+.back:hover{color:var(--ink)}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px 18px 18px;display:flex;flex-direction:column;gap:16px}
+.card.enter{animation:enter .28s ease-out}
+@keyframes enter{from{transform:translateY(10px);opacity:.35}to{transform:none;opacity:1}}
+.meta{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.heat{display:inline-flex;align-items:center;gap:3px;color:var(--gold);font-size:12px;letter-spacing:1.4px;text-transform:uppercase;white-space:nowrap}
+.heat i{width:6px;height:6px;border-radius:50%;border:1px solid var(--gold);display:inline-block}
+.heat i.on{background:var(--gold)}
+.heat b{font-weight:600;margin-left:5px}
+.card-title{font-family:var(--display);font-weight:400;font-size:clamp(34px,9vw,44px);line-height:1;margin:0;text-wrap:balance}
+.card-desc{margin:-4px 0 0;color:var(--muted);font-size:16px}
+.rows{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;flex-direction:column;gap:8px}
+.row-label{font-size:16px;font-weight:500}
+.row-label small{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:2px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg button{padding:13px 6px;border-radius:12px;border:1px solid var(--line);background:var(--bg);font-weight:600;font-size:15px;transition:background .12s,border-color .12s,color .12s}
+.seg button:hover{border-color:var(--muted)}
+.seg button[aria-pressed=true][data-val=y]{background:var(--yes);border-color:var(--yes);color:var(--yes-ink)}
+.seg button[aria-pressed=true][data-val=m]{background:var(--maybe);border-color:var(--maybe);color:var(--maybe-ink)}
+.seg button[aria-pressed=true][data-val=n]{background:var(--no);border-color:var(--no);color:var(--ink)}
+.note{margin:0;font-size:13px;color:var(--muted);padding:10px 12px;border-radius:12px;background:var(--bg);border-left:2px solid var(--gold)}
+.play-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* matches */
+.m-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.m-head h1{font-family:var(--display);font-weight:400;font-size:40px;line-height:1;margin:0}
+.group{display:flex;flex-direction:column;gap:8px}
+.group h3{margin:6px 0 0;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.m-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.m-item{background:var(--surface);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border:1px solid transparent}
+.m-item.yes{border-color:color-mix(in srgb, var(--yes) 35%, transparent)}
+.m-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.m-name{font-weight:600;min-width:0}
+.m-dir{font-size:14px;color:var(--muted)}
+.m-dir b{color:var(--ink);font-weight:600}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:22px;color:var(--muted);text-align:center}
+.legend{font-size:13px;color:var(--faint);margin:0}
+
+@media (prefers-reduced-motion: reduce){
+  .card.enter{animation:none}
+  .track i{transition:none}
+}
+/* standalone additions */
+.form{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.form input[type=text]{font:inherit;font-size:18px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.form input[type=text]::placeholder{color:var(--faint)}
+.err{color:var(--maybe);font-size:14px;margin:0}
+.invite{background:var(--surface-2);border:1px solid color-mix(in srgb, var(--yes) 40%, var(--line));border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px}
+.invite h2{font-family:var(--display);font-weight:400;font-size:28px;line-height:1.05;margin:0}
+.invite p{margin:0;color:var(--muted);font-size:14px}
+.copy{display:grid;grid-template-columns:1fr auto;gap:8px}
+.copy input{min-width:0;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px}
+.copy .btn{padding:12px 16px}
+.settings{background:var(--surface);border-radius:var(--r);border:1px solid var(--line)}
+.settings summary{padding:14px 16px;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+.settings summary::-webkit-details-marker{display:none}
+.settings summary::after{content:"+";color:var(--muted);font-weight:400;font-size:20px;line-height:1}
+.settings[open] summary::after{content:"–"}
+.settings-body{padding:0 16px 16px;display:flex;flex-direction:column;gap:14px}
+.settings-body h3{margin:0;font-size:14px}
+.danger{color:var(--yes)}
+.me-chip{padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14px;white-space:nowrap;flex-shrink:0}
+.loading{padding-top:20vh;text-align:center;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px}
+.panel .eyebrow{margin:0}
+.panel h2{font-family:var(--display);font-weight:400;font-size:32px;line-height:1;margin:0;text-wrap:balance}
+.panel p{margin:0;color:var(--muted);font-size:14px}
+.panel .link{align-self:flex-start}
+.mood.on{border-color:color-mix(in srgb, var(--yes) 50%, var(--line))}
+.mood.both{background:linear-gradient(140deg, #c2214f 0%, #7d1236 100%);border-color:var(--yes);animation:glow 2.6s ease-in-out infinite}
+.mood.both h2{font-size:40px;color:#fff}
+.mood.both p,.mood.both .eyebrow,.mood.both .link{color:#ffe3ec}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(255,79,126,.0)}50%{box-shadow:0 0 34px 2px rgba(255,79,126,.45)}}
+.q-text{font-family:var(--display);font-weight:400;font-size:clamp(28px,7.6vw,36px);line-height:1.12;margin:0;text-wrap:pretty}
+.timer{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.timer-out{font-family:var(--display);font-size:52px;line-height:1;color:var(--gold);font-variant-numeric:tabular-nums}
+.timer-out.big{font-size:min(30vw,120px)}
+@media (prefers-reduced-motion: reduce){ .mood.both{animation:none} }
+</style>
+</head>
+<body>
+<div class="app"><main id="view" class="view" aria-live="polite"><p class="loading">Loading…</p></main></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- questions ---------- */
+const HEAT = ["", "Sweet", "Spicy", "Wild"];
+const CATS = [
+  { id:"romance", name:"Romance",          blurb:"Slow, sweet and close." },
+  { id:"touch",   name:"Hands & mouths",   blurb:"Oral, edging, watching each other." },
+  { id:"senses",  name:"Senses",           blurb:"Blindfolds, ice, wax, the dark." },
+  { id:"food",    name:"Food play",        blurb:"Things that taste better on skin." },
+  { id:"toys",    name:"Toys",             blurb:"Vibrators, remotes, plugs, straps." },
+  { id:"power",   name:"Power & roles",    blurb:"Who's in charge and how you talk." },
+  { id:"rough",   name:"Rough",            blurb:"Spanking, biting, slapping, pinning." },
+  { id:"deep",    name:"Anal & beyond",    blurb:"Prostate, anal, DP, fisting." },
+  { id:"places",  name:"Places & cameras", blurb:"Where you do it, and filming it." },
+  { id:"fantasy", name:"Fantasy talk",     blurb:"Some to talk about, some for real." },
+  { id:"custom",  name:"Your own",         blurb:"Questions you two added." }
+];
+
+const SUGAR = "Keep sugary stuff away from the vulva, it can cause irritation or infections.";
+const ITEMS = [
+  // Romance
+  { id:"candle",   c:"romance", h:1, n:"Candlelit night in", d:"A slow evening with candles and music that ends in bed." },
+  { id:"undress",  c:"romance", h:1, n:"Undress each other", d:"Take each other's clothes off slowly, no rushing." },
+  { id:"shower",   c:"romance", h:1, n:"Shower together", d:"Wash each other and see where it goes." },
+  { id:"massage",  c:"romance", h:1, n:"Full-body oil massage", give:"Give {p} a full-body oil massage", get:"Get a full-body oil massage from {p}" },
+  { id:"foreplay", c:"romance", h:1, n:"Long foreplay", d:"Half an hour of everything except sex." },
+  { id:"morning",  c:"romance", h:1, n:"Morning sex", d:"Before the alarm, still half asleep." },
+  { id:"eyes",     c:"romance", h:1, n:"Eye contact", d:"Keep looking at each other the whole time." },
+  { id:"quickie",  c:"romance", h:1, n:"Quickie", d:"Fast and urgent, wherever you are." },
+  { id:"naked",    c:"romance", h:1, n:"Naked day", d:"A whole day at home with no clothes on." },
+  { id:"hotel",    c:"romance", h:1, n:"Hotel weekend", d:"A night or two away with no plans except each other." },
+  { id:"sext",     c:"romance", h:1, n:"Sexting", give:"Send {p} dirty texts during the day", get:"Get dirty texts from {p} during the day" },
+  { id:"surprise", c:"romance", h:1, n:"Planned seduction", give:"Plan a surprise seduction for {p}", get:"Get seduced by {p}'s surprise plan" },
+  { id:"positions",c:"romance", h:1, n:"New positions", d:"Pick a few you've never tried and work through them." },
+  { id:"onefant",  c:"romance", h:1, n:"Share a fantasy", d:"Tell each other one fantasy you've never said out loud." },
+
+  // Hands & mouths
+  { id:"oral",     c:"touch", h:1, n:"Oral", give:"Go down on {p}", get:"Have {p} go down on you" },
+  { id:"handsonly",c:"touch", h:1, n:"Hands only", d:"A whole session using only your hands." },
+  { id:"sixtynine",c:"touch", h:2, n:"69", d:"Go down on each other at the same time." },
+  { id:"mutual",   c:"touch", h:2, n:"Side by side", d:"Masturbate next to each other and watch." },
+  { id:"watch",    c:"touch", h:2, n:"Show and watch", give:"Watch while {p} masturbates", get:"Masturbate while {p} watches" },
+  { id:"edging",   c:"touch", h:2, n:"Edging", give:"Bring {p} to the edge again and again before letting go", get:"Get edged by {p}" },
+  { id:"facesit",  c:"touch", h:2, n:"Face-sitting", give:"Sit on {p}'s face", get:"Have {p} sit on your face" },
+  { id:"finish",   c:"touch", h:3, n:"Finish on the body", give:"Finish on {p}'s body", get:"Have {p} finish on your body" },
+
+  // Senses
+  { id:"blindfold",c:"senses", h:1, n:"Blindfold", give:"Blindfold {p}", get:"Get blindfolded by {p}" },
+  { id:"feather",  c:"senses", h:1, n:"Feather tease", give:"Tease {p} with a feather", get:"Get teased with a feather by {p}" },
+  { id:"silent",   c:"senses", h:1, n:"Silent rule", d:"No talking allowed, only sounds." },
+  { id:"playlist", c:"senses", h:1, n:"Sex playlist", d:"Build a playlist together just for sex." },
+  { id:"darkroom", c:"senses", h:2, n:"Blindfolded in the dark", d:"Both of you blindfolded in a dark room, finding each other by touch." },
+  { id:"ice",      c:"senses", h:2, n:"Ice cubes", give:"Trace an ice cube over {p}'s body", get:"Feel {p} trace ice over you" },
+  { id:"wax",      c:"senses", h:2, n:"Candle wax", give:"Drip massage-candle wax on {p}", get:"Have {p} drip wax on you", note:"Use a low-temperature massage candle and test a drop on your own arm first." },
+  { id:"senseoff", c:"senses", h:2, n:"Sight and sound off", give:"Take away {p}'s sight and hearing (blindfold and headphones)", get:"Have {p} take away your sight and hearing" },
+  { id:"mirror",   c:"senses", h:2, n:"Mirror", d:"Have sex in front of a mirror and watch yourselves." },
+
+  // Food
+  { id:"champagne",c:"food", h:1, n:"Strawberries in bed", d:"Champagne and strawberries in bed, naked." },
+  { id:"tasting",  c:"food", h:1, n:"Blind tasting", give:"Blindfold {p} and feed bites to guess", get:"Get blindfolded and fed by {p}" },
+  { id:"eatoff",   c:"food", h:2, n:"Eat off each other", give:"Eat food off {p}'s body", get:"Have {p} eat food off your body", note:SUGAR },
+  { id:"cream",    c:"food", h:2, n:"Whipped cream and oral", give:"Use whipped cream on {p} for oral", get:"Have {p} use whipped cream on you for oral", note:SUGAR },
+  { id:"bodyshot", c:"food", h:2, n:"Body shots", give:"Take a body shot off {p}", get:"Let {p} take a body shot off you" },
+
+  // Toys
+  { id:"shoptoy",  c:"toys", h:1, n:"Toy shopping", d:"Pick out a new toy together." },
+  { id:"vibe",     c:"toys", h:1, n:"Vibrator during sex", d:"Bring a vibrator into sex together." },
+  { id:"usetoy",   c:"toys", h:2, n:"Toy on each other", give:"Use a toy on {p}", get:"Have {p} use a toy on you" },
+  { id:"remote",   c:"toys", h:2, n:"Remote vibrator", d:"At home, or out to dinner.", give:"Hold the remote while {p} wears the toy", get:"Wear the toy while {p} holds the remote" },
+  { id:"plug",     c:"toys", h:2, n:"Butt plug", give:"Put a plug in {p}", get:"Wear a plug for {p}" },
+  { id:"strapon",  c:"toys", h:3, n:"Strap-on", give:"Wear a strap-on for {p}", get:"Have {p} wear a strap-on for you" },
+  { id:"wand",     c:"toys", h:3, n:"Past the first orgasm", give:"Keep a wand vibrator on {p} past the first orgasm", get:"Have {p} keep the wand on you past the first one" },
+
+  // Power & roles
+  { id:"dirty",    c:"power", h:1, n:"Dirty talk", give:"Talk dirty to {p}", get:"Have {p} talk dirty to you" },
+  { id:"praise",   c:"power", h:1, n:"Praise", give:"Praise {p} out loud during sex", get:"Hear {p} praise you during sex" },
+  { id:"lingerie", c:"power", h:1, n:"Dress up", give:"Dress up in lingerie for {p}", get:"Have {p} dress up in lingerie for you" },
+  { id:"tease",    c:"power", h:2, n:"All-day tease", d:"Tease each other all day, nothing happens until tonight." },
+  { id:"strangers",c:"power", h:2, n:"Strangers at a bar", d:"Arrive separately and pick each other up like strangers." },
+  { id:"costume",  c:"power", h:2, n:"Costume roleplay", d:"Roleplay with outfits or uniforms." },
+  { id:"swap",     c:"power", h:2, n:"Swap roles", d:"Flip whatever your usual roles in bed are." },
+  { id:"control",  c:"power", h:2, n:"In charge for a night", give:"Take full control of {p} for a night", get:"Give {p} full control for a night" },
+  { id:"tie",      c:"power", h:2, n:"Tied up", give:"Tie {p} up", get:"Get tied up by {p}", note:"Keep safety scissors close, nothing around the neck, and check hands for tingling or numbness." },
+  { id:"permission",c:"power",h:3, n:"Ask permission", give:"Make {p} ask permission before coming", get:"Ask {p} for permission before you come" },
+  { id:"names",    c:"power", h:3, n:"Dirty names", give:"Call {p} dirty names", get:"Get called dirty names by {p}" },
+  { id:"collar",   c:"power", h:3, n:"Collar", give:"Put a collar on {p}", get:"Wear a collar for {p}" },
+  { id:"spit",     c:"power", h:3, n:"Spit", give:"Spit on {p}", get:"Get spit on by {p}" },
+
+  // Rough
+  { id:"spank",    c:"rough", h:2, n:"Spanking", give:"Spank {p}", get:"Get spanked by {p}" },
+  { id:"bite",     c:"rough", h:2, n:"Biting", give:"Bite {p}", get:"Get bitten by {p}" },
+  { id:"hair",     c:"rough", h:2, n:"Hair pulling", give:"Pull {p}'s hair", get:"Have {p} pull your hair", note:"Grip close to the scalp so it pulls evenly instead of yanking." },
+  { id:"scratch",  c:"rough", h:2, n:"Scratching", give:"Scratch {p}'s back", get:"Get scratched by {p}" },
+  { id:"marks",    c:"rough", h:2, n:"Marks and hickeys", give:"Leave marks on {p}", get:"Have {p} leave marks on you" },
+  { id:"pin",      c:"rough", h:2, n:"Pinned down", give:"Pin {p} down by the wrists", get:"Get pinned down by {p}" },
+  { id:"slap",     c:"rough", h:3, n:"Face slap", give:"Slap {p}'s face (light)", get:"Get slapped in the face by {p}", note:"Open hand on the cheek, away from ears, eyes and jaw. Agree on it before, not in the moment." },
+  { id:"throat",   c:"rough", h:3, n:"Hand on the throat", give:"Rest a hand on {p}'s throat", get:"Have {p} rest a hand on your throat", note:"Resting only, no pressure. Pressing on the neck can cause serious injury, even briefly." },
+  { id:"paddle",   c:"rough", h:3, n:"Paddle or flogger", give:"Use a paddle or flogger on {p}", get:"Feel a paddle or flogger from {p}" },
+  { id:"rough",    c:"rough", h:3, n:"Really rough", d:"Grabbing, throwing, holding down. Less gentle, more intense." },
+
+  // Anal & beyond
+  { id:"finger",   c:"deep", h:2, n:"A finger in the butt", give:"Slip a finger into {p}'s butt during sex or oral", get:"Have {p} slip a finger into yours" },
+  { id:"rim",      c:"deep", h:3, n:"Rimming", give:"Lick {p}'s ass", get:"Have {p} lick your ass" },
+  { id:"prostate", c:"deep", h:3, n:"Prostate massage", give:"Give {p} a prostate massage", get:"Get a prostate massage from {p}", note:"Short, smooth nails and plenty of lube. Answer No on any side that doesn't fit your body." },
+  { id:"anal",     c:"deep", h:3, n:"Anal sex", give:"Penetrate {p} anally", get:"Be penetrated anally by {p}", note:"Lots of lube and a slow start. Never switch from anal to vaginal without washing or a fresh condom." },
+  { id:"dp",       c:"deep", h:3, n:"Double penetration", give:"Give {p} DP, with a toy", get:"Get DP from {p}, with a toy", note:"Between the two of you that means one partner plus a toy. Clean or re-cover the toy before it switches places." },
+  { id:"fist",     c:"deep", h:3, n:"Fisting", give:"Fist {p}", get:"Get fisted by {p}", note:"Needs a long, slow warm-up, plenty of lube and short, smooth nails (gloves help). Talk through vaginal or anal first." },
+
+  // Places & cameras
+  { id:"everyroom",c:"places", h:1, n:"Every room", d:"Every room in the place, kitchen counter included." },
+  { id:"porn",     c:"places", h:1, n:"Watch porn together", d:"Pick something together and watch it in bed." },
+  { id:"erotica",  c:"places", h:1, n:"Read erotica", give:"Read erotica out loud to {p}", get:"Have {p} read erotica to you" },
+  { id:"outdoors", c:"places", h:2, n:"Outdoors", d:"Somewhere secluded in nature." },
+  { id:"car",      c:"places", h:2, n:"In the car", d:"Parked somewhere quiet, windows steamed up." },
+  { id:"water",    c:"places", h:2, n:"In the water", d:"A hot tub, a pool or a lake." },
+  { id:"nudes",    c:"places", h:2, n:"Nudes", give:"Send {p} nudes", get:"Get nudes from {p}" },
+  { id:"almost",   c:"places", h:3, n:"Almost caught", d:"Somewhere you could almost get caught (but won't)." },
+  { id:"film",     c:"places", h:3, n:"Film yourselves", d:"Just for the two of you.", note:"Agree where it's stored and when it gets deleted." },
+
+  // Fantasy
+  { id:"fantasybox",c:"fantasy",h:1, n:"Fantasy jar", d:"Each write a few fantasies on paper, then draw one together." },
+  { id:"threetalk",c:"fantasy", h:2, n:"Threesome, as dirty talk", d:"Describe a threesome to each other in bed. Talk only." },
+  { id:"three",    c:"fantasy", h:3, n:"Threesome, for real", d:"Actually invite a third person." },
+  { id:"watched",  c:"fantasy", h:3, n:"Being watched", d:"Have sex while someone else watches." },
+  { id:"club",     c:"fantasy", h:3, n:"Sex club or play party", d:"Go to one, even if it's only to watch." },
+  { id:"share",    c:"fantasy", h:3, n:"Watching with someone else", give:"Watch {p} with someone else", get:"Be with someone else while {p} watches" }
+];
+
+
+/* ---------- state ---------- */
+// Supabase project "vincialmedia-game". The publishable key is meant to be public:
+// it can only call the sg_* functions, which check each player's private token.
+const SB_URL = "https://ygordxdugdnykmazpgtf.supabase.co";
+const SB_KEY = "sb_publishable__gzD8F1bTx_K9gl47Lvr9g_rQr_5CaU";
+const LS_TOKEN = "doubleyes.token";
+const LS_Q36 = "doubleyes.q36";
+
+// 36 questions in three sets that get deeper, inspired by Arthur Aron's 1997
+// closeness study and rewritten for a couple who already know each other.
+const Q36 = [
+  "If you could have dinner with anyone, living or not, who would it be and what would you ask?",
+  "What small thing can turn a bad day around for you?",
+  "Describe your perfect lazy Sunday, from waking up to falling asleep.",
+  "Which song do you know every single word to, even if you'd never admit it?",
+  "If you could relive one ordinary day from your childhood, which one would it be?",
+  "What were you completely obsessed with as a kid?",
+  "What's the best meal you've ever had, and who were you with?",
+  "Name three things the two of you share that most people wouldn't guess.",
+  "What are you most thankful for this year?",
+  "What's one thing about how you grew up that you'd do differently one day?",
+  "Tell your life story in four minutes. The other one just listens.",
+  "If you could master one skill overnight, which would you pick?",
+  "If you could know one thing about your future for certain, what would you want to know?",
+  "What's a dream you've had for years and still haven't chased? What's stopping you?",
+  "What are you proudest of so far?",
+  "What do you need most from the people closest to you?",
+  "What's your favorite memory of the two of you?",
+  "What's a hard moment that shaped who you are today?",
+  "If you knew you had one year left, what would you change about how you live now?",
+  "When do you feel most loved by the other person?",
+  "What does a really good relationship look like to you, ten years from now?",
+  "Take turns naming things you love about each other until you've each said five.",
+  "How did your family show love when you were growing up?",
+  "How do you feel about your relationship with your parents today?",
+  "Each make three true sentences that start with \"We\", like \"We both feel… right now.\"",
+  "Finish this: \"Something I wish I could share with someone more often is…\"",
+  "What's something about you that you'd like the other person to understand better?",
+  "Say what you love about the other person, the honest version, not the polite one.",
+  "What's an embarrassing moment you've never told anyone about?",
+  "When did you last cry, and what was it about?",
+  "What does the other person do that makes you feel safe?",
+  "Is there anything too serious to joke about, for you?",
+  "What's something you never said to someone and wish you had?",
+  "If your home caught fire and everyone was safe, what one thing would you go back for?",
+  "What worries you most about the future, and how could the other person help?",
+  "Share something you're struggling with and ask how the other would handle it. Then ask how they think you feel about it."
+];
+const Q36_SETS = [["Set I", "Warming up"], ["Set II", "Getting deeper"], ["Set III", "Closest"]];
+
+// "In the mood tonight?" is one answer per night, keyed by date. A night runs
+// from 6 in the morning to 6 the next morning.
+function moodKey(){
+  const d = new Date(Date.now() - 6 * 3600 * 1000);
+  return "mood_" + d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+}
+const S = {
+  token: null,
+  meName: "", partnerName: "", hasPartner: false, partnerCount: 0,
+  invite: null, inviterName: "", joinInvite: null,
+  answers: {}, custom: [], matches: [],
+  view: "loading", seq: [], idx: 0, seqCat: null,
+  status: "connecting", banner: "", formError: "",
+  clearArmed: false, deleteArmed: false, busy: false
+};
+let dirty = false, inflight = false, saveTimer = null, advanceTimer = null, lastCardKey = null, loaded = false;
+let timer = null, wakeLock = null;
+S.q36 = Math.max(0, Math.min(36, parseInt(lsGet(LS_Q36), 10) || 0));
+const LIVE = v => v === "home" || v === "matches";
+
+/* ---------- helpers ---------- */
+const $view = document.getElementById("view");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fill = (s, p) => s.replace(/\{p\}/g, p);
+const catName = id => (CATS.find(c => c.id === id) || {}).name || "";
+const pname = () => S.partnerName || "your partner";
+const Pname = () => S.partnerName || "Your partner";
+const pageUrl = () => location.origin + location.pathname;
+
+function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+function lsSet(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+function lsDel(k){ try { localStorage.removeItem(k); } catch(e){} }
+
+function cleanCustom(list){
+  if (!Array.isArray(list)) return [];
+  return list.filter(x => x && typeof x.n === "string" && typeof x.id === "string").slice(0, 50).map(x => ({
+    id: x.id.replace(/[^a-z0-9]/gi, "").slice(0, 24),
+    n: x.n.slice(0, 140),
+    t: x.t === "dir" ? "dir" : "both",
+    h: [1,2,3].includes(x.h) ? x.h : 2
+  }));
+}
+function cleanAnswers(a){
+  const out = {};
+  if (a && typeof a === "object") for (const k in a) if (a[k] === "y" || a[k] === "m" || a[k] === "n") out[k] = a[k];
+  return out;
+}
+function allItems(){
+  return ITEMS.concat(S.custom.map(c => c.t === "dir"
+    ? { id:"c_"+c.id, c:"custom", h:c.h, n:c.n, give:"Do it to {p}", get:"Have {p} do it to you" }
+    : { id:"c_"+c.id, c:"custom", h:c.h, n:c.n }));
+}
+const itemById = id => allItems().find(i => i.id === id);
+function rowsOf(item){
+  if (!item.give) return [{ key:item.id, label:null }];
+  return [
+    { key:item.id+":give", label:fill(item.give, pname()), tag:"You → " + pname() },
+    { key:item.id+":get",  label:fill(item.get, pname()),  tag:Pname() + " → you" }
+  ];
+}
+const isDone = item => rowsOf(item).every(r => S.answers[r.key]);
+function progressMine(cat){
+  let total = 0, done = 0;
+  for (const it of allItems()){
+    if (cat && it.c !== cat) continue;
+    for (const r of rowsOf(it)){ total++; if (S.answers[r.key]) done++; }
+  }
+  return { total, done };
+}
+
+/* ---------- api ---------- */
+const PARAMS = {
+  create: ["name"], peek: ["invite"], join: ["invite", "name"], state: ["token"],
+  save: ["token", "answers"], custom: ["token", "custom"], delete: ["token"]
+};
+const MESSAGES = {
+  400: "That didn't work. Check what you typed and try again.",
+  401: "This game doesn't exist anymore.",
+  404: "This invite link was already used or doesn't exist.",
+  429: "No room for new games right now.",
+  503: "The game's server can't be reached right now."
+};
+async function api(action, payload){
+  const body = {};
+  for (const k of PARAMS[action]) body["p_" + k] = (payload || {})[k];
+  let r;
+  try {
+    r = await fetch(SB_URL + "/rest/v1/rpc/sg_" + action, {
+      method: "POST",
+      headers: { "apikey": SB_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store"
+    });
+  } catch(e){ const err = new Error("You seem to be offline."); err.status = 0; throw err; }
+  let data = null;
+  try { data = await r.json(); } catch(e){}
+  if (!r.ok){
+    const hint = data && data.hint, code = data && data.code;
+    let status = r.status >= 500 ? 503 : r.status;
+    if (hint === "gone" || code === "PT401") status = 401;
+    else if (hint === "used" || code === "PT404") status = 404;
+    else if (hint === "full" || code === "PT429") status = 429;
+    else if (hint === "invalid" || code === "PT400") status = 400;
+    const known = hint === "gone" || hint === "used" || hint === "full" || hint === "invalid";
+    const err = new Error((known && data.message) || MESSAGES[status] || MESSAGES[503]);
+    err.status = status;
+    throw err;
+  }
+  return data;
+}
+function apply(st, keepAnswers){
+  if (!st || !st.me) return;
+  S.meName = String(st.me.name || "");
+  S.hasPartner = !!st.partner;
+  S.partnerName = st.partner ? String(st.partner.name || "") : "";
+  S.partnerCount = st.partner ? Number(st.partner.count) || 0 : 0;
+  S.invite = typeof st.invite === "string" ? st.invite : null;
+  S.custom = cleanCustom(st.custom);
+  S.matches = Array.isArray(st.matches) ? st.matches.filter(m => m && typeof m.k === "string" && (m.l === "y" || m.l === "m")) : [];
+  if (!keepAnswers) S.answers = cleanAnswers(st.me.answers);
+  loaded = true;
+}
+function handleError(e){
+  if (e.status === 401){
+    lsDel(LS_TOKEN);
+    S.token = null; loaded = false;
+    S.banner = e.message || "This game doesn't exist anymore.";
+    go("start");
+    return;
+  }
+  if (e.status === 503) setStatus("setup");
+  else if (e.status === 0) setStatus("offline");
+  else setStatus("unsaved");
+}
+
+/* ---------- status ---------- */
+const STATUS = {
+  connecting: ["Connecting…", ""],
+  synced:     ["Synced", "ok"],
+  saving:     ["Saving…", ""],
+  offline:    ["Offline", "warn"],
+  unsaved:    ["Not saved", "warn"],
+  setup:      ["Server asleep", "warn"]
+};
+const statusPill = () => { const s = STATUS[S.status] || STATUS.connecting; return `<span class="pill ${s[1]}" data-status>${s[0]}</span>`; };
+function setStatus(s){
+  S.status = s;
+  const st = STATUS[s] || STATUS.connecting;
+  document.querySelectorAll("[data-status]").forEach(el => { el.textContent = st[0]; el.className = "pill " + st[1]; });
+}
+
+/* ---------- saving ---------- */
+function setAnswer(key, val){
+  S.answers = Object.assign({}, S.answers, { [key]: val });
+  dirty = true;
+  scheduleSave(600);
+}
+// Send all answers, dropping "in the mood" taps from earlier nights.
+function answersPayload(){
+  const k = moodKey(), out = {};
+  for (const key in S.answers) if (!key.startsWith("mood_") || key === k) out[key] = S.answers[key];
+  return out;
+}
+function setMood(on){
+  const next = {};
+  for (const k in S.answers) if (!k.startsWith("mood_")) next[k] = S.answers[k];
+  if (on) next[moodKey()] = "y";
+  S.answers = next;
+  dirty = true;
+  render();
+  saveNow();
+}
+function scheduleSave(ms){ clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, ms); }
+async function saveNow(){
+  if (!S.token || !dirty) return;
+  if (inflight){ scheduleSave(400); return; }
+  inflight = true; dirty = false;
+  setStatus("saving");
+  try {
+    const st = await api("save", { token: S.token, answers: answersPayload() });
+    apply(st, true);
+    setStatus(dirty ? "saving" : "synced");
+    if (LIVE(S.view)) render();
+  } catch(e){
+    dirty = true;
+    handleError(e);
+    if (S.token) scheduleSave(6000);
+  } finally { inflight = false; }
+}
+async function refresh(){
+  if (!S.token || inflight) return;
+  try {
+    const st = await api("state", { token: S.token });
+    apply(st, dirty || inflight);
+    if (!dirty) setStatus("synced");
+    if (S.view === "loading") S.view = "home";
+    if (LIVE(S.view)) render();
+  } catch(e){
+    if (S.view === "loading" && e.status !== 401){ S.view = "home"; render(); }
+    handleError(e);
+  }
+}
+async function saveCustom(next){
+  S.custom = next;
+  render();
+  setStatus("saving");
+  try { apply(await api("custom", { token: S.token, custom: next }), true); setStatus("synced"); render(); }
+  catch(e){ handleError(e); }
+}
+
+/* ---------- rendering ---------- */
+function bar(){
+  return `<div class="bar">
+    <button class="bar-brand" data-act="home" aria-label="Home">Double <em>Yes</em></button>
+    <span class="bar-space"></span>
+    ${statusPill()}
+    ${S.meName ? `<span class="me-chip">${esc(S.meName)}</span>` : ""}
+  </div>${S.banner ? `<div class="banner">${esc(S.banner)}</div>` : ""}`;
+}
+function heat(h){
+  return `<span class="heat" aria-label="Heat: ${HEAT[h]}">${[1,2,3].map(i => `<i class="${i <= h ? "on" : ""}"></i>`).join("")}<b>${HEAT[h]}</b></span>`;
+}
+function copyField(id, value, label){
+  return `<div class="copy"><input id="${id}" type="text" readonly value="${esc(value)}" aria-label="${esc(label)}"><button class="btn" data-act="copy" data-target="${id}">Copy</button></div>`;
+}
+
+function viewStart(){
+  return `<section class="who">
+    ${S.banner ? `<div class="banner">${esc(S.banner)}</div>` : ""}
+    <p class="eyebrow">For two</p>
+    <h1 class="brand">Double <em>Yes</em></h1>
+    <p class="lede">Each of you answers on your own phone. You only ever see the things you both said yes to.</p>
+    <form class="form" id="start-form" autocomplete="off">
+      <input type="text" id="name-in" maxlength="30" placeholder="Your first name" aria-label="Your first name" required>
+      ${S.formError ? `<p class="err">${esc(S.formError)}</p>` : ""}
+      <button class="btn primary block" type="submit" ${S.busy ? "disabled" : ""}>${S.busy ? "Starting…" : "Start a game"}</button>
+    </form>
+    <p class="fine">You'll get a link to send to your partner. Already playing on another phone? Open your personal link from there.</p>
+  </section>`;
+}
+function viewJoin(){
+  const who = S.inviterName ? esc(S.inviterName) + " wants" : "Someone wants";
+  return `<section class="who">
+    <p class="eyebrow">You're invited</p>
+    <h1 class="brand">Double <em>Yes</em></h1>
+    <p class="lede">${who} to play. Answer privately: only the things you both say yes to ever show up.</p>
+    ${S.token ? `<div class="banner">This phone is already in a game. Joining switches it to this one.</div>` : ""}
+    <form class="form" id="join-form" autocomplete="off">
+      <input type="text" id="name-in" maxlength="30" placeholder="Your first name" aria-label="Your first name" required>
+      ${S.formError ? `<p class="err">${esc(S.formError)}</p>` : ""}
+      <button class="btn primary block" type="submit" ${S.busy ? "disabled" : ""}>${S.busy ? "Joining…" : "Join the game"}</button>
+    </form>
+    <p class="fine">Pick a safe word before you try anything new. Red means stop, yellow means slow down.</p>
+  </section>`;
+}
+
+function viewHome(){
+  const pm = progressMine();
+  const both = S.matches.filter(m => m.l === "y" && itemFor(m)).length;
+  const chat = S.matches.filter(m => m.l === "m" && itemFor(m)).length;
+  const next = allItems().find(it => !isDone(it));
+  const pct = x => x.total ? Math.round(100 * x.done / x.total) : 0;
+  const partnerDone = Math.min(S.partnerCount, pm.total);
+  const custom = S.custom;
+  return `${bar()}
+  ${!S.hasPartner && S.invite ? `<section class="invite">
+    <h2>Invite your partner</h2>
+    <p>Send this link. It works once, for one person.</p>
+    ${copyField("invite-link", pageUrl() + "#join=" + S.invite, "Invite link")}
+  </section>` : ""}
+  ${viewMood()}
+  <section class="score">
+    <div class="score-top">
+      <span class="big">${both}</span>
+      <span class="score-lbl">${both === 1 ? "thing you both said yes to" : "things you both said yes to"}</span>
+    </div>
+    <p class="score-sub">${S.hasPartner
+      ? (S.partnerCount ? `Plus ${chat} where one of you said maybe.` : `${esc(S.partnerName)} hasn't answered anything yet.`)
+      : `Matches show up once your partner joins and starts answering.`}</p>
+    <button class="btn ${both ? "primary" : ""} block" data-act="matches">See matches</button>
+  </section>
+
+  <section class="progs" aria-label="Progress">
+    <div class="prog"><span class="who-name">You</span><div class="track"><i style="width:${pct(pm)}%"></i></div><span class="n">${pm.done} / ${pm.total}</span></div>
+    ${S.hasPartner ? `<div class="prog"><span class="who-name">${esc(S.partnerName)}</span><div class="track partner"><i style="width:${pct({ done: partnerDone, total: pm.total })}%"></i></div><span class="n">${partnerDone} / ${pm.total}</span></div>` : ""}
+  </section>
+
+  ${next
+    ? `<button class="btn primary block" data-act="continue">${pm.done ? "Keep answering" : "Start answering"}</button>`
+    : `<p class="score-sub">You've answered everything. Tap a category to change an answer.</p>`}
+
+  <section class="panel">
+    <p class="eyebrow">Date night</p>
+    <h2>36 Questions</h2>
+    <p>Three rounds of questions that get deeper as you go, inspired by Arthur Aron's 1997 closeness study. Sit together with one phone and take turns. Plan about 45 minutes.</p>
+    <button class="btn block" data-act="q36">${S.q36 === 0 ? "Start" : S.q36 >= 36 ? "Continue to the last step" : "Continue at question " + (S.q36 + 1)}</button>
+  </section>
+
+  <h2 class="section-h">Categories</h2>
+  <ul class="cats">
+    ${CATS.filter(c => c.id !== "custom" || custom.length).map(c => {
+      const pc = progressMine(c.id);
+      return `<li><button class="cat-btn" data-act="cat" data-c="${c.id}">
+        <span class="cat-name">${esc(c.name)}</span>
+        <span class="cat-blurb">${esc(c.blurb)}</span>
+        <span class="cat-count ${pc.done === pc.total ? "done" : ""}">${pc.done === pc.total ? "Done" : pc.done + " / " + pc.total}</span>
+      </button></li>`;
+    }).join("")}
+  </ul>
+
+  <details class="add" id="add-details">
+    <summary>Add your own question</summary>
+    <form class="add-body" id="add-form" autocomplete="off">
+      <label class="field">What is it?
+        <input type="text" id="cq-text" maxlength="140" placeholder="e.g. Shower sex with the lights off" required>
+      </label>
+      <div class="field">How does it work?
+        <div class="radios">
+          <label><input type="radio" name="cq-type" id="cq-both" value="both" checked> We do it together</label>
+          <label><input type="radio" name="cq-type" id="cq-dir" value="dir"> One does it to the other</label>
+        </div>
+      </div>
+      <label class="field">Heat
+        <select id="cq-heat"><option value="1">Sweet</option><option value="2" selected>Spicy</option><option value="3">Wild</option></select>
+      </label>
+      <button class="btn primary" type="submit">Add question</button>
+      ${custom.length ? `<ul class="custom-list">${custom.map(c => `<li><span>${esc(c.n)}</span><button type="button" class="link" data-act="rmq" data-id="${esc(c.id)}">Remove</button></li>`).join("")}</ul>` : ""}
+      <p class="fine">You both see questions added here.</p>
+    </form>
+  </details>
+
+  <details class="settings" id="settings-details">
+    <summary>Settings</summary>
+    <div class="settings-body">
+      <h3>Your personal link</h3>
+      <p class="fine">Open it on another phone or browser to pick up where you left off. Keep it to yourself: whoever has it can see your answers.</p>
+      ${copyField("me-link", pageUrl() + "#me=" + S.token, "Your personal link")}
+      <button class="link" style="align-self:flex-start" data-act="clear">${S.clearArmed ? "Tap again to clear all of your answers" : "Clear my answers"}</button>
+      <button class="link danger" style="align-self:flex-start" data-act="delete">${S.deleteArmed ? "Tap again: this deletes both of your answers for good" : "Delete our game"}</button>
+    </div>
+  </details>
+
+  <footer class="foot">
+    <p class="fine">A match is a starting point to talk, not a promise. Either of you can change your mind any time.</p>
+  </footer>`;
+}
+
+function viewMood(){
+  if (!S.hasPartner) return "";
+  const k = moodKey();
+  const mine = S.answers[k] === "y";
+  const both = mine && S.matches.some(m => m.k === k && m.l === "y");
+  const p = esc(S.partnerName || "Your partner");
+  if (both) return `<section class="panel mood both">
+    <p class="eyebrow">Tonight</p>
+    <h2>You're both in the mood.</h2>
+    <p>This resets tomorrow morning.</p>
+    <button class="link" data-act="mood-off">Take mine back</button>
+  </section>`;
+  if (mine) return `<section class="panel mood on">
+    <p class="eyebrow">Tonight</p>
+    <h2>You're in the mood.</h2>
+    <p>If ${p} taps it too tonight, you'll both see it here. If not, nobody ever knows.</p>
+    <button class="link" data-act="mood-off">Take it back</button>
+  </section>`;
+  return `<section class="panel mood">
+    <p class="eyebrow">Tonight</p>
+    <h2>In the mood?</h2>
+    <p>Tap it quietly. ${p} only finds out if they tap it too.</p>
+    <button class="btn primary block" data-act="mood-on">I'm in the mood</button>
+  </section>`;
+}
+
+function viewQ36(){
+  const i = S.q36;
+  if (i >= 36) return `${bar()}
+  <div class="play-head"><button class="back" data-act="home">‹ Home</button><span class="count">Last step</span></div>
+  <section class="who" style="padding-top:2vh">
+    <p class="eyebrow">The finish</p>
+    <h1 class="brand" style="font-size:clamp(48px,13vw,76px)">Four minutes</h1>
+    <p class="lede">Put the phone down where you can both see it. Look into each other's eyes for four minutes, without talking.</p>
+    <div class="timer"><span class="timer-out big" id="timer-out">4:00</span></div>
+    <button class="btn primary block" data-act="timer" data-sec="240">Start the timer</button>
+    <div class="play-nav">
+      <button class="btn ghost" data-act="q-prev">Back</button>
+      <button class="btn ghost" data-act="q-restart">Start over</button>
+    </div>
+  </section>`;
+  const set = Q36_SETS[Math.floor(i / 12)];
+  const first = i % 2 === 0 ? (S.meName || "You") : (S.partnerName || "Your partner");
+  return `${bar()}
+  <div class="play-head">
+    <button class="back" data-act="home">‹ Home</button>
+    <span class="count">${i + 1} / 36</span>
+  </div>
+  <div class="track"><i style="width:${Math.round(100 * i / 36)}%"></i></div>
+  <article class="card enter">
+    <div class="meta"><span>${set[0]}</span><span>${set[1]}</span></div>
+    <h2 class="q-text">${esc(Q36[i])}</h2>
+    <p class="fine">You both answer. ${esc(first)} goes first.</p>
+    ${i === 10 ? `<div class="timer"><span class="timer-out" id="timer-out">4:00</span><button class="btn" data-act="timer" data-sec="240">Start 4-minute timer</button></div>` : ""}
+  </article>
+  <div class="play-nav">
+    <button class="btn ghost" data-act="q-prev" ${i === 0 ? "disabled" : ""}>Back</button>
+    <button class="btn" data-act="q-next">${i === 35 ? "Last step" : "Next question"}</button>
+  </div>`;
+}
+function setQ36(i){
+  S.q36 = Math.max(0, Math.min(36, i));
+  lsSet(LS_Q36, String(S.q36));
+  stopTimer();
+  render();
+  window.scrollTo(0, 0);
+}
+function stopTimer(){
+  clearInterval(timer); timer = null;
+  if (wakeLock){ wakeLock.release().catch(() => {}); wakeLock = null; }
+}
+async function startTimer(seconds, button){
+  stopTimer();
+  if (button) button.hidden = true;
+  const end = Date.now() + seconds * 1000;
+  const fmt = s => Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+  const tick = () => {
+    const left = Math.max(0, Math.round((end - Date.now()) / 1000));
+    const out = document.getElementById("timer-out");
+    if (out) out.textContent = left ? fmt(left) : "Time's up";
+    if (!left){
+      stopTimer();
+      try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch(e){}
+    }
+  };
+  tick();
+  timer = setInterval(tick, 250);
+  try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request("screen"); } catch(e){}
+}
+
+function viewPlay(){
+  S.seq = S.seq.filter(id => itemById(id));
+  if (S.idx >= S.seq.length) return viewDone();
+  const it = itemById(S.seq[S.idx]);
+  const rows = rowsOf(it);
+  const enter = it.id !== lastCardKey;
+  lastCardKey = it.id;
+  const label = S.seqCat ? catName(S.seqCat) : "All questions";
+  return `${bar()}
+  <div class="play-head">
+    <button class="back" data-act="home">‹ ${esc(label)}</button>
+    <span class="count">${S.idx + 1} / ${S.seq.length}</span>
+  </div>
+  <div class="track"><i style="width:${Math.round(100 * S.idx / S.seq.length)}%"></i></div>
+  <article class="card ${enter ? "enter" : ""}">
+    <div class="meta"><span>${esc(catName(it.c))}</span>${heat(it.h)}</div>
+    <h2 class="card-title">${esc(it.n)}</h2>
+    ${it.d ? `<p class="card-desc">${esc(it.d)}</p>` : ""}
+    <div class="rows">
+      ${rows.map(r => {
+        const v = S.answers[r.key];
+        return `<div class="row">
+          ${r.label ? `<div class="row-label"><small>${esc(r.tag)}</small>${esc(r.label)}</div>` : ""}
+          <div class="seg" role="group" aria-label="${esc(r.label || it.n)}">
+            ${[["y","Yes"],["m","Maybe"],["n","No"]].map(([val, txt]) =>
+              `<button data-act="ans" data-key="${esc(r.key)}" data-val="${val}" aria-pressed="${v === val}">${txt}</button>`).join("")}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+    ${it.note ? `<p class="note">${esc(it.note)}</p>` : ""}
+  </article>
+  <div class="play-nav">
+    <button class="btn ghost" data-act="prev" ${S.idx === 0 ? "disabled" : ""}>Back</button>
+    <button class="btn ghost" data-act="next">${isDone(it) ? "Next" : "Skip for now"}</button>
+  </div>`;
+}
+
+function viewDone(){
+  const left = allItems().filter(it => !isDone(it)).length;
+  const label = S.seqCat ? catName(S.seqCat) : "this round";
+  return `${bar()}
+  <section class="who" style="padding-top:4vh">
+    <p class="eyebrow">Done</p>
+    <h1 class="brand" style="font-size:clamp(44px,12vw,68px)">That's ${esc(label)}.</h1>
+    <p class="lede">${left ? `${left} question${left === 1 ? "" : "s"} still open elsewhere.` : "You've answered every question."}</p>
+    <div class="who-btns">
+      <button class="btn primary block" data-act="matches">See matches</button>
+      ${left ? `<button class="btn block" data-act="continue">Keep answering</button>` : ""}
+      <button class="btn ghost block" data-act="home">Back to categories</button>
+    </div>
+  </section>`;
+}
+
+function itemFor(m){
+  const id = m.k.replace(/:(give|get)$/, "");
+  return itemById(id);
+}
+function viewMatches(){
+  const pm = progressMine();
+  const resolved = S.matches.map(m => ({ m, it: itemFor(m) })).filter(x => x.it);
+  const both = resolved.filter(x => x.m.l === "y");
+  const chat = resolved.filter(x => x.m.l === "m");
+  const dirLine = ({ m, it }) => {
+    if (m.k.endsWith(":give")) return `<span class="m-dir"><b>You → ${esc(pname())}</b> · ${esc(fill(it.give, pname()))}</span>`;
+    if (m.k.endsWith(":get"))  return `<span class="m-dir"><b>${esc(Pname())} → you</b> · ${esc(fill(it.get, pname()))}</span>`;
+    return `<span class="m-dir">Together</span>`;
+  };
+  const list = (arr, cls) => CATS.map(c => ({ c, xs: arr.filter(x => x.it.c === c.id) })).filter(g => g.xs.length).map(g => `
+    <div class="group"><h3>${esc(g.c.name)}</h3><ul class="m-list">
+      ${g.xs.map(x => `<li class="m-item ${cls}"><div class="m-top"><span class="m-name">${esc(x.it.n)}</span>${heat(x.it.h)}</div>${dirLine(x)}</li>`).join("")}
+    </ul></div>`).join("");
+  const partnerDone = Math.min(S.partnerCount, pm.total);
+  return `${bar()}
+  <div class="play-head"><button class="back" data-act="home">‹ Home</button></div>
+  <div class="m-head"><span class="big">${both.length}</span><h1>double ${both.length === 1 ? "yes" : "yeses"}</h1></div>
+  <p class="score-sub">${S.hasPartner
+    ? `You've answered ${pm.done} of ${pm.total}, ${esc(S.partnerName)} ${partnerDone} of ${pm.total}. More can show up as you both keep going.`
+    : `Your partner hasn't joined yet. Send the invite link from the home screen.`}</p>
+  ${both.length ? list(both, "yes") : `<div class="empty">${S.hasPartner && S.partnerCount ? "No double yeses yet. Keep going." : "Nothing yet."}</div>`}
+  ${chat.length ? `<h2 class="section-h">Worth talking about</h2><p class="score-sub">One of you said yes, the other said maybe.</p>${list(chat, "")}` : ""}
+  <p class="legend">Arrows point from whoever does it to whoever gets it. The database compares your answers and only sends back matches, so neither of you can see the other's other answers.</p>`;
+}
+
+function keepForm(){
+  const d = document.getElementById("add-details");
+  const st = document.getElementById("settings-details");
+  const t = document.getElementById("cq-text");
+  const n = document.getElementById("name-in");
+  return {
+    open: d ? d.open : false, sopen: st ? st.open : false,
+    text: t ? t.value : "", dir: !!(document.getElementById("cq-dir") || {}).checked,
+    heat: (document.getElementById("cq-heat") || {}).value, name: n ? n.value : "",
+    focus: document.activeElement && document.activeElement.id
+  };
+}
+function restoreForm(k){
+  const d = document.getElementById("add-details"); if (d) d.open = k.open;
+  const st = document.getElementById("settings-details"); if (st) st.open = k.sopen;
+  const t = document.getElementById("cq-text"); if (t) t.value = k.text;
+  const n = document.getElementById("name-in"); if (n) n.value = k.name;
+  if (k.dir && document.getElementById("cq-dir")) document.getElementById("cq-dir").checked = true;
+  if (k.heat && document.getElementById("cq-heat")) document.getElementById("cq-heat").value = k.heat;
+  if (k.focus){ const f = document.getElementById(k.focus); if (f) f.focus(); }
+}
+function render(){
+  const kept = keepForm();
+  let html;
+  switch (S.view){
+    case "start":   html = viewStart(); break;
+    case "join":    html = viewJoin(); break;
+    case "home":    html = viewHome(); break;
+    case "play":    html = viewPlay(); break;
+    case "matches": html = viewMatches(); break;
+    case "q36":     html = viewQ36(); break;
+    default:        html = `<p class="loading">Loading…</p>`;
+  }
+  $view.innerHTML = html;
+  restoreForm(kept);
+}
+function go(view){
+  clearTimeout(advanceTimer);
+  stopTimer();
+  if (view !== "home"){ S.clearArmed = false; S.deleteArmed = false; }
+  S.view = view;
+  render();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- play flow ---------- */
+function startSeq(cat){
+  S.seqCat = cat;
+  if (cat){
+    S.seq = allItems().filter(it => it.c === cat).map(it => it.id);
+    const first = S.seq.findIndex(id => !isDone(itemById(id)));
+    S.idx = first < 0 ? 0 : first;
+  } else {
+    S.seq = allItems().filter(it => !isDone(it)).map(it => it.id);
+    S.idx = 0;
+  }
+  lastCardKey = null;
+  go("play");
+}
+function step(d){
+  clearTimeout(advanceTimer);
+  S.idx = Math.max(0, Math.min(S.seq.length, S.idx + d));
+  render();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b || b.disabled) return;
+  const act = b.dataset.act;
+  if (act !== "clear") S.clearArmed = false;
+  if (act !== "delete") S.deleteArmed = false;
+  switch (act){
+    case "home": S.banner = ""; go(S.token ? "home" : "start"); break;
+    case "continue": startSeq(null); break;
+    case "cat": startSeq(b.dataset.c); break;
+    case "matches": go("matches"); refresh(); break;
+    case "prev": step(-1); break;
+    case "next": step(1); break;
+    case "ans": {
+      const it = itemById(S.seq[S.idx]);
+      const wasDone = it && isDone(it);
+      setAnswer(b.dataset.key, b.dataset.val);
+      render();
+      if (it && !wasDone && isDone(it)){
+        const at = S.idx;
+        clearTimeout(advanceTimer);
+        advanceTimer = setTimeout(() => { if (S.view === "play" && S.idx === at) step(1); }, 360);
+      }
+      break;
+    }
+    case "copy": {
+      const input = document.getElementById(b.dataset.target);
+      if (!input) break;
+      const done = () => { b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy"; }, 1600); };
+      const fallback = () => { input.focus(); input.select(); try { if (document.execCommand("copy")) done(); } catch(err){} };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(input.value).then(done, fallback);
+      else fallback();
+      break;
+    }
+    case "clear":
+      if (S.clearArmed){ S.clearArmed = false; S.answers = {}; dirty = true; saveNow(); render(); }
+      else { S.clearArmed = true; render(); }
+      break;
+    case "delete":
+      if (!S.deleteArmed){ S.deleteArmed = true; render(); break; }
+      S.deleteArmed = false;
+      api("delete", { token: S.token }).then(() => {
+        lsDel(LS_TOKEN); S.token = null; loaded = false; S.answers = {}; S.matches = []; S.meName = "";
+        S.banner = "Your game is deleted.";
+        go("start");
+      }, handleError);
+      break;
+    case "rmq":
+      saveCustom(S.custom.filter(c => c.id !== b.dataset.id));
+      break;
+    case "mood-on": setMood(true); break;
+    case "mood-off": setMood(false); break;
+    case "q36": go("q36"); break;
+    case "q-next": setQ36(S.q36 + 1); break;
+    case "q-prev": setQ36(S.q36 - 1); break;
+    case "q-restart": setQ36(0); break;
+    case "timer": startTimer(parseInt(b.dataset.sec, 10) || 240, b); break;
+  }
+});
+
+document.addEventListener("submit", async e => {
+  const id = e.target.id;
+  if (id !== "start-form" && id !== "join-form" && id !== "add-form") return;
+  e.preventDefault();
+  if (id === "add-form"){
+    const t = document.getElementById("cq-text");
+    const text = (t.value || "").trim().slice(0, 140);
+    if (!text || S.custom.length >= 50) return;
+    const dir = document.getElementById("cq-dir").checked;
+    const h = parseInt(document.getElementById("cq-heat").value, 10) || 2;
+    const cid = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    t.value = "";
+    saveCustom(S.custom.concat([{ id: cid, n: text, t: dir ? "dir" : "both", h }]));
+    return;
+  }
+  const name = (document.getElementById("name-in").value || "").trim();
+  if (!name || S.busy) return;
+  S.busy = true; S.formError = ""; render();
+  try {
+    const res = id === "start-form"
+      ? await api("create", { name })
+      : await api("join", { invite: S.joinInvite, name });
+    S.token = res.token;
+    lsSet(LS_TOKEN, res.token);
+    apply(res, false);
+    S.joinInvite = null; S.banner = "";
+    setStatus("synced");
+    S.busy = false;
+    go("home");
+  } catch(err){
+    S.busy = false;
+    S.formError = err.status === 503 ? "The game's server can't be reached right now. Try again in a minute."
+      : err.status === 0 ? "You seem to be offline. Check your connection and try again."
+      : err.message;
+    render();
+  }
+});
+
+/* ---------- live updates ---------- */
+setInterval(() => {
+  if (document.visibilityState === "visible" && S.token && LIVE(S.view)) refresh();
+}, 8000);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && S.token) refresh();
+  if (document.visibilityState === "hidden" && dirty) saveNow();
+});
+
+/* ---------- boot ---------- */
+(async function boot(){
+  const params = new URLSearchParams(location.hash.slice(1));
+  const join = params.get("join");
+  const me = params.get("me");
+  if (join || me) history.replaceState(null, "", location.pathname + location.search);
+  const valid = t => typeof t === "string" && /^[A-Za-z0-9_-]{20,80}$/.test(t);
+  if (valid(me)) lsSet(LS_TOKEN, me);
+  S.token = valid(me) ? me : lsGet(LS_TOKEN);
+
+  if (valid(join)){
+    S.joinInvite = join;
+    S.view = "join";
+    render();
+    try { const p = await api("peek", { invite: join }); S.inviterName = String(p.name || ""); render(); }
+    catch(e){
+      S.joinInvite = null;
+      S.banner = e.status === 404 ? e.message : "The invite couldn't be checked right now. Try the link again in a moment.";
+      go(S.token ? "home" : "start");
+      if (S.token) refresh();
+    }
+    return;
+  }
+  if (S.token){ S.view = "loading"; render(); refresh(); }
+  else go("start");
+})();
+})();
+</script>
+</body>
+</html>
