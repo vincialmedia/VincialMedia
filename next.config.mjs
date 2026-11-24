@@ -1,5 +1,10 @@
 import siteRewrites from './site-rewrites.mjs';
 
+// Vercel serves public/*.html without the extension (cleanUrls in vercel.json), and a rewrite to the .html path finds nothing
+// there. A local Next server only knows the full file name. So the destination depends on where the build runs.
+const cleanUrls = !!process.env.VERCEL;
+const sitePages = siteRewrites.map((r) => (cleanUrls ? { ...r, destination: r.destination.replace(/\/index\.html$/, '').replace(/\.html$/, '') } : r));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -11,7 +16,7 @@ const nextConfig = {
   async rewrites() {
     return [
       // the new agency site: pre-rendered HTML in public/site, served under clean URLs
-      ...siteRewrites,
+      ...sitePages,
       {
         source: '/workout',
         destination: '/workout/index.html',
