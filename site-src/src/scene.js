@@ -545,13 +545,14 @@ function pose(port) {
 }
 /* the moments inside each loop when the screen is moving; in between it is repainted once and left alone */
 const BUSY = { app: [[3, 3.5], [4.2, 4.5], [5, 5.3], [5.35, 5.85], [8.7, 9.2]], auto: [[0.5, 0.85], [1.3, 2.85], [4.3, 4.65], [5, 6.35], [7.2, 7.65], [12.5, 13.25]], ads: [[0, 3], [4.6, 5.05], [5.3, 5.85], [10.8, 11.65]] }[SHOT] || [];
-let seqKey = '';
+let seqKey = '', FRZ = null;                         // FRZ: one exact frame, set through seek() when the build renders stills or a clip
 function updateShot(p, t, px, py) {
   if (!ready) return;
-  if (POSTER) { p = 0.5; t = 0; px = py = 0; }
+  if (POSTER && FRZ && p !== undefined) return;       // a seeked frame stays until the next seek
+  if (POSTER) { const f = FRZ || { p: 0.5, t: 0, px: 0, py: 0 }; p = f.p; t = f.t; px = f.px; py = f.py; }
   if (t0 < 0) t0 = t;
   px = px || 0; py = py || 0;
-  const port = camera.aspect < 0.9, P = pose(port), still = reduce || POSTER;
+  const port = camera.aspect < 0.9, P = pose(port), still = reduce || (POSTER && !FRZ);
   const e = io(seg(p, 0.02, 0.4)), leave = seg(p, 0.62, 1);                      // arriving, leaving
   const sway = still ? 0 : Math.sin(t * 0.6) * 0.014, bob = still ? 0 : Math.sin(t * 1.2) * 0.02;
   const turn = (e - 1) * 0.5 + leave * 0.22 + sway + px * 0.3;
@@ -564,11 +565,11 @@ function updateShot(p, t, px, py) {
   glowLight.intensity = P.lap ? 1.8 : 0;
   pool.material.opacity = P.lap ? 0.5 : 0.28; pool.position.x = P.lap ? P.lap[0] : 0; halo.material.opacity = 0.5; halo.position.x = P.lap ? P.lap[0] * 0.5 : 0;
   if (SCROLLS) {                                     // the sample site scrolls by itself: down, pause, back up
-    const c = POSTER ? 0 : ((t - t0) % 15) / 15, sc = SHOT === 'local' ? 0.7 + (still ? 0 : Math.sin(t * 0.35) * 0.1) : c < 0.2 ? 0 : c < 0.47 ? io((c - 0.2) / 0.27) : c < 0.67 ? 1 : c < 0.94 ? 1 - io((c - 0.67) / 0.27) : 0;
+    const c = still ? 0 : ((t - t0) % 15) / 15, sc = SHOT === 'local' ? 0.7 + (still ? 0 : Math.sin(t * 0.35) * 0.1) : c < 0.2 ? 0 : c < 0.47 ? io((c - 0.2) / 0.27) : c < 0.67 ? 1 : c < 0.94 ? 1 - io((c - 0.67) / 0.27) : 0;
     tex.site.offset.y = SITE_TOP - sc * SITE_TOP * 0.82;
   }
   if (SEQ) {                                         // the phone screen plays its loop; repaint only when the picture changes
-    const tt = still ? SEQ[2] : (SEQ[2] + (t - t0)) % SEQ[1], busy = BUSY.some(w => tt >= w[0] && tt <= w[1]);
+    const tt = FRZ ? FRZ.tt % SEQ[1] : still ? SEQ[2] : (SEQ[2] + (t - t0)) % SEQ[1], busy = BUSY.some(w => tt >= w[0] && tt <= w[1]);
     const key = busy ? 'b' + Math.floor(tt * 24) : 'i' + BUSY.filter(w => tt > w[1]).length;
     if (key !== seqKey) { seqKey = key; seqT = tt; tex.app.userData.paint(tt); }
   }
@@ -578,5 +579,5 @@ function updateShot(p, t, px, py) {
 const update = HERO ? updateHero : updateShot;
 resize();
 if (window.ResizeObserver) new ResizeObserver(resize).observe(stage); else addEventListener('resize', resize);
-window.__scene = { update, resize };
+window.__scene = { update, resize, seek: POSTER && !HERO ? f => { FRZ = f; t0 = 0; updateShot(); } : null };
 })();
