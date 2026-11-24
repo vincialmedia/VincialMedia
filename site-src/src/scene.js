@@ -1,12 +1,13 @@
 /* VincialMedia 3D scenes. Real-time laptop + phone, three.js r160 (global THREE).
-   Two uses: the scroll-driven hero on the homepage (#gl), and one device "shot" per service page (canvas[data-shot]).
+   Two uses: the scroll-driven hero on the homepage (#gl), and one device "shot" per service page (canvas[data-shot]),
+   pinned behind the text and driven by the scroll as well.
    The page script owns scroll progress and the pointer and calls window.__scene.update(p, t, px, py).
    Words on the screens come from content.js through the JSON block #sd. */
 (function () {
 'use strict';
 const T = window.THREE, doc = document, heroCv = doc.getElementById('gl'), shotCv = doc.querySelector('canvas[data-shot]');
 const canvas = heroCv || shotCv, HERO = !!heroCv, SHOT = HERO ? '' : (window.__shot || (shotCv && shotCv.dataset.shot) || '');
-const sceneEl = HERO ? doc.getElementById('scene') : canvas && canvas.closest('.shot'), stage = HERO ? doc.getElementById('stage') : canvas && canvas.parentElement;
+const sceneEl = HERO ? doc.getElementById('scene') : canvas && canvas.closest('.sv'), stage = HERO ? doc.getElementById('stage') : canvas && canvas.parentElement;
 const fail = () => { if (sceneEl) sceneEl.classList.add(HERO ? 'nogl' : 'still'); };
 if (!T || !canvas) { fail(); return; }
 const QS = new URLSearchParams(location.search), POSTER = QS.has('poster'), PT0 = parseFloat(QS.get('poster')) || 0;   // ?poster=<seconds> freezes a frame for the build's still images
@@ -488,12 +489,14 @@ function resize() {
   camera.fov = Math.max(28, 2 * Math.atan(Math.tan(10 * Math.PI / 180) / camera.aspect) * 180 / Math.PI);
   camera.updateProjectionMatrix();
 }
-function frame(cx, ty, drop, pitch, fitW, fitH) {    // place the camera so a box of fitW x fitH around the target fills the view
+function frame(cx, ty, drop, pitch, fitW, fitH, ox, oy) {   // place the camera so a box of fitW x fitH around the target fills the view; ox, oy shift the picture (share of the view, right and down)
   const A = camera.aspect, th = Math.tan(camera.fov * Math.PI / 360), tw = th * A, d = Math.max(fitW / (2 * tw), fitH / (2 * th));
   V.set(cx, ty + drop * 2 * d * th, 0);
   camera.position.set(cx, V.y + d * Math.sin(pitch), d * Math.cos(pitch));
   camera.lookAt(V);
-  camera.near = Math.max(0.2, d * 0.25); camera.far = d * 2.5 + 30; camera.updateProjectionMatrix();
+  camera.near = Math.max(0.2, d * 0.25); camera.far = d * 2.5 + 30;
+  if (ox || oy) { const w = canvas.width, h = canvas.height; camera.setViewOffset(w, h, -ox * w, -oy * h, w, h); }
+  else { if (camera.view) camera.clearViewOffset(); camera.updateProjectionMatrix(); }
   renderer.render(scene, camera);
   if (!shown) { shown = true; canvas.classList.add('on'); if (!HERO) sceneEl.classList.add('live'); }
 }
@@ -531,35 +534,39 @@ function updateHero(p, t) {
   frame(cx, ty, drop, pitch, fitW, fitH);
 }
 
-/* ---------- one device per service page ----------
-   p: how far the figure has travelled through the viewport (0 enters at the bottom, 0.5 centred, 1 gone at the top)
-   px, py: pointer or finger inside the figure, -1..1, already damped by the page */
-function pose(port) {
-  const phone = { ph: [0, 1.2, 0, 1.5], fitW: 1.62, fitH: 2.9, ty: 1.1, pitch: 0.05, drop: 0, cx: 0 };
-  if (SHOT === 'web') return { lap: [0, -0.28], fitW: port ? 3.7 : 4.3, fitH: port ? 3 : 2.95, ty: 0.95, pitch: 0.15, drop: -0.03, cx: 0 };
-  if (SHOT === 'local') return { lap: [0, 0.28], fitW: port ? 3.7 : 4.3, fitH: port ? 3 : 2.95, ty: 0.95, pitch: 0.15, drop: -0.03, cx: 0 };
-  if (SHOT === 'app') return Object.assign({ pyaw: -0.3 }, phone);
-  if (SHOT === 'auto') return Object.assign({ pyaw: 0.3 }, phone);
-  if (SHOT === 'ads' && port) return Object.assign({ pyaw: -0.28 }, phone);
-  return { lap: [port ? -0.22 : -0.95, 0.22], ph: port ? [0.98, 0.86, 1.3, 1] : [1.62, 1.1, 0.6, 1.36], pyaw: port ? -0.4 : -0.52, fitW: port ? 4.0 : 6.3, fitH: port ? 3 : 3.7, ty: 0.98, pitch: 0.14, drop: -0.06, cx: port ? 0 : 0.2 };
+/* ---------- one device per service page, pinned behind the text ----------
+   p: scroll progress through the page's intro section, 0 at the top, 1 when its last card has passed
+   px, py: pointer, -1..1, already damped by the page
+   lay: { side, safe } from the page. side: wide screen, device beside the text. safe: where the intro text ends (share of the
+   screen height); on narrow screens the device starts below that line and rises to the middle as the text scrolls away */
+function pose(side, port) {
+  const pair = SHOT === 'case' || (SHOT === 'ads' && !port), lap = SHOT === 'web' || SHOT === 'local';
+  if (pair) return side
+    ? { lap: [-0.95, 0.2], ph: [1.62, 1.1, 0.6, 1.36], pyaw: -0.5, dir: 1, fitW: 10.8, fitH: 4.6, ty: 0.98, pitch: 0.14, drop: -0.05, cx: -0.18, ox: 0.22, dev: 2.6 }
+    : { lap: [-0.95, 0.22], ph: [1.62, 1.1, 0.6, 1.36], pyaw: -0.52, dir: 1, fitW: 6.3, fitH: 3.7, ty: 0.98, pitch: 0.14, drop: -0.06, cx: 0.2, ox: 0, dev: 2.6 };
+  if (lap) { const yaw = side ? (SHOT === 'web' ? -0.3 : -0.2) : (SHOT === 'web' ? -0.28 : 0.28);
+    return { lap: [0, yaw], dir: yaw < 0 ? 1 : -1, fitW: side ? 7.5 : port ? 3.7 : 5.4, fitH: side ? 3.7 : 3.0, ty: 0.95, pitch: 0.15, drop: -0.03, cx: 0, ox: 0.225, dev: 2.5 }; }
+  const yaw = side ? -0.3 : SHOT === 'auto' ? 0.3 : -0.3;
+  return { ph: [0, 1.2, 0, 1.5], pyaw: yaw, dir: yaw < 0 ? 1 : -1, fitW: side ? 5.4 : 1.9, fitH: side ? 2.95 : port ? 3.7 : 2.95, ty: 1.1, pitch: 0.05, drop: 0, cx: 0, ox: 0.23, dev: 2.3 };
 }
 /* the moments inside each loop when the screen is moving; in between it is repainted once and left alone */
 const BUSY = { app: [[3, 3.5], [4.2, 4.5], [5, 5.3], [5.35, 5.85], [8.7, 9.2]], auto: [[0.5, 0.85], [1.3, 2.85], [4.3, 4.65], [5, 6.35], [7.2, 7.65], [12.5, 13.25]], ads: [[0, 3], [4.6, 5.05], [5.3, 5.85], [10.8, 11.65]] }[SHOT] || [];
-let seqKey = '', FRZ = null;                         // FRZ: one exact frame, set through seek() when the build renders stills or a clip
-function updateShot(p, t, px, py) {
+let seqKey = '', FRZ = null, LAY = { side: false, safe: 0.6 };   // FRZ: one exact frame, set through seek() when the build renders stills or a clip
+function updateShot(p, t, px, py, lay) {
   if (!ready) return;
+  if (lay) LAY = lay;
   if (POSTER && FRZ && p !== undefined) return;       // a seeked frame stays until the next seek
-  if (POSTER) { const f = FRZ || { p: 0.5, t: 0, px: 0, py: 0 }; p = f.p; t = f.t; px = f.px; py = f.py; }
+  if (POSTER) { const f = FRZ || { p: 0.45, t: 0, px: 0, py: 0 }; p = f.p; t = f.t; px = f.px; py = f.py; }
   if (t0 < 0) t0 = t;
   px = px || 0; py = py || 0;
-  const port = camera.aspect < 0.9, P = pose(port), still = reduce || (POSTER && !FRZ);
-  const e = io(seg(p, 0.02, 0.4)), leave = seg(p, 0.62, 1);                      // arriving, leaving
+  const A = camera.aspect, port = A < 0.9, side = LAY.side && SHOT !== 'case', P = pose(side, port), still = reduce || (POSTER && !FRZ);
+  const e = io(seg(p, 0, 0.22)), s = smooth(p);                                  // settling in, travelling through
   const sway = still ? 0 : Math.sin(t * 0.6) * 0.014, bob = still ? 0 : Math.sin(t * 1.2) * 0.02;
-  const turn = (e - 1) * 0.5 + leave * 0.22 + sway + px * 0.3;
-  sets.forEach(s => {
-    s.lap.visible = !!P.lap; s.ph.visible = !!P.ph; s.sB.visible = s.pB.visible = false; s.sC.visible = !!tex.chrome;
-    if (P.lap) { s.pivot.rotation.x = -lerp(1.0, 1.9, e); s.lap.position.x = P.lap[0]; s.lap.rotation.y = P.lap[1] + turn * (P.ph ? 0.5 : 1); }
-    if (P.ph) { s.ph.position.set(P.ph[0], P.ph[1] + bob - (1 - e) * 0.18, P.ph[2]); s.ph.rotation.set((1 - e) * 0.16 - py * 0.05, P.pyaw + turn * 1.25, (1 - e) * 0.08); s.ph.scale.setScalar(P.ph[3]); }
+  const turn = P.dir * (s * 0.26 - (1 - e) * 0.22) + sway + px * 0.22;           // starts turned away, ends almost facing the viewer
+  sets.forEach(o => {
+    o.lap.visible = !!P.lap; o.ph.visible = !!P.ph; o.sB.visible = o.pB.visible = false; o.sC.visible = !!tex.chrome;
+    if (P.lap) { o.pivot.rotation.x = -lerp(1.5, 1.9, e); o.lap.position.x = P.lap[0]; o.lap.rotation.y = P.lap[1] + turn * (P.ph ? 0.5 : 1); }
+    if (P.ph) { o.ph.position.set(P.ph[0], P.ph[1] + bob, P.ph[2]); o.ph.rotation.set((1 - e) * 0.1 - py * 0.05, P.pyaw + turn * (P.lap ? 1.2 : 1), (1 - e) * 0.05 * P.dir); o.ph.scale.setScalar(P.ph[3]); }
   });
   M.siteA.emissiveIntensity = 1; M.chrome.color.setScalar(1);
   glowLight.intensity = P.lap ? 1.8 : 0;
@@ -573,7 +580,10 @@ function updateShot(p, t, px, py) {
     const key = busy ? 'b' + Math.floor(tt * 24) : 'i' + BUSY.filter(w => tt > w[1]).length;
     if (key !== seqKey) { seqKey = key; seqT = tt; tex.app.userData.paint(tt); }
   }
-  frame(P.cx, P.ty, P.drop, P.pitch - py * 0.035, P.fitW, P.fitH);
+  /* narrow screens: start below the intro text, rise to the middle. wide screens: beside the text, drifting a little closer */
+  const hf = P.dev / Math.max(P.fitW / A, P.fitH), low = side || SHOT === 'case' ? 0 : Math.max(0, LAY.safe + 0.03 - (0.5 - hf / 2));
+  const zoom = side ? lerp(1, 0.93, s) : 1;
+  frame(P.cx, P.ty, P.drop, P.pitch - py * 0.035, P.fitW * zoom, P.fitH * zoom, side ? P.ox : 0, low * (1 - io(seg(p, 0.02, 0.24))));
   if (POSTER) window.__posterReady = true;
 }
 const update = HERO ? updateHero : updateShot;

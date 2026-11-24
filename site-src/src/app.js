@@ -85,28 +85,43 @@ const weakGL = () => {
 };
 const loadScene = (src, fail) => { const s = document.createElement('script'); s.src = src; s.async = true; s.onerror = fail; document.head.appendChild(s); };
 
-/* service pages: the still image of the device becomes a live 3D model you can turn */
-const vis = document.querySelector('.shot[data-src]');
-if (vis && !weakGL()) {
-  const box = vis.querySelector('.vs'), poster = /[?&]poster/.test(location.search);
-  let on = false, raf = 0, drawn = 0, moved = 0, tx = 0, ty = 0, px = 0, py = 0, last = 0;
-  const aim = e => { const r = box.getBoundingClientRect(); tx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - .5) * 2)); ty = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height - .5) * 2)); moved = performance.now(); };
-  box.addEventListener('pointermove', aim, { passive: true });
-  box.addEventListener('pointerdown', aim, { passive: true });
-  box.addEventListener('pointerleave', () => { tx = ty = 0; moved = performance.now(); }, { passive: true });
+/* service pages: the 3D device is a pinned background that moves with the scroll while the text passes over it */
+const sv = $('sv');
+if (sv) {
+  const hero = sv.querySelector('.svhero'), img = sv.querySelector('.svbg img'), sideMq = matchMedia('(min-width:900px) and (min-aspect-ratio:21/20)'), lay = { side: false, safe: .6 };
+  const prog = () => { const r = sv.getBoundingClientRect(); return Math.max(0, Math.min(1, -r.top / Math.max(1, r.height - innerHeight))); };
+  /* side: device beside the text. safe: where the intro text ends, as a share of the screen height, so the device starts below it */
+  const measure = () => { lay.side = sideMq.matches; lay.safe = Math.max(.3, Math.min(.86, (hero.offsetTop + hero.offsetHeight - 70) / innerHeight)); peek(); };
+  /* the still image follows the same path as the live device on narrow screens: below the intro first, then up to the middle */
+  const tall = /^(app|auto|ads)$/.test(sv.querySelector('canvas').dataset.shot) ? .62 : .39;
+  const peek = () => {
+    if (!img) return;
+    if (lay.side || sv.classList.contains('live')) { img.style.transform = ''; return; }
+    const u = Math.max(0, Math.min(1, (prog() - .02) / .22)), k = 1 - (u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+    img.style.transform = `translateY(${(Math.max(0, lay.safe + .03 - (.5 - tall / 2)) * k * 100).toFixed(2)}vh)`;
+  };
+  measure(); addEventListener('resize', measure, { passive: true }); afterLoad(measure);
+  addEventListener('scroll', peek, { passive: true });
+}
+if (sv && !weakGL()) {
+  const lay = { side: false, safe: .6 }, hero = sv.querySelector('.svhero'), sideMq = matchMedia('(min-width:900px) and (min-aspect-ratio:21/20)');
+  const measure = () => { lay.side = sideMq.matches; lay.safe = Math.max(.3, Math.min(.86, (hero.offsetTop + hero.offsetHeight - 70) / innerHeight)); };
+  measure(); addEventListener('resize', measure, { passive: true }); afterLoad(measure);
+  let on = false, raf = 0, drawn = 0, moved = 0, tx = 0, ty = 0, px = 0, py = 0, last = 0, cur = -1, lp = -1;
+  sv.addEventListener('pointermove', e => { if (e.pointerType === 'touch') return; tx = (e.clientX / innerWidth - .5) * 2; ty = (e.clientY / innerHeight - .5) * 2; moved = performance.now(); }, { passive: true });
+  sv.addEventListener('pointerleave', () => { tx = ty = 0; moved = performance.now(); }, { passive: true });
   const tick = now => {
     raf = 0; if (!on) return;
-    const dt = Math.min(.05, (now - last) / 1000 || .016), k = 1 - Math.exp(-dt * 6); last = now;
-    px += (tx - px) * k; py += (ty - py) * k;
-    const r = box.getBoundingClientRect(), p = Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight + r.height)));
-    /* full frame rate while it is being turned or scrolled, about 30 fps for the idle motion */
-    if (window.__scene && (now - moved < 1500 || Math.abs(p - tick.p) > .0005 || now - drawn > 30)) { drawn = now; tick.p = p; window.__scene.update(p, now / 1000, px, py); }
+    const dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
+    const k = 1 - Math.exp(-dt * 6); px += (tx - px) * k; py += (ty - py) * k;
+    const r = sv.getBoundingClientRect(), target = Math.max(0, Math.min(1, -r.top / Math.max(1, r.height - innerHeight)));
+    cur = cur < 0 ? target : cur + (target - cur) * (1 - Math.exp(-dt * 9)); if (Math.abs(target - cur) < .0002) cur = target;
+    /* full frame rate while it moves, about 30 fps for the idle motion */
+    if (window.__scene && (now - moved < 1500 || Math.abs(cur - lp) > .0002 || now - drawn > 30)) { drawn = now; lp = cur; window.__scene.update(cur, now / 1000, px, py, lay); }
     raf = requestAnimationFrame(tick);
   };
-  new IntersectionObserver(es => { on = es[0].isIntersecting; if (on && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }).observe(box);
-  const start = () => loadScene(vis.dataset.src, () => vis.classList.add('still'));
-  if (poster) afterLoad(start);
-  else new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { o.disconnect(); afterLoad(start); } }, { rootMargin: '500px 0px' }).observe(box);
+  new IntersectionObserver(es => { on = es[0].isIntersecting; if (on && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }).observe(sv);
+  afterLoad(() => loadScene(sv.dataset.src, () => {}));
 }
 
 /* everything below exists on the homepage only */

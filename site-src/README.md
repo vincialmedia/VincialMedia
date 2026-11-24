@@ -23,9 +23,9 @@ A public phone number goes into `PHONE` at the top of `build.mjs`. It then shows
 
 ## 3D visuals
 
-The homepage hero and the device on each service page are drawn live by `src/scene.js` (three.js). Words on the device screens come from `scene` in `src/content.js`. Visitors without a graphics chip, with data saver or with reduced motion get a still image instead, and everyone sees that still until the 3D model has loaded.
+The homepage hero and the device on each service page are drawn live by `src/scene.js` (three.js). On a service page the device is a pinned background: beside the text on wide screens, behind glass cards on narrow ones, and it moves with the scroll. Words on the device screens come from `scene` in `src/content.js`. Visitors without a graphics chip, with data saver or with reduced motion get a still image instead, and everyone sees that still until the 3D model has loaded.
 
-The stills live in `src/vis/` and are rendered from the same scene, so re-render them after changing `scene.js` or the screen texts:
+The stills live in `src/vis/` (`-w` for wide screens, `-p` for narrow ones) and are rendered from the same scene, so re-render them after changing `scene.js` or the screen texts:
 
 ```sh
 npx next build && npx next start -p 3100   # in the repo root, in a second terminal

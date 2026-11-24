@@ -13,16 +13,18 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "src", "vis")
 SRC = os.path.join(ROOT, "vis-src")
 ARGS = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--no-sandbox"]
-W, T, P = (1600, 900), (900, 720), (800, 1400)
+W, T, P = (1600, 900), (900, 720), (800, 1400)   # wide (device beside the text), small box, narrow (device behind the text)
 # name, page, shot, sizes {suffix: (w, h)}, per language
 JOBS = [
-    ("web", "/webdesign", "web", {"w": W, "t": T}, True),
-    ("local", "/webdesign-schlieren", "local", {"w": W, "t": T}, True),
-    ("ads", "/google-ads", "ads", {"w": W, "t": P}, True),
-    ("app", "/app-entwicklung", "app", {"p": P}, True),
-    ("auto", "/ki-automation", "auto", {"p": P}, True),
+    ("web", "/webdesign", "web", {"w": W, "p": P}, True),
+    ("local", "/webdesign-schlieren", "local", {"w": W, "p": P}, True),
+    ("ads", "/google-ads", "ads", {"w": W, "p": P}, True),
+    ("app", "/app-entwicklung", "app", {"w": W, "p": P}, True),
+    ("auto", "/ki-automation", "auto", {"w": W, "p": P}, True),
     ("case", "/webdesign", "case", {"w": W, "t": T}, False),
 ]
+
+ISO = "header,footer,.cb,.skip,.svfg,.svtag,.pg{display:none!important}html,body{background:#000!important;overflow:hidden!important}.sv{margin:0!important}.svbg{position:fixed!important;inset:0!important;height:100vh!important}.svbg img{display:none!important}.svbg canvas{opacity:1!important;transition:none!important}"
 
 def data_url(path):
     return "data:image/webp;base64," + base64.b64encode(open(path, "rb").read()).decode()
@@ -39,18 +41,17 @@ async def main():
                 print("skip case: no screenshots in vis-src/"); continue
             for lang in (("de", "en") if per_lang else ("",)):
                 for suf, (w, h) in sizes.items():
-                    ctx = await b.new_context(viewport={"width": max(w, 1000) + 40, "height": h + 40}, device_scale_factor=1)
+                    ctx = await b.new_context(viewport={"width": w, "height": h}, device_scale_factor=1)
                     pg = await ctx.new_page()
                     if shot == "case":
                         await pg.add_init_script("window.__shot='case';window.__caseImgs={d:new Image(),m:new Image()};window.__caseImgs.d.src=%r;window.__caseImgs.m.src=%r;" % (data_url(os.path.join(SRC, "buyauto-d.webp")), data_url(os.path.join(SRC, "buyauto-m.webp"))))
                     await pg.add_init_script("try{localStorage.setItem('vm-consent','no')}catch(e){}")
                     await pg.goto(BASE + ("/en" if lang == "en" else "") + page + "?gl=1&poster=1")
-                    await pg.add_style_tag(content="header,footer,.cb,.skip,.pg>*:not(.shot):not(.duo),.duo>*:not(.shot),.shot>*:not(.vs){display:none!important}main,.pg,.duo,.shot{animation:none!important;transform:none!important;opacity:1!important;margin:0!important;padding:0!important;max-width:none!important;display:block!important}.vs{width:%dpx!important;height:%dpx!important;max-width:none!important;margin:0!important;aspect-ratio:auto!important;border-radius:0!important}.vs img{display:none!important}.vs canvas{opacity:1!important;transition:none!important}" % (w, h))
+                    await pg.add_style_tag(content=ISO)
                     await pg.wait_for_function("window.__posterReady === true", timeout=90000)
                     await pg.wait_for_timeout(700)
-                    png = await pg.locator(".vs").first.screenshot()
+                    png = await pg.screenshot(clip={"x": 0, "y": 0, "width": w, "height": h})
                     im = Image.open(io.BytesIO(png)).convert("RGB")
-                    im = im.crop((0, 0, w, h))
                     f = os.path.join(OUT, "-".join(x for x in (name, lang, suf) if x) + ".webp")
                     im.save(f, "WEBP", quality=int(os.environ.get("Q", "78")), method=6)
                     print(os.path.basename(f), im.size, os.path.getsize(f) // 1024, "KB")

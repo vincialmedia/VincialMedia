@@ -349,29 +349,45 @@ footer{background:var(--panel);padding:48px 0 28px;font-size:14px}
 .nogl .skipf,html:not(.js) .skipf{display:none}
 @media(max-width:700px){.scene{height:360vh}}
 
-/* device visual on a service page: a still image first, the live 3D model on top when the device can run it */
-.shot{margin:clamp(30px,5vw,56px) 0 0;padding:0}
-.vs{position:relative;aspect-ratio:16/9;border-radius:28px;overflow:hidden;background:radial-gradient(120% 90% at 50% 8%,#0b1a33 0%,#04070d 46%,#000 78%);touch-action:pan-y;cursor:grab;isolation:isolate}
-.vs img,.vs canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.vs img{object-fit:cover;transition:opacity .5s .35s}
-.vs canvas{opacity:0;transition:opacity .6s;pointer-events:none}
-.shot.live canvas{opacity:1}.shot.live img{opacity:0}
-.shot.tall .vs{aspect-ratio:4/7;max-width:420px;margin-inline:auto}
-.shot figcaption{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin-top:14px;font-size:14px;color:var(--mute);max-width:70ch}
-.shot figcaption b{font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--link);border:1px solid rgba(41,151,255,.45);border-radius:999px;padding:2px 9px}
-.shot figcaption i{font-style:normal;display:none}
-.shot.live figcaption i{display:inline}
-.tr{margin-top:10px;font-size:15px;color:var(--soft)}
-.tr summary{cursor:pointer;color:var(--link);min-height:44px;display:inline-flex;align-items:center}
-.tr ol{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:8px}
+/* service pages: the 3D device is a pinned background, the text scrolls over it (wide screens: device beside the text) */
+.sv{position:relative;margin-top:-57px}
+.svbg{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;pointer-events:none}
+.svbg img,.svbg canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.svbg img{object-fit:cover;object-position:74% 50%;transition:opacity .6s .3s}
+.svbg canvas{opacity:0;transition:opacity .7s}
+.sv.live canvas{opacity:1}.sv.live .svbg img{opacity:0}
+.svtag{position:absolute;right:max(5vw,16px);bottom:16px;margin:0;display:flex;gap:10px;align-items:baseline;justify-content:flex-end;font-size:13px;color:var(--mute);max-width:min(520px,46vw);text-align:right;text-shadow:0 1px 8px #000}
+.svtag b{flex:none;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--link);border:1px solid rgba(41,151,255,.45);border-radius:999px;padding:2px 9px;background:rgba(0,0,0,.5)}
+.svfg{position:relative;z-index:1;margin-top:-100vh;margin-top:-100svh;padding-bottom:30vh}
+.svhero{padding-top:calc(57px + clamp(28px,5vw,64px));min-height:94vh;min-height:94svh;max-width:min(520px,38vw)}
+.svhero h1{font-size:clamp(34px,4.3vw,60px);font-weight:700}
+.svhero .lead{font-size:clamp(17px,1.5vw,20px)}
+.gc{background:rgba(22,22,24,.6);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border:1px solid rgba(255,255,255,.11);border-radius:24px;padding:24px 26px;max-width:min(470px,36vw);margin-bottom:22vh;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.gc h3{font-size:22px;line-height:1.15;margin-bottom:10px}
+.gc p{color:var(--soft)}
+.svh{display:inline-block;font-size:15px;font-weight:600;letter-spacing:0;line-height:1.3;color:var(--link);background:rgba(22,22,24,.6);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid rgba(41,151,255,.35);border-radius:999px;padding:8px 16px;margin-bottom:16px}
+.gf{padding:6px 26px}
+.gf .facts{display:block;margin:0;max-width:none;background:none;border:0;border-radius:0}
+.gf .facts div{background:none;padding:16px 0;border-top:1px solid rgba(255,255,255,.1)}
+.gf .facts div:first-child{border-top:0}
+.tr.gc{margin-bottom:0;padding:8px 22px;font-size:15px;color:var(--soft)}
+.tr summary{cursor:pointer;color:var(--link);min-height:44px;display:flex;align-items:center}
+.tr ol{list-style:none;margin:4px 0 14px;padding:0;display:grid;gap:8px}
 .tr b{color:var(--ink);font-weight:600}
-@media(max-width:699px){.dk{display:none}.vs{aspect-ratio:5/4;border-radius:22px}.shot.tall .vs,.shot.mtall .vs{aspect-ratio:4/7;max-width:420px;margin-inline:auto}}
-/* phone pages on wide screens: facts on the left, the phone on the right */
-@media(min-width:1000px){
- .duo{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:clamp(32px,5vw,72px);align-items:center;margin-top:8px}
- .duo .shot{order:2;margin-top:0}
- .duo .facts{grid-template-columns:1fr;max-width:460px;margin-top:0}
+@media(max-width:899px),(max-aspect-ratio:21/20){
+ .svbg img{object-position:50% 50%}
+ .svtag{left:16px;right:16px;max-width:none;justify-content:center;text-align:center;font-size:12px}
+ .svbg::after{content:"";position:absolute;inset:auto 0 0 0;height:110px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.9) 70%)}
+ .svtag{z-index:1}
+ .dk{display:none}
+ /* the intro covers the device at first, then scrolls away and uncovers it */
+ .svhero{max-width:none;min-height:0;margin:0 calc(-1*max(5vw,16px)) 34vh;padding-inline:max(5vw,16px);padding-bottom:96px;background:linear-gradient(#000 calc(100% - 96px),rgba(0,0,0,0))}
+ .gc{max-width:none;margin-bottom:33vh}
+ .tr.gc{margin-bottom:0}
 }
+.csv{position:relative;aspect-ratio:16/9;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 68%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 68%,transparent 100%)}
+.csv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+@media(max-width:699px){.csv{aspect-ratio:5/4}}
 /* founder and own project on the homepage */
 .me{display:flex;align-items:center;gap:16px;margin-bottom:22px}
 .me img{width:84px;height:84px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 0 0 6px rgba(41,151,255,.14)}
@@ -382,8 +398,7 @@ footer{background:var(--panel);padding:48px 0 28px;font-size:14px}
 .cs h2{font-size:clamp(30px,3.8vw,46px);margin:8px 0 18px}
 .cs p{color:var(--soft);font-size:clamp(17px,1.7vw,19px);max-width:52ch}
 .cs .tl{display:inline-flex;align-items:center;min-height:44px;margin-top:12px;font-size:17px}
-.cs .vs{cursor:default}
-@media(max-width:860px){.cs{grid-template-columns:1fr}.cs .vs{order:-1}}
+@media(max-width:860px){.cs{grid-template-columns:1fr}.cs .csv{order:-1}}
 .region{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
 
 .ctop{margin-top:26px}

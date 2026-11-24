@@ -1,6 +1,6 @@
 {
  "de/app-entwicklung": {
-  "h": "15010bafd7",
+  "h": "76559281c5",
   "d": "2026-11-24"
  },
  "de/datenschutz": {
@@ -8,11 +8,11 @@
   "d": "2026-11-24"
  },
  "de/google-ads": {
-  "h": "17ad9ac5af",
+  "h": "c296acb14b",
   "d": "2026-11-24"
  },
  "de/home": {
-  "h": "0d26d637f8",
+  "h": "eba3070119",
   "d": "2026-11-24"
  },
  "de/impressum": {
@@ -20,7 +20,7 @@
   "d": "2026-11-24"
  },
  "de/ki-automation": {
-  "h": "6c13576395",
+  "h": "c84390e24b",
   "d": "2026-11-24"
  },
  "de/preise": {
@@ -28,23 +28,23 @@
   "d": "2026-11-24"
  },
  "de/webdesign": {
-  "h": "4035e976c1",
+  "h": "0245e2aecd",
   "d": "2026-11-24"
  },
  "de/webdesign-dietikon": {
-  "h": "0ed10bf2a4",
+  "h": "2652f81feb",
   "d": "2026-11-24"
  },
  "de/webdesign-schlieren": {
-  "h": "eb7cbf8e39",
+  "h": "32feef08f9",
   "d": "2026-11-24"
  },
  "de/webdesign-urdorf": {
-  "h": "aa484d9d8f",
+  "h": "60ed167715",
   "d": "2026-11-24"
  },
  "en/app-entwicklung": {
-  "h": "9460a359bb",
+  "h": "62c4c25441",
   "d": "2026-11-24"
  },
  "en/datenschutz": {
@@ -52,11 +52,11 @@
   "d": "2026-11-24"
  },
  "en/google-ads": {
-  "h": "8d2bbf2cda",
+  "h": "cedb47d427",
   "d": "2026-11-24"
  },
  "en/home": {
-  "h": "b7e1dee029",
+  "h": "f568a1ecf1",
   "d": "2026-11-24"
  },
  "en/impressum": {
@@ -64,7 +64,7 @@
   "d": "2026-11-24"
  },
  "en/ki-automation": {
-  "h": "739ad4dec6",
+  "h": "dd3785f1fa",
   "d": "2026-11-24"
  },
  "en/preise": {
@@ -72,19 +72,19 @@
   "d": "2026-11-24"
  },
  "en/webdesign": {
-  "h": "0aff3c7748",
+  "h": "0d0f97a79d",
   "d": "2026-11-24"
  },
  "en/webdesign-dietikon": {
-  "h": "32c2810894",
+  "h": "253aa3576e",
   "d": "2026-11-24"
  },
  "en/webdesign-schlieren": {
-  "h": "eff17ab5bc",
+  "h": "e8c2bcc198",
   "d": "2026-11-24"
  },
  "en/webdesign-urdorf": {
-  "h": "20416aa52a",
+  "h": "96de06bcf2",
   "d": "2026-11-24"
  }
 }

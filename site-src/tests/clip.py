@@ -12,10 +12,7 @@ W, H, FPS = int(os.environ.get("CW", "1280")), int(os.environ.get("CH", "720")),
 ease = lambda x: 0.5 - 0.5 * math.cos(math.pi * max(0.0, min(1.0, x)))
 # page, seconds, start of the screen loop
 PARTS = [("/webdesign", 5.5, 0.0), ("/ki-automation", 8.2, 0.0), ("/app-entwicklung", 6.6, 2.2), ("/google-ads", 7.0, 0.0)]
-CSS = ("header,footer,.cb,.skip,.pg>*:not(.shot):not(.duo),.duo>*:not(.shot),.shot>*:not(.vs){display:none!important}"
-       "main,.pg,.duo,.shot{animation:none!important;transform:none!important;opacity:1!important;margin:0!important;padding:0!important;max-width:none!important;display:block!important}"
-       ".vs{width:%dpx!important;height:%dpx!important;max-width:none!important;margin:0!important;aspect-ratio:auto!important;border-radius:0!important}"
-       ".vs img{display:none!important}.vs canvas{opacity:1!important;transition:none!important}") % (W, H)
+CSS = "header,footer,.cb,.skip,.svfg,.svtag,.pg{display:none!important}html,body{background:#000!important;overflow:hidden!important}.sv{margin:0!important}.svbg{position:fixed!important;inset:0!important;height:100vh!important}.svbg img{display:none!important}.svbg canvas{opacity:1!important;transition:none!important}"
 
 async def main():
     out = sys.argv[1] if len(sys.argv) > 1 else "clip.mp4"
@@ -23,18 +20,17 @@ async def main():
     async with async_playwright() as pw:
         b = await pw.chromium.launch(args=ARGS, executable_path=os.environ.get("CHROME") or None)
         for page, secs, start in PARTS:
-            ctx = await b.new_context(viewport={"width": W + 40, "height": H + 40}, device_scale_factor=1)
+            ctx = await b.new_context(viewport={"width": W, "height": H}, device_scale_factor=1)
             pg = await ctx.new_page()
             await pg.add_init_script("try{localStorage.setItem('vm-consent','no')}catch(e){}")
             await pg.goto(BASE + page + "?gl=1&poster=1")
             await pg.add_style_tag(content=CSS)
             await pg.wait_for_function("window.__posterReady === true", timeout=90000)
-            box = pg.locator(".vs").first
             for i in range(int(min(secs, float(os.environ.get("MAXS", "99"))) * FPS)):
                 t = i / FPS
-                f = {"t": t, "tt": start + t, "p": 0.06 + 0.44 * ease(t / 2.2), "px": 0.55 * math.sin(t * 0.9 + 0.4) * ease(t / 1.5), "py": 0.3 * math.sin(t * 0.6)}
+                f = {"t": t, "tt": start + t, "p": 0.05 + 0.8 * ease(t / secs), "px": 0.55 * math.sin(t * 0.9 + 0.4) * ease(t / 1.5), "py": 0.3 * math.sin(t * 0.6)}
                 await pg.evaluate("f => window.__scene.seek(f)", f)
-                await box.screenshot(path=os.path.join(tmp, "f%05d.jpg" % n), type="jpeg", quality=93); n += 1
+                await pg.screenshot(path=os.path.join(tmp, "f%05d.jpg" % n), type="jpeg", quality=93); n += 1
             await ctx.close(); print(page, "done", n, flush=True)
         await b.close()
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", os.path.join(tmp, "f%05d.jpg"), "-vf", "crop=%d:%d:0:0,format=yuv420p" % (W, H), "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-movflags", "+faststart", out], check=True)

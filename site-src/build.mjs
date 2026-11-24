@@ -86,21 +86,15 @@ function graph(T, lang, view, mod) {
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': g }).replace(/</g, '\\u003c');
 }
 
-/* still image of a 3D scene plus the canvas that takes over when the device can run it */
-function figure(T, lang, shot) {
-  const v = T.vis[shot], tall = shot === 'app' || shot === 'auto', key = `${shot}-${lang}`, W = VIS[key + '-w'], P = VIS[key + '-p'], S2 = VIS[key + '-t'];
-  const im = (src, w, h) => `<img src="${src}" width="${w}" height="${h}" alt="${esc(v.alt)}" loading="lazy" decoding="async">`;
-  const pic = tall ? (P ? im(P, 800, 1400) : '') : (W ? `<picture>${S2 ? `<source media="(max-width:699px)" srcset="${S2}" width="${shot === 'ads' ? 800 : 900}" height="${shot === 'ads' ? 1400 : 720}">` : ''}${im(W, 1600, 900)}</picture>` : '');
-  const tr = shot === 'auto' ? `<details class="tr"><summary>${esc(v.tr)}</summary><ol>${T.scene.chat.msgs.map(m => `<li><b>${esc(v.who[m[0]])}:</b> ${esc(m[1])}</li>`).join('')}${T.scene.chat.done.map(d => `<li>${esc(d)}</li>`).join('')}</ol></details>` : '';
-  return `<figure class="shot${tall ? ' tall' : ''}${shot === 'ads' ? ' mtall' : ''}" data-src="${SCENE}"><div class="vs">${pic}<canvas data-shot="${shot}" aria-hidden="true"></canvas></div><figcaption><b>${esc(T.vis.tag)}</b><span>${esc(v.cap)}${v.cap2 ? ` <span class="dk">${esc(v.cap2)}</span>` : ''}</span><i>${esc(T.vis.live)}</i></figcaption>${tr}</figure>`;
-}
+/* the device sits beside the text on wide screens and behind it on narrow or tall ones; app.js uses the same query */
+const SIDE = '(min-width:900px) and (min-aspect-ratio:21/20)', CENTER = '(max-width:899px), (max-aspect-ratio:21/20)';
 const sceneData = T => `<script id="sd" type="application/json">${JSON.stringify(T.scene).replace(/</g, '\\u003c')}</script>`;
 
 /* ---------- page parts ---------- */
 function head(T, lang, view, mod) {
   const p = view === 'home' ? null : (T.pages[view] || T.docs[view]);
   const title = p ? p.title : T.meta.title, desc = p ? p.desc : T.meta.desc, here = url(view, lang);
-  const shot = p && p.svc ? (LOCAL.includes(view) ? 'local' : p.svc) : '', wide = shot !== 'app' && shot !== 'auto', poster = shot ? VIS[`${shot}-${lang}-${wide ? 'w' : 'p'}`] : '';
+  const shot = p && p.svc ? (LOCAL.includes(view) ? 'local' : p.svc) : '', poster = shot ? VIS[`${shot}-${lang}-w`] : '';
   return `<!doctype html>
 <html lang="${lang === 'en' ? 'en' : 'de-CH'}">
 <head>
@@ -127,7 +121,7 @@ function head(T, lang, view, mod) {
 ${view === 'home' ? `<meta name="google-site-verification" content="${GSV}">\n` : ''}<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" href="${FONT}" as="font" type="font/woff2" crossorigin>${poster ? `\n<link rel="preload" as="image" href="${poster}" media="(min-width:${wide ? 700 : 1000}px)">` : ''}
+<link rel="preload" href="${FONT}" as="font" type="font/woff2" crossorigin>${poster ? `\n<link rel="preload" as="image" href="${poster}" media="${SIDE}">` : ''}
 <script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__vm)document.documentElement.classList.remove('js')},4000)</script>
 <style>${CSS}</style>
 <script type="application/ld+json">${graph(T, lang, view, mod)}</script>
@@ -251,7 +245,7 @@ function home(T, lang) {
  ${csW ? `<section class="band wrap" id="case">
   <div class="cs rv">
    <div><small>${esc(T.cs.k)}</small><h2>${esc(T.cs.h)}</h2><p>${esc(T.cs.p)}</p><a class="tl" href="https://www.buyauto.ch/" target="_blank" rel="noopener">${esc(T.cs.link)} ›</a></div>
-   <div class="vs"><picture>${csT ? `<source media="(max-width:699px)" srcset="${csT}" width="900" height="720">` : ''}<img src="${csW}" width="1600" height="900" alt="${esc(T.cs.alt)}" loading="lazy" decoding="async"></picture></div>
+   <div class="csv"><picture>${csT ? `<source media="(max-width:699px)" srcset="${csT}" width="900" height="720">` : ''}<img src="${csW}" width="1600" height="900" alt="${esc(T.cs.alt)}" loading="lazy" decoding="async"></picture></div>
   </div>
  </section>
 
@@ -276,29 +270,44 @@ ${sceneData(T)}`;
 
 function servicePage(T, lang, slug) {
   const p = T.pages[slug], H = url('home', lang), cta = `${H}?svc=${p.svc}#finder`;
-  const local = LOCAL.includes(slug), shot = local ? 'local' : p.svc, duo = shot === 'app' || shot === 'auto';
+  const local = LOCAL.includes(slug), shot = local ? 'local' : p.svc, v = T.vis[shot], W = VIS[`${shot}-${lang}-w`], P = VIS[`${shot}-${lang}-p`];
   const facts = `<dl class="facts rg">${p.facts.map((f, i) => `<div><dt>${esc(f[0])}</dt><dd class="roll"><i data-v="${esc(f[1])}"${st(i)}>${esc(f[1])}</i></dd></div>`).join('')}</dl>`;
-  const fig = figure(T, lang, shot);
-  const top = [
-    `<nav class="crumb" aria-label="Breadcrumb"><a href="${H}">${esc(T.nav.home)}</a> › ${local ? `<a href="${url('webdesign', lang)}">${esc(T.pages.webdesign.nav)}</a> › ` : ''}${esc(p.nav)}</nav>`,
-    `<h1>${esc(p.h1)}</h1>`, `<p class="lead">${esc(p.lead)}</p>`, `<p class="by">${esc(T.page.by)}</p>`,
-    `<a class="pill big ctop" href="${cta}">${esc(T.nav.cta)}</a>`,
-    duo ? `<div class="duo">${fig}${facts}</div>` : fig, duo ? '' : facts
-  ].filter(Boolean).map((h, i) => h.replace(/^<(\w+)/, `<$1${st(Math.min(i, 6))}`));
+  const tr = shot === 'auto' ? `<details class="tr gc"><summary>${esc(v.tr)}</summary><ol>${T.scene.chat.msgs.map(m => `<li><b>${esc(v.who[m[0]])}:</b> ${esc(m[1])}</li>`).join('')}${T.scene.chat.done.map(d => `<li>${esc(d)}</li>`).join('')}</ol></details>` : '';
   const region = slug === 'webdesign' ? `<section class="rv"><h2>${esc(T.page.region)}</h2><p>${esc(T.page.regionP)}</p><div class="more region">${LOCAL.map(s2 => `<a href="${url(s2, lang)}">${esc(navOf(T, s2))}</a>`).join('')}</div></section>\n  ` : '';
   const prices = LOCAL.includes(slug)
     ? `<table class="tiers"><thead><tr>${T.page.cols.map(c => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead><tbody>${ORDER.map((k, i) => `<tr><td>${esc(T.finder.size[k])}</td><td>${esc(p.tiers[i])}</td><td>${esc(T.finder.time[p.svc][i])}</td><td>${esc(priceText(T, p.svc, i))}</td></tr>`).join('')}</tbody></table><a class="tl" href="${url('preise', lang)}">${esc(T.lv.all)}</a>`
     : tierCards(T, p.svc);
-  return `<article id="page"><div class="pg wrap enter">
-  ${top.join('\n  ')}
-  <section class="rv"><h2>${esc(T.page.inc)}</h2><div class="inc sg">${p.inc.map((x, i) => `<div${st(i)}><h3>${esc(x[0])}</h3><p>${esc(x[1])}</p></div>`).join('')}</div></section>
+  /* the 3D device is a pinned background (a still image until the live scene has loaded); the text scrolls over it */
+  return `<article id="page">
+ <section class="sv" id="sv" data-src="${SCENE}">
+  <div class="svbg">
+   ${W ? `<picture>${P ? `<source media="${CENTER}" srcset="${P}" width="800" height="1400">` : ''}<img src="${W}" width="1600" height="900" alt="${esc(v.alt)}" decoding="async"></picture>` : ''}
+   <canvas data-shot="${shot}" aria-hidden="true"></canvas>
+   <p class="svtag"><b>${esc(T.vis.tag)}</b><span>${esc(v.cap)}${v.cap2 ? ` <span class="dk">${esc(v.cap2)}</span>` : ''}</span></p>
+  </div>
+  <div class="svfg wrap">
+   <div class="svhero">
+    <nav class="crumb in" aria-label="Breadcrumb"><a href="${H}">${esc(T.nav.home)}</a> › ${local ? `<a href="${url('webdesign', lang)}">${esc(T.pages.webdesign.nav)}</a> › ` : ''}${esc(p.nav)}</nav>
+    <h1 class="in">${esc(p.h1)}</h1>
+    <p class="lead in d2">${esc(p.lead)}</p>
+    <p class="by in d2">${esc(T.page.by)}</p>
+    <a class="pill big ctop in d3" href="${cta}">${esc(T.nav.cta)}</a>
+   </div>
+   <div class="gc gf rv">${facts}</div>
+   <h2 class="svh rv">${esc(T.page.inc)}</h2>
+   ${p.inc.map(x => `<div class="gc rv"><h3>${esc(x[0])}</h3><p>${esc(x[1])}</p></div>`).join('\n   ')}
+   ${tr}
+  </div>
+ </section>
+ <div class="pg wrap">
   <section class="rv"><h2>${esc(T.page.tiers)}</h2>${prices}</section>
   <section class="honest rv"><h2>${esc(p.honest[0])}</h2><p>${esc(p.honest[1])}</p></section>
   <section class="rv"><h2>${esc(T.how.h)}</h2><ol class="steps sg">${stepsHtml(T)}</ol></section>
   <section class="rv"><h2>${esc(T.page.faq)}</h2><div class="faq sg">${faqHtml(T, lang, p.faq, 'p')}</div></section>
   ${region}<section class="rv"><h2>${esc(T.page.more)}</h2><div class="more">${[...SLUGS.filter(s => s !== slug), 'preise'].map(s => `<a href="${url(s, lang)}">${esc(navOf(T, s))}</a>`).join('')}</div></section>
   <section class="cta rv"><h2>${esc(T.page.cta)}</h2><a class="pill big" href="${cta}">${esc(T.nav.cta)}</a></section>
- </div></article>
+ </div>
+</article>
 ${sceneData(T)}`;
 }
 

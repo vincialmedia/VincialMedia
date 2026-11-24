@@ -57,7 +57,7 @@ async def main():
             await pg.screenshot(path=f"shots/e2e_done_{name}.png")
             # preselect from a service page
             await pg.goto(B+"/en/google-ads"); await pg.wait_for_timeout(300)
-            await pg.click(".pg > a.pill.big"); await pg.wait_for_timeout(900)
+            await pg.click(".ctop"); await pg.wait_for_timeout(900)
             r["preselect"]=await pg.evaluate("[location.pathname+location.search+location.hash,[...document.querySelectorAll('#svc .chip[aria-pressed=true]')].map(c=>c.dataset.k)]")
             # language link and FAQ
             await pg.goto(B+"/preise"); await pg.wait_for_timeout(300)
