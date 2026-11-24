@@ -15,8 +15,11 @@ const nextConfig = {
   allowedDevOrigins: ['*.daytona.work'],
   async redirects() {
     return [
-      // the old clinics landing page is gone; its visitors want the AI assistant page
+      // pages of the old clinic-focused site, removed November 2026
       { source: '/kliniken', destination: '/ki-automation', permanent: true },
+      { source: '/cerisa', destination: '/ki-automation', permanent: true },
+      { source: '/arzthub', destination: '/ki-automation', permanent: true },
+      { source: '/drvince', destination: '/', permanent: true },
     ];
   },
   async rewrites() {

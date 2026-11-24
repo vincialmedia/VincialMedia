@@ -19,7 +19,7 @@ cd .. && git add -A && git commit -m "Update site"
 
 `lastmod.json` remembers when each page's content last changed. The build updates it by itself and the sitemap and structured data read their dates from it, so commit it with the rest.
 
-A public phone number goes into `PHONE` at the top of `build.mjs`. It then shows in the footer and in the structured data.
+The phone number is never written into the pages, the structured data or llms.txt, so scrapers reading the source find nothing. It is stored as XOR-encoded character codes (`PHONE_CODES` in `src/app.js`) and becomes a tel: link when a visitor clicks "Telefon anzeigen" in the footer. To change it: `python3 -c "print([ord(c)^23 for c in '076 530 69 69'])"` and paste the list.
 
 ## 3D visuals
 

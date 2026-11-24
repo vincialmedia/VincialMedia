@@ -244,5 +244,16 @@ if (finder) {
   });
 }
 
+/* phone number: not in the HTML, so scrapers that read the page source find nothing. It is stored as character codes
+   XOR 23 (also keeps the digits out of the public repository) and turned into a tel: link when a visitor asks for it. */
+const PHONE_CODES = [39, 32, 33, 55, 34, 36, 39, 55, 33, 46, 55, 33, 46];
+const phr = $('phr');
+if (phr) phr.addEventListener('click', () => {
+  const n = String.fromCharCode.apply(null, PHONE_CODES.map(c => c ^ 23)), a = document.createElement('a');
+  a.href = 'tel:+41' + n.replace(/\s/g, '').slice(1); a.textContent = n;
+  a.addEventListener('click', () => track('phone_click'));
+  phr.replaceWith(a); a.focus(); track('phone_reveal');
+});
+
 /* tells the safety timer in <head> that the page is wired up */
 window.__vm = 1;

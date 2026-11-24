@@ -278,7 +278,8 @@ window.C = {
    "c2": "Region",
    "c3": "Kontakt",
    "place": "Schlieren, Kanton Zürich",
-   "addr": "Brandstrasse 21, 8952 Schlieren"
+   "addr": "Brandstrasse 21, 8952 Schlieren",
+   "phone": "Telefon anzeigen"
   },
   "page": {
    "inc": "Das ist im Preis drin",
@@ -1808,7 +1809,8 @@ window.C = {
    "c2": "Region",
    "c3": "Contact",
    "place": "Schlieren, Canton of Zurich",
-   "addr": "Brandstrasse 21, 8952 Schlieren, Switzerland"
+   "addr": "Brandstrasse 21, 8952 Schlieren, Switzerland",
+   "phone": "Show phone number"
   },
   "page": {
    "inc": "What the price includes",

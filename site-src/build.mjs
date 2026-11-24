@@ -15,7 +15,8 @@ const ORIGIN = 'https://www.vincialmedia.com';
 /* lastmod per page: the date a page's content last changed, remembered in lastmod.json between builds */
 const NOW = new Date(), TODAY = `${NOW.getFullYear()}-${String(NOW.getMonth() + 1).padStart(2, '0')}-${String(NOW.getDate()).padStart(2, '0')}`;
 const MODFILE = path.join(ROOT, 'lastmod.json'), MOD = fs.existsSync(MODFILE) ? JSON.parse(fs.readFileSync(MODFILE, 'utf8')) : {};
-const PHONE = '';   // public phone number in international form, e.g. '+41 44 000 00 00'. Empty: no number is shown anywhere.
+/* The phone number is deliberately absent from the HTML, the structured data and llms.txt, so page scrapers find nothing.
+   It sits encoded in src/app.js and is built in the browser when a visitor clicks "Telefon anzeigen". */
 const GSV = 'RxrhpDdeCiLf75Rizc6_TtQwKls1UCBaUVUGbqtKq8g';
 
 fs.rmSync(OUT, { recursive: true, force: true });
@@ -65,7 +66,7 @@ const tab = (cols, rows, cls) => `<table class="ptab${cls || ''}"><thead><tr>${c
 function graph(T, lang, view, mod) {
   const p = view === 'home' ? null : (T.pages[view] || T.docs[view]), en = lang === 'en';
   const here = abs(url(view, lang)), ME = ORIGIN + '/#vincent', CAT = abs(url('preise', lang)) + '#catalog', per = en ? 'per month' : 'pro Monat';
-  const org = { '@type': 'ProfessionalService', '@id': ORIGIN + '/#org', name: 'VincialMedia', url: ORIGIN + '/', logo: ORIGIN + LOGO, image: ORIGIN + OG[lang], description: T.meta.desc, email: 'vincent@vincialmedia.com', ...(PHONE ? { telephone: PHONE.replace(/\s/g, '') } : {}), priceRange: 'CHF 590–39’000', founder: { '@id': ME }, address: { '@type': 'PostalAddress', streetAddress: 'Brandstrasse 21', addressLocality: 'Schlieren', postalCode: '8952', addressRegion: 'ZH', addressCountry: 'CH' }, areaServed: [...['Zürich', 'Schlieren', 'Dietikon', 'Urdorf'].map(n => ({ '@type': 'City', name: n })), { '@type': 'Place', name: 'Limmattal' }], knowsLanguage: ['de', 'en'], hasOfferCatalog: { '@id': CAT } };
+  const org = { '@type': 'ProfessionalService', '@id': ORIGIN + '/#org', name: 'VincialMedia', url: ORIGIN + '/', logo: ORIGIN + LOGO, image: ORIGIN + OG[lang], description: T.meta.desc, email: 'vincent@vincialmedia.com',  priceRange: 'CHF 590–39’000', founder: { '@id': ME }, address: { '@type': 'PostalAddress', streetAddress: 'Brandstrasse 21', addressLocality: 'Schlieren', postalCode: '8952', addressRegion: 'ZH', addressCountry: 'CH' }, areaServed: [...['Zürich', 'Schlieren', 'Dietikon', 'Urdorf'].map(n => ({ '@type': 'City', name: n })), { '@type': 'Place', name: 'Limmattal' }], knowsLanguage: ['de', 'en'], hasOfferCatalog: { '@id': CAT } };
   const me = { '@type': 'Person', '@id': ME, name: 'Vincent Hänggi', jobTitle: en ? 'Founder' : 'Inhaber', worksFor: { '@id': ORIGIN + '/#org' }, url: ORIGIN + '/', ...(PHOTO ? { image: ORIGIN + PHOTO } : {}), knowsAbout: ['CRM', 'Marketing Automation', 'Webdesign', 'App-Entwicklung', 'Google Ads', 'KI-Automation'] };
   /* a monthly price is marked as monthly; the AI assistant has a setup price plus a monthly running price */
   const offer = (k, i, extra) => {
@@ -155,7 +156,7 @@ function footer(T, lang, view) {
   <nav class="links" aria-label="Footer">
    <div><strong>${esc(T.foot.c1)}</strong><span class="fl">${links([...SERVICE, 'preise'])}</span></div>
    <div><strong>${esc(T.foot.c2)}</strong><span class="fl">${links(LOCAL)}</span></div>
-   <div><strong>${esc(T.foot.c3)}</strong><span>VincialMedia, ${esc(T.foot.addr)}</span>${PHONE ? `<a href="tel:${PHONE.replace(/\s/g, '')}">${PHONE}</a>` : ''}<a href="mailto:vincent@vincialmedia.com">vincent@vincialmedia.com</a><a href="${cta}">${esc(T.nav.cta)}</a></div>
+   <div><strong>${esc(T.foot.c3)}</strong><span>VincialMedia, ${esc(T.foot.addr)}</span><button type="button" class="phr" id="phr">${esc(T.foot.phone)}</button><a href="mailto:vincent@vincialmedia.com">vincent@vincialmedia.com</a><a href="${cta}">${esc(T.nav.cta)}</a></div>
   </nav>
   <div class="legal"><span>© 2026 VincialMedia</span><span class="lg"><span id="f3">${links(['impressum', 'datenschutz'])}</span><button type="button" class="cset" id="cset">${esc(T.consent.settings)}</button></span><span class="lng">${LANGS.map(l => `<a href="${url(view, l)}" hreflang="${l}" lang="${l}"${l === lang ? ' aria-current="true"' : ''}>${l.toUpperCase()}</a>`).join('·')}</span></div>
  </div>
