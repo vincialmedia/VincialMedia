@@ -13,6 +13,12 @@ const nextConfig = {
     remotePatterns: [],
   },
   allowedDevOrigins: ['*.daytona.work'],
+  async redirects() {
+    return [
+      // the old clinics landing page is gone; its visitors want the AI assistant page
+      { source: '/kliniken', destination: '/ki-automation', permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       // the new agency site: pre-rendered HTML in public/site, served under clean URLs
