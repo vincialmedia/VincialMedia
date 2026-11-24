@@ -24,7 +24,9 @@ export default function SiteHeader() {
         return;
       }
     }
-    router.push(`/#${sectionId}`);
+    // the homepage is now a static page: map the old section ids to where that content lives
+    const target: Record<string, string> = { services: "/#finder", portfolio: "/", contact: "/#finder" };
+    window.location.assign(target[sectionId] || "/");
   };
 
   return (

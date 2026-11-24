@@ -1,13 +1,21 @@
-/* VincialMedia hero scene. Real-time 3D laptop + phone, three.js r160 (global THREE).
-   The page's inline script owns scroll progress and calls window.__scene.update(p, t). */
+/* VincialMedia 3D scenes. Real-time laptop + phone, three.js r160 (global THREE).
+   Two uses: the scroll-driven hero on the homepage (#gl), and one device "shot" per service page (canvas[data-shot]).
+   The page script owns scroll progress and the pointer and calls window.__scene.update(p, t, px, py).
+   Words on the screens come from content.js through the JSON block #sd. */
 (function () {
 'use strict';
-const T = window.THREE, canvas = document.getElementById('gl'), sceneEl = document.getElementById('scene'), stage = document.getElementById('stage');
-if (!T || !canvas) { if (sceneEl) sceneEl.classList.add('nogl'); return; }
+const T = window.THREE, doc = document, heroCv = doc.getElementById('gl'), shotCv = doc.querySelector('canvas[data-shot]');
+const canvas = heroCv || shotCv, HERO = !!heroCv, SHOT = HERO ? '' : (window.__shot || (shotCv && shotCv.dataset.shot) || '');
+const sceneEl = HERO ? doc.getElementById('scene') : canvas && canvas.closest('.shot'), stage = HERO ? doc.getElementById('stage') : canvas && canvas.parentElement;
+const fail = () => { if (sceneEl) sceneEl.classList.add(HERO ? 'nogl' : 'still'); };
+if (!T || !canvas) { fail(); return; }
+const QS = new URLSearchParams(location.search), POSTER = QS.has('poster'), PT0 = parseFloat(QS.get('poster')) || 0;   // ?poster=<seconds> freezes a frame for the build's still images
+const EN = doc.documentElement.lang.slice(0, 2) === 'en';
+let S; try { S = JSON.parse(doc.getElementById('sd').textContent); } catch (e) { fail(); return; }
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let renderer;
-try { renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
-catch (e) { sceneEl.classList.add('nogl'); return; }
+try { renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: POSTER }); }
+catch (e) { fail(); return; }
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = T.SRGBColorSpace;
 renderer.toneMapping = T.ACESFilmicToneMapping;
@@ -61,6 +69,13 @@ function face(w, h, r, seg) {                        // flat rounded rectangle w
   return g;
 }
 
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const seg = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = t => t * t * (3 - 2 * t);
+const io = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const out = t => 1 - Math.pow(1 - t, 3);
+
 /* ---------- screen artwork, painted on 2D canvases ---------- */
 const FONT = (w, s) => w + ' ' + s + 'px Inter, "Helvetica Neue", Arial, sans-serif';
 function rr(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
@@ -78,6 +93,7 @@ function card(x, X, Y, w, h, r, fill) { x.save(); x.shadowColor = 'rgba(0,0,0,.1
 
 const SW_PX = 1600, VH = 1046, SITE_H = 2500, CH = 72;
 const BLUE = '#0071e3', INK = '#1d1d1f', MUTE = '#6e6e73';
+const URLBAR = SHOT === 'case' ? 'buyauto.ch' : S.url;
 const COOL = [[0.2, 0.2, 0.7, '122,200,255'], [0.85, 0.25, 0.6, '0,113,227'], [0.75, 0.9, 0.7, '255,170,120'], [0.1, 0.95, 0.55, '255,221,150']];
 const WARM = [[0.2, 0.15, 0.7, '255,214,170'], [0.9, 0.3, 0.6, '255,140,105'], [0.5, 1, 0.7, '255,196,120']];
 const MINT = [[0.2, 0.2, 0.7, '170,236,214'], [0.9, 0.3, 0.6, '70,180,160'], [0.4, 1, 0.7, '190,225,255']];
@@ -85,35 +101,36 @@ const MINT = [[0.2, 0.2, 0.7, '170,236,214'], [0.9, 0.3, 0.6, '70,180,160'], [0.
 function drawSite(x) {
   x.fillStyle = '#fbfbfd'; x.fillRect(0, 0, SW_PX, SITE_H);
   let y = CH;
-  tx(x, 'yourbrand', 90, y + 64, 700, 32, INK, 'left', -1);
-  ['Collection', 'Stories', 'Stores', 'Contact'].forEach((s, i) => tx(x, s, 720 + i * 150, y + 62, 500, 22, '#424245'));
-  x.fillStyle = INK; rr(x, 1340, y + 28, 170, 54, 27); x.fill(); tx(x, 'Shop now', 1425, y + 63, 600, 21, '#fff', 'center');
-  tx(x, 'New this season', 90, 300, 600, 25, BLUE);
-  tx(x, 'Made for people', 86, 420, 700, 104, INK, 'left', -4.5);
-  tx(x, 'who notice.', 86, 532, 700, 104, INK, 'left', -4.5);
-  tx(x, 'Quiet design, honest materials and', 90, 612, 400, 28, MUTE);
-  tx(x, 'delivery across Switzerland in 48 hours.', 90, 652, 400, 28, MUTE);
-  x.fillStyle = BLUE; rr(x, 90, 712, 220, 68, 34); x.fill(); tx(x, 'Shop now', 200, 755, 600, 25, '#fff', 'center');
-  tx(x, 'Our story  ›', 350, 755, 500, 25, BLUE);
+  tx(x, S.brand, 90, y + 64, 700, 32, INK, 'left', -1);
+  S.nav.forEach((s, i) => tx(x, s, 720 + i * 150, y + 62, 500, 22, '#424245'));
+  x.fillStyle = INK; rr(x, 1340, y + 28, 170, 54, 27); x.fill(); tx(x, S.shop, 1425, y + 63, 600, 21, '#fff', 'center');
+  tx(x, S.kicker, 90, 300, 600, 25, BLUE);
+  x.font = FONT(700, 104); const hs = Math.min(104, Math.floor(104 * 730 / Math.max(730, x.measureText(S.h1[0]).width, x.measureText(S.h1[1]).width)));
+  tx(x, S.h1[0], 86, 420, 700, hs, INK, 'left', -4.5 * hs / 104);
+  tx(x, S.h1[1], 86, 532, 700, hs, INK, 'left', -4.5 * hs / 104);
+  tx(x, S.sub[0], 90, 612, 400, 28, MUTE);
+  tx(x, S.sub[1], 90, 652, 400, 28, MUTE);
+  x.fillStyle = BLUE; rr(x, 90, 712, 240, 68, 34); x.fill(); tx(x, S.shop, 210, 755, 600, 25, '#fff', 'center');
+  tx(x, S.story, 366, 755, 500, 25, BLUE);
   art(x, 850, 190, 660, 760, 48, '#dfeeff', COOL);
   orb(x, 1215, 560, 205, '#ffffff', '#cfe3ff', '#5f93e6');
   orb(x, 1010, 760, 86, '#fff6ea', '#ffd0a6', '#e98952');
   card(x, 770, 770, 310, 150, 30);
   x.lineWidth = 12; x.strokeStyle = '#e5e5ea'; x.beginPath(); x.arc(845, 845, 40, 0, 7); x.stroke();
   x.strokeStyle = '#30b85a'; x.lineCap = 'round'; x.beginPath(); x.arc(845, 845, 40, -1.57, 4.5); x.stroke();
-  tx(x, '100', 910, 842, 700, 40, INK, 'left', -1); tx(x, 'Speed score', 910, 876, 500, 20, MUTE);
+  tx(x, '100', 910, 842, 700, 40, INK, 'left', -1); tx(x, S.speed, 910, 876, 500, 20, MUTE);
   /* below the fold */
-  tx(x, 'Featured', 90, 1180, 700, 60, INK, 'left', -2);
-  tx(x, 'View all  ›', 1510, 1176, 500, 24, BLUE, 'right');
-  [[90, COOL, '#dfeeff', 'Travel flask', 'CHF 49'], [580, WARM, '#fff0e2', 'Table lamp', 'CHF 129'], [1070, MINT, '#e2f6ee', 'Linen throw', 'CHF 89']].forEach((c, i) => {
+  tx(x, S.feat, 90, 1180, 700, 60, INK, 'left', -2);
+  tx(x, S.all, 1510, 1176, 500, 24, BLUE, 'right');
+  [[90, COOL, '#dfeeff'], [580, WARM, '#fff0e2'], [1070, MINT, '#e2f6ee']].forEach((c, i) => {
     art(x, c[0], 1230, 440, 500, 40, c[2], c[1]);
     orb(x, c[0] + 220, 1470, 120 - i * 8, '#ffffff', i === 1 ? '#ffd9b8' : i === 2 ? '#c8ecdf' : '#cfe3ff', i === 1 ? '#e58a52' : i === 2 ? '#3fa58e' : '#5f93e6');
-    tx(x, c[3], c[0] + 6, 1790, 600, 30, INK); tx(x, c[4], c[0] + 6, 1830, 400, 24, MUTE);
+    tx(x, S.items[i][0], c[0] + 6, 1790, 600, 30, INK); tx(x, S.items[i][1], c[0] + 6, 1830, 400, 24, MUTE);
   });
   x.fillStyle = INK; x.fillRect(0, 1920, SW_PX, 580);
-  tx(x, 'Built to last.', 90, 2130, 700, 96, '#f5f5f7', 'left', -4);
-  tx(x, 'Made nearby.', 90, 2240, 700, 96, '#86868b', 'left', -4);
-  x.fillStyle = BLUE; rr(x, 90, 2310, 250, 68, 34); x.fill(); tx(x, 'Find a store', 215, 2353, 600, 24, '#fff', 'center');
+  tx(x, S.foot[0], 90, 2130, 700, 96, '#f5f5f7', 'left', -4);
+  tx(x, S.foot[1], 90, 2240, 700, 96, '#86868b', 'left', -4);
+  x.fillStyle = BLUE; rr(x, 90, 2310, 250, 68, 34); x.fill(); tx(x, S.store, 215, 2353, 600, 24, '#fff', 'center');
 }
 function drawChrome(x) {
   x.clearRect(0, 0, SW_PX, VH);
@@ -121,25 +138,26 @@ function drawChrome(x) {
   x.fillStyle = '#d2d2d7'; x.fillRect(0, CH - 1, SW_PX, 1);
   ['#ff5f57', '#febc2e', '#28c840'].forEach((c, i) => { x.fillStyle = c; x.beginPath(); x.arc(44 + i * 34, CH / 2, 11, 0, 7); x.fill(); });
   x.fillStyle = '#fff'; rr(x, 440, 14, 720, 44, 22); x.fill();
-  tx(x, 'yourbrand.ch', 800, 44, 500, 22, '#424245', 'center');
+  tx(x, URLBAR, 800, 44, 500, 22, '#424245', 'center');
 }
 function drawDash(x) {
   x.fillStyle = '#f5f5f7'; x.fillRect(0, 0, SW_PX, VH);
   x.fillStyle = '#fff'; x.fillRect(0, CH, 250, VH);
-  tx(x, 'yourbrand', 40, CH + 62, 700, 28, INK, 'left', -1);
-  ['Overview', 'Campaigns', 'Creatives', 'Audiences', 'Reports'].forEach((s, i) => {
+  const DS = S.dash;
+  tx(x, S.brand, 40, CH + 62, 700, 28, INK, 'left', -1);
+  DS.nav.forEach((s, i) => {
     if (i === 1) { x.fillStyle = '#eaf3ff'; rr(x, 24, CH + 152, 202, 50, 12); x.fill(); }
     tx(x, s, 44, CH + 124 + i * 62, i === 1 ? 600 : 500, 22, i === 1 ? BLUE : '#424245');
   });
-  tx(x, 'Campaigns', 290, CH + 78, 700, 46, INK, 'left', -1.5);
-  x.fillStyle = '#e8e8ed'; rr(x, 560, CH + 44, 150, 40, 20); x.fill(); tx(x, 'Sample data', 635, CH + 71, 500, 18, MUTE, 'center');
-  [['Leads', '248', '+18%'], ['Cost per lead', 'CHF 21', '−12%'], ['Click rate', '4.6%', '+0.8'], ['Spend', 'CHF 5’210', 'on plan']].forEach((k, i) => {
+  tx(x, DS.h, 290, CH + 78, 700, 46, INK, 'left', -1.5);
+  x.fillStyle = '#e8e8ed'; rr(x, 580, CH + 44, 170, 40, 20); x.fill(); tx(x, DS.sample, 665, CH + 71, 500, 18, MUTE, 'center');
+  DS.kpi.forEach((k, i) => {
     const X = 290 + i * 322; card(x, X, CH + 120, 300, 150, 24);
     tx(x, k[0], X + 26, CH + 166, 500, 21, MUTE); tx(x, k[1], X + 26, CH + 228, 700, 46, INK, 'left', -1.5);
     x.fillStyle = '#e3f6e8'; rr(x, X + 196, CH + 142, 84, 34, 17); x.fill(); tx(x, k[2], X + 238, CH + 165, 600, 17, '#1f8f43', 'center');
   });
   card(x, 290, CH + 300, 870, 640, 28);
-  tx(x, 'Leads per week', 322, CH + 356, 600, 26, INK);
+  tx(x, DS.chart, 322, CH + 356, 600, 26, INK);
   const pts = [22, 26, 24, 33, 38, 36, 47, 52, 58, 71, 78, 92], X0 = 340, Y0 = CH + 880, WW = 770, HH = 440;
   x.strokeStyle = '#ececf0'; x.lineWidth = 2; for (let i = 0; i < 5; i++) { x.beginPath(); x.moveTo(X0, Y0 - i * HH / 4); x.lineTo(X0 + WW, Y0 - i * HH / 4); x.stroke(); }
   const px = i => X0 + i * WW / (pts.length - 1), py = v => Y0 - v / 100 * HH;
@@ -149,63 +167,164 @@ function drawDash(x) {
   const g = x.createLinearGradient(0, Y0 - HH, 0, Y0); g.addColorStop(0, 'rgba(0,113,227,.28)'); g.addColorStop(1, 'rgba(0,113,227,0)'); x.fillStyle = g; x.fill();
   x.fillStyle = '#fff'; x.strokeStyle = BLUE; x.lineWidth = 6; x.beginPath(); x.arc(px(11), py(92), 11, 0, 7); x.fill(); x.stroke();
   card(x, 1190, CH + 300, 372, 640, 28);
-  tx(x, 'Best creative', 1220, CH + 356, 600, 26, INK);
+  tx(x, DS.best, 1220, CH + 356, 600, 26, INK);
   art(x, 1220, CH + 384, 312, 300, 24, '#dfeeff', COOL); orb(x, 1376, CH + 524, 84, '#fff', '#cfe3ff', '#5f93e6');
-  [['Video A', 0.92], ['Carousel B', 0.64], ['Static C', 0.38]].forEach((b, i) => {
-    const Y = CH + 736 + i * 66; tx(x, b[0], 1220, Y, 500, 20, '#424245');
+  [0.92, 0.64, 0.38].forEach((v, i) => {
+    const b = [DS.bars[i], v], Y = CH + 736 + i * 66; tx(x, b[0], 1220, Y, 500, 20, '#424245');
     x.fillStyle = '#ececf0'; rr(x, 1220, Y + 14, 312, 12, 6); x.fill(); x.fillStyle = i ? '#9cc4f5' : BLUE; rr(x, 1220, Y + 14, 312 * b[1], 12, 6); x.fill();
   });
 }
 const PW_PX = 720, PH_PX = 1558;
+function sbar(x, col, time) {                        // phone status bar: time left, battery right, camera in the middle
+  tx(x, time || '9:30', 64, 82, 600, 30, col);
+  x.strokeStyle = col === '#fff' ? 'rgba(255,255,255,.55)' : 'rgba(0,0,0,.45)'; x.lineWidth = 3; rr(x, 596, 56, 54, 28, 9); x.stroke(); x.fillStyle = col; rr(x, 601, 61, 36, 18, 5); x.fill();
+}
+function wrap(x, s, max, w, size) {                  // break a sentence into lines that fit
+  x.font = FONT(w, size); if ('letterSpacing' in x) x.letterSpacing = '0px';
+  const out = []; let cur = '';
+  s.split(' ').forEach(word => { const t = cur ? cur + ' ' + word : word; if (cur && x.measureText(t).width > max) { out.push(cur); cur = word; } else cur = t; });
+  if (cur) out.push(cur); return out;
+}
+const today = () => POSTER ? (EN ? 'Thursday, 26 November' : 'Donnerstag, 26. November') : new Date().toLocaleDateString(EN ? 'en-GB' : 'de-CH', { weekday: 'long', day: 'numeric', month: 'long' });
 function drawApp(x) {
+  const A = S.app;
   x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, PW_PX, PH_PX);
-  tx(x, '9:30', 64, 82, 600, 30, '#fff');
-  x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = 3; rr(x, 596, 56, 54, 28, 9); x.stroke(); x.fillStyle = '#fff'; rr(x, 601, 61, 36, 18, 5); x.fill();
-  tx(x, 'Tuesday, 24 November', 48, 190, 500, 26, '#8e8e93');
-  tx(x, 'Good morning', 46, 258, 700, 62, '#fff', 'left', -2.5);
+  sbar(x, '#fff');
+  tx(x, today(), 48, 190, 500, 26, '#8e8e93');
+  tx(x, A.hello, 46, 258, 700, 62, '#fff', 'left', -2.5);
   const g = x.createLinearGradient(40, 310, 680, 660); g.addColorStop(0, '#0a84ff'); g.addColorStop(1, '#5e5ce6');
   x.fillStyle = g; rr(x, 40, 310, 640, 350, 48); x.fill();
   x.save(); rr(x, 40, 310, 640, 350, 48); x.clip(); blob(x, 620, 340, 300, '255,255,255', 0.28); blob(x, 100, 680, 260, '120,220,255', 0.35); x.restore();
-  tx(x, 'Next booking', 84, 388, 500, 26, 'rgba(255,255,255,.85)');
-  tx(x, 'Today · 14:30', 82, 468, 700, 60, '#fff', 'left', -2);
-  tx(x, 'Studio Zürich West', 84, 516, 500, 28, 'rgba(255,255,255,.9)');
-  x.fillStyle = '#fff'; rr(x, 84, 560, 200, 64, 32); x.fill(); tx(x, 'Check in', 184, 601, 600, 25, '#0a3fa8', 'center');
-  tx(x, 'Quick actions', 48, 748, 600, 30, '#fff');
-  [['Book', '#30d158'], ['Pay', '#ff9f0a'], ['Chat', '#64d2ff'], ['Rewards', '#ff6482']].forEach((a, i) => {
+  tx(x, A.next, 84, 388, 500, 26, 'rgba(255,255,255,.85)');
+  tx(x, A.today, 82, 468, 700, 60, '#fff', 'left', -2);
+  tx(x, A.place, 84, 516, 500, 28, 'rgba(255,255,255,.9)');
+  x.fillStyle = '#fff'; rr(x, 84, 560, 220, 64, 32); x.fill(); tx(x, A.checkin, 194, 601, 600, 25, '#0a3fa8', 'center');
+  tx(x, A.quick, 48, 748, 600, 30, '#fff');
+  [['#30d158'], ['#ff9f0a'], ['#64d2ff'], ['#ff6482']].forEach((a, i) => {
     const X = 40 + (i % 2) * 328, Y = 784 + Math.floor(i / 2) * 200;
     x.fillStyle = '#1c1c1e'; rr(x, X, Y, 312, 180, 40); x.fill();
-    const gg = x.createRadialGradient(X + 60, Y + 54, 2, X + 70, Y + 66, 36); gg.addColorStop(0, '#fff'); gg.addColorStop(0.25, a[1]); gg.addColorStop(1, a[1]);
+    const gg = x.createRadialGradient(X + 60, Y + 54, 2, X + 70, Y + 66, 36); gg.addColorStop(0, '#fff'); gg.addColorStop(0.25, a[0]); gg.addColorStop(1, a[0]);
     x.fillStyle = gg; x.beginPath(); x.arc(X + 70, Y + 66, 30, 0, 7); x.fill();
-    tx(x, a[0], X + 40, Y + 146, 600, 28, '#fff');
+    tx(x, A.acts[i], X + 40, Y + 146, 600, 28, '#fff');
   });
-  tx(x, 'Recent', 48, 1240, 600, 30, '#fff');
-  [['Yoga flow · 60 min', 'Yesterday'], ['Sauna pass', 'Sunday']].forEach((r, i) => {
+  tx(x, A.recent, 48, 1240, 600, 30, '#fff');
+  A.rows.forEach((r, i) => {
     const Y = 1268 + i * 72; x.fillStyle = '#1c1c1e'; rr(x, 40, Y, 640, 62, 20); x.fill();
     tx(x, r[0], 66, Y + 41, 500, 24, '#fff'); tx(x, r[1], 654, Y + 41, 400, 22, '#8e8e93', 'right');
   });
   x.fillStyle = 'rgba(44,44,46,.96)'; rr(x, 40, 1424, 640, 100, 50); x.fill();
-  x.fillStyle = '#0a84ff'; rr(x, 56, 1438, 150, 72, 36); x.fill(); tx(x, 'Home', 131, 1483, 600, 24, '#fff', 'center');
-  ['Classes', 'Wallet', 'Profile'].forEach((s, i) => tx(x, s, 290 + i * 150, 1483, 500, 23, '#aeaeb2', 'center'));
+  x.fillStyle = '#0a84ff'; rr(x, 56, 1438, 150, 72, 36); x.fill(); tx(x, A.tabs[0], 131, 1483, 600, 24, '#fff', 'center');
+  A.tabs.slice(1).forEach((s, i) => tx(x, s, 290 + i * 150, 1483, 500, 23, '#aeaeb2', 'center'));
+}
+/* booking screen of the sample app: sel 0..1 fades the chosen slot in, press darkens the button */
+function drawBook(x, sel, press) {
+  const B = S.app.book;
+  x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, PW_PX, PH_PX);
+  sbar(x, '#fff');
+  tx(x, '‹', 44, 206, 500, 64, '#0a84ff');
+  tx(x, B.h, 46, 300, 700, 62, '#fff', 'left', -2.5); tx(x, B.sub, 48, 350, 500, 28, '#8e8e93');
+  B.days.forEach((d, i) => {
+    const X = 40 + i * 132, on = i === 3;
+    x.fillStyle = on ? '#0a84ff' : '#1c1c1e'; rr(x, X, 410, 116, 136, 34); x.fill();
+    tx(x, d, X + 58, 458, 500, 24, on ? 'rgba(255,255,255,.85)' : '#8e8e93', 'center'); tx(x, String(23 + i), X + 58, 516, 700, 42, '#fff', 'center');
+  });
+  B.slots.forEach((s, i) => {
+    const X = 40 + (i % 2) * 328, Y = 600 + Math.floor(i / 2) * 136;
+    x.fillStyle = '#1c1c1e'; rr(x, X, Y, 312, 120, 32); x.fill();
+    if (i === 2 && sel > 0) { x.globalAlpha = sel; x.fillStyle = '#0a84ff'; rr(x, X, Y, 312, 120, 32); x.fill(); x.globalAlpha = 1; }
+    tx(x, s, X + 156, Y + 73, 600, 36, '#fff', 'center');
+  });
+  if (sel > 0) { x.globalAlpha = sel; x.fillStyle = '#1c1c1e'; rr(x, 40, 1040, 640, 120, 32); x.fill(); x.fillStyle = '#30d158'; x.beginPath(); x.arc(92, 1100, 12, 0, 7); x.fill(); tx(x, B.doneSub, 124, 1111, 500, 28, '#fff'); x.globalAlpha = 1; }
+  x.globalAlpha = sel > 0 ? 1 : 0.35; x.fillStyle = press ? '#0066cc' : '#0a84ff'; rr(x, 40, 1380, 640, 104, 52); x.fill(); tx(x, B.cta, 360, 1445, 600, 34, '#fff', 'center'); x.globalAlpha = 1;
+}
+function drawSheet(x, u) {                           // "booked" sheet sliding up over the booking screen
+  const B = S.app.book, top = PH_PX - 620 * u;
+  x.fillStyle = 'rgba(0,0,0,' + 0.55 * u + ')'; x.fillRect(0, 0, PW_PX, PH_PX);
+  x.fillStyle = '#1c1c1e'; rr(x, 16, top, 688, 700, 64); x.fill();
+  x.fillStyle = '#30d158'; x.beginPath(); x.arc(360, top + 170, 70, 0, 7); x.fill();
+  x.strokeStyle = '#fff'; x.lineWidth = 12; x.lineCap = 'round'; x.lineJoin = 'round'; x.beginPath(); x.moveTo(328, top + 172); x.lineTo(352, top + 196); x.lineTo(396, top + 146); x.stroke();
+  tx(x, B.done, 360, top + 330, 700, 60, '#fff', 'center', -2); tx(x, B.doneSub, 360, top + 388, 500, 28, '#8e8e93', 'center');
+}
+/* chat with the AI assistant: tt is the time inside the loop, messages arrive one by one */
+function drawChat(x, tt) {
+  const Cc = S.chat, AT = [0.5, 2.5, 4.3, 6.0], TYPE = [[1.3, 2.5], [5.0, 6.0]], DONE = 7.2, fade = 1 - seg(tt, 12.5, 13.2);
+  x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, PW_PX, PH_PX);
+  sbar(x, '#fff', Cc.time);
+  const av = x.createLinearGradient(46, 152, 122, 228); av.addColorStop(0, '#7ac8ff'); av.addColorStop(1, BLUE);
+  x.fillStyle = av; x.beginPath(); x.arc(84, 190, 38, 0, 7); x.fill();
+  tx(x, Cc.name, 142, 186, 700, 34, '#fff', 'left', -0.5); x.fillStyle = '#30d158'; x.beginPath(); x.arc(150, 216, 7, 0, 7); x.fill(); tx(x, Cc.role, 166, 225, 500, 24, '#8e8e93');
+  x.fillStyle = 'rgba(255,255,255,.08)'; x.fillRect(0, 262, PW_PX, 2);
+  let y = 300;
+  const bubble = (me, lines, k) => {
+    x.font = FONT(500, 38); const w = Math.max.apply(null, lines.map(l => x.measureText(l).width)) + 60, h = lines.length * 50 + 40, X = me ? PW_PX - 40 - w : 40;
+    x.save(); x.globalAlpha = k * fade; x.translate(0, (1 - k) * 26);
+    x.fillStyle = me ? '#0a84ff' : '#26262b'; rr(x, X, y, w, h, 34); x.fill();
+    lines.forEach((l, i) => tx(x, l, X + 30, y + 58 + i * 50, 500, 38, me ? '#fff' : '#f5f5f7'));
+    x.restore(); y += h + 20;
+  };
+  Cc.msgs.forEach((m, i) => { const k = out(seg(tt, AT[i], AT[i] + 0.3)); if (k > 0) bubble(m[0] === 'u', wrap(x, m[1], 500, 500, 38), k); });
+  TYPE.forEach(w => { if (tt > w[0] && tt < w[1]) { x.fillStyle = '#26262b'; rr(x, 40, y, 132, 80, 34); x.fill(); for (let i = 0; i < 3; i++) { x.fillStyle = 'rgba(255,255,255,' + (0.35 + 0.5 * Math.max(0, Math.sin(tt * 7 - i * 0.9))) + ')'; x.beginPath(); x.arc(78 + i * 28, y + 40, 9, 0, 7); x.fill(); } } });
+  const d = out(seg(tt, DONE, DONE + 0.4));
+  if (d > 0) {
+    x.save(); x.globalAlpha = d * fade; x.translate(0, (1 - d) * 26);
+    x.fillStyle = '#0f2417'; rr(x, 40, y + 6, 640, 158, 34); x.fill(); x.strokeStyle = 'rgba(48,209,88,.45)'; x.lineWidth = 2; rr(x, 40, y + 6, 640, 158, 34); x.stroke();
+    Cc.done.forEach((s, i) => { const Y = y + 58 + i * 60; x.fillStyle = '#30d158'; x.beginPath(); x.arc(84, Y - 9, 16, 0, 7); x.fill(); x.strokeStyle = '#0f2417'; x.lineWidth = 4.5; x.lineCap = 'round'; x.lineJoin = 'round'; x.beginPath(); x.moveTo(76, Y - 8); x.lineTo(82, Y - 2); x.lineTo(93, Y - 15); x.stroke(); tx(x, s, 116, Y, 600, 28, '#d9f7e1'); });
+    x.restore();
+  }
+  x.fillStyle = '#1c1c1e'; rr(x, 40, 1424, 640, 92, 46); x.fill(); tx(x, Cc.input, 84, 1481, 400, 30, '#6e6e73');
+  x.fillStyle = '#0a84ff'; x.beginPath(); x.arc(634, 1470, 30, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 5; x.lineCap = 'round'; x.lineJoin = 'round'; x.beginPath(); x.moveTo(634, 1484); x.lineTo(634, 1456); x.moveTo(622, 1468); x.lineTo(634, 1456); x.lineTo(646, 1468); x.stroke();
+}
+/* a search on the phone: the query is typed, the ad shows first, a tap turns into an enquiry */
+function drawSearch(x, tt) {
+  const Q = S.search, n = Math.round(seg(tt, 0.6, 2.2) * Q.q.length), k = out(seg(tt, 2.4, 2.9)) * (1 - seg(tt, 11, 11.6)), tap = tt > 4.6 && tt < 5.0, toast = out(seg(tt, 5.3, 5.8)) * (1 - seg(tt, 10.8, 11.2));
+  x.fillStyle = '#fff'; x.fillRect(0, 0, PW_PX, PH_PX);
+  sbar(x, INK);
+  x.fillStyle = '#f2f2f7'; rr(x, 32, 128, 656, 96, 48); x.fill();
+  x.strokeStyle = MUTE; x.lineWidth = 5; x.lineCap = 'round'; x.beginPath(); x.arc(78, 173, 15, 0, 7); x.moveTo(89, 185); x.lineTo(100, 197); x.stroke();
+  const typed = tt >= 11.6 ? '' : Q.q.slice(0, n); tx(x, typed, 122, 189, 500, 34, INK);
+  if (k < 0.5 && Math.sin(tt * 9) > -0.2) { x.font = FONT(500, 34); x.fillStyle = BLUE; x.fillRect(126 + x.measureText(typed).width, 154, 3, 44); }
+  if (k > 0) {
+    x.save(); x.globalAlpha = k; x.translate(0, (1 - k) * 30);
+    tx(x, Q.spons, 40, 306, 700, 26, INK);
+    const av = x.createLinearGradient(40, 340, 92, 392); av.addColorStop(0, '#7ac8ff'); av.addColorStop(1, BLUE); x.fillStyle = av; x.beginPath(); x.arc(66, 366, 26, 0, 7); x.fill();
+    tx(x, Q.dom, 108, 375, 500, 27, '#3c4043');
+    Q.h.forEach((l, i) => tx(x, l, 40, 462 + i * 52, 600, 42, BLUE, 'left', -1));
+    Q.d.forEach((l, i) => tx(x, l, 40, 572 + i * 40, 400, 28, MUTE));
+    x.fillStyle = tap ? '#0058b0' : BLUE; rr(x, 40, 660, 304, 88, 44); x.fill(); tx(x, Q.call, 192, 715, 600, 30, '#fff', 'center');
+    x.strokeStyle = '#d2d2d7'; x.lineWidth = 3; rr(x, 368, 660, 304, 88, 44); x.stroke(); tx(x, Q.quote, 520, 715, 600, 30, INK, 'center');
+    if (tap) { const r = seg(tt, 4.6, 5.0); x.fillStyle = 'rgba(255,255,255,' + 0.35 * (1 - r) + ')'; x.beginPath(); x.arc(192, 704, 30 + r * 90, 0, 7); x.fill(); }
+    x.fillStyle = '#e5e5ea'; x.fillRect(40, 800, 640, 2);
+    Q.other.forEach((s, i) => { const Y = 870 + i * 200; tx(x, s, 40, Y, 500, 31, '#5f6368'); x.fillStyle = '#ececf0'; rr(x, 40, Y + 30, 600, 18, 9); x.fill(); rr(x, 40, Y + 64, 430, 18, 9); x.fill(); x.fillStyle = '#f2f2f7'; x.fillRect(40, Y + 124, 640, 2); });
+    x.fillStyle = '#ececf0'; rr(x, 40, 1290, 560, 18, 9); x.fill(); rr(x, 40, 1324, 380, 18, 9); x.fill();
+    x.restore();
+  }
+  if (toast > 0) {
+    const Y = PH_PX + 20 - toast * 196;                // rises from the bottom so the search stays readable
+    x.save(); x.shadowColor = 'rgba(0,0,0,.3)'; x.shadowBlur = 40; x.shadowOffsetY = 16; x.fillStyle = 'rgba(28,28,30,.97)'; rr(x, 24, Y, 672, 136, 38); x.fill(); x.restore();
+    x.fillStyle = '#30d158'; x.beginPath(); x.arc(74, Y + 68, 14, 0, 7); x.fill();
+    tx(x, Q.toast, 108, Y + 60, 700, 31, '#fff'); tx(x, Q.toastSub, 108, Y + 100, 400, 25, '#aeaeb2');
+  }
 }
 function drawAd(x) {
   x.fillStyle = '#fff'; x.fillRect(0, 0, PW_PX, PH_PX);
-  tx(x, '9:30', 64, 82, 600, 30, INK);
-  x.strokeStyle = 'rgba(0,0,0,.45)'; x.lineWidth = 3; rr(x, 596, 56, 54, 28, 9); x.stroke(); x.fillStyle = INK; rr(x, 601, 61, 36, 18, 5); x.fill();
-  tx(x, 'For you', 46, 196, 700, 54, INK, 'left', -2);
+  const AD = S.ad;
+  sbar(x, INK);
+  tx(x, AD.feed, 46, 196, 700, 54, INK, 'left', -2);
   const av = x.createLinearGradient(46, 244, 118, 316); av.addColorStop(0, '#7ac8ff'); av.addColorStop(1, BLUE);
   x.fillStyle = av; x.beginPath(); x.arc(82, 280, 36, 0, 7); x.fill();
-  tx(x, 'yourbrand', 138, 274, 600, 27, INK); tx(x, 'Sponsored', 138, 308, 400, 22, MUTE);
+  tx(x, S.brand, 138, 274, 600, 27, INK); tx(x, AD.spons, 138, 308, 400, 22, MUTE);
   art(x, 0, 340, 720, 800, 0, '#dfeeff', COOL);
   orb(x, 430, 700, 220, '#ffffff', '#cfe3ff', '#5f93e6'); orb(x, 190, 930, 92, '#fff6ea', '#ffd0a6', '#e98952');
-  tx(x, 'Spring drop', 44, 452, 700, 84, '#0b2a55', 'left', -3.5);
-  x.fillStyle = '#0b2a55'; rr(x, 46, 486, 268, 60, 30); x.fill(); tx(x, '−20% this week', 180, 525, 600, 24, '#fff', 'center');
-  x.fillStyle = '#f2f2f7'; x.fillRect(0, 1140, 720, 96); tx(x, 'Shop now', 46, 1198, 600, 28, INK); tx(x, '›', 676, 1200, 500, 36, MUTE, 'right');
+  x.font = FONT(700, 84); const as = Math.min(84, Math.floor(84 * 620 / Math.max(620, x.measureText(AD.h).width)));
+  tx(x, AD.h, 44, 452, 700, as, '#0b2a55', 'left', -3.5 * as / 84);
+  x.fillStyle = '#0b2a55'; rr(x, 46, 486, 300, 60, 30); x.fill(); tx(x, AD.off, 196, 525, 600, 24, '#fff', 'center');
+  x.fillStyle = '#f2f2f7'; x.fillRect(0, 1140, 720, 96); tx(x, AD.shop, 46, 1198, 600, 28, INK); tx(x, '›', 676, 1200, 500, 36, MUTE, 'right');
   x.strokeStyle = INK; x.lineWidth = 4.5; x.lineJoin = 'round'; x.lineCap = 'round';
   x.beginPath(); x.moveTo(74, 1318); x.bezierCurveTo(40, 1288, 52, 1262, 74, 1280); x.bezierCurveTo(96, 1262, 108, 1288, 74, 1318); x.stroke();
   x.beginPath(); x.arc(170, 1290, 24, 0.6, 6.4); x.lineTo(150, 1322); x.stroke();
   x.beginPath(); x.moveTo(238, 1276); x.lineTo(296, 1268); x.lineTo(270, 1320); x.lineTo(262, 1294); x.closePath(); x.stroke();
-  tx(x, '1’204 likes', 46, 1384, 600, 25, INK);
-  tx(x, 'yourbrand', 46, 1426, 600, 25, INK); tx(x, 'New colours, made in small batches.', 190, 1426, 400, 25, INK);
+  tx(x, AD.likes, 46, 1384, 600, 25, INK);
+  tx(x, S.brand, 46, 1426, 600, 25, INK); x.font = FONT(600, 25); tx(x, AD.cap, 58 + x.measureText(S.brand).width, 1426, 400, 25, INK);
   x.fillStyle = '#e5e5ea'; x.fillRect(0, 1470, 720, 2);
   x.fillStyle = '#ffd0a6'; x.beginPath(); x.arc(82, 1530, 36, 0, 7); x.fill(); tx(x, 'studio.nord', 138, 1540, 600, 27, INK);
 }
@@ -213,16 +332,54 @@ function ctex(w, h, draw) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const x = c.getContext('2d'), t = new T.CanvasTexture(c);
   t.colorSpace = T.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  t.userData.paint = () => { x.save(); draw(x); x.restore(); t.needsUpdate = true; };
-  t.userData.paint();
+  t.userData.x = x;
+  t.userData.paint = a => { x.save(); x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; draw(x, a); x.restore(); t.needsUpdate = true; };
+  t.userData.paint(0);
   return t;
 }
-const tex = { site: ctex(SW_PX, SITE_H, drawSite), chrome: ctex(SW_PX, VH, drawChrome), dash: ctex(SW_PX, VH, drawDash), app: ctex(PW_PX, PH_PX, drawApp), ad: ctex(PW_PX, PH_PX, drawAd) };
-const SITE_TOP = 1 - VH / SITE_H;
-tex.site.repeat.set(1, VH / SITE_H); tex.site.offset.y = SITE_TOP;
-if (document.fonts && document.fonts.load) {
-  Promise.all(['400', '500', '600', '700'].map(w => document.fonts.load(w + ' 24px Inter'))).then(() => { Object.keys(tex).forEach(k => tex[k].userData.paint()); }).catch(() => {});
+/* which screens this page needs: the hero uses all five, a shot only its own */
+const LAP = HERO || /^(web|local|ads|case)$/.test(SHOT), PHONE = HERO || /^(app|auto|ads|case)$/.test(SHOT);
+const CASE = SHOT === 'case' ? (window.__caseImgs || {}) : null;
+const still = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); draw(x); return c; };
+let frames = null;                                   // pre-drawn app screens, composed while the sequence plays
+function paintFrames() { frames = { home: still(PW_PX, PH_PX, drawApp), b0: still(PW_PX, PH_PX, x => drawBook(x, 0, false)), b1: still(PW_PX, PH_PX, x => drawBook(x, 1, false)), b2: still(PW_PX, PH_PX, x => drawBook(x, 1, true)) }; }
+function drawAppSeq(x, tt) {                         // home, slide to booking, pick a slot, book, confirmation, back
+  if (!frames) paintFrames();
+  const F = frames;
+  if (tt < 3) { x.drawImage(F.home, 0, 0); return; }
+  if (tt < 3.45) { const k = io(seg(tt, 3, 3.45)); x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, PW_PX, PH_PX); x.globalAlpha = 1 - k * 0.7; x.drawImage(F.home, -k * 220, 0); x.globalAlpha = 1; x.drawImage(F.b0, (1 - k) * PW_PX, 0); return; }
+  const sel = seg(tt, 4.2, 4.45), press = tt > 5.0 && tt < 5.25, sheet = out(seg(tt, 5.35, 5.8)), back = seg(tt, 8.7, 9.2);
+  x.drawImage(sel >= 1 ? (press ? F.b2 : F.b1) : F.b0, 0, 0);
+  if (sel > 0 && sel < 1) { x.globalAlpha = sel; x.drawImage(F.b1, 0, 0); x.globalAlpha = 1; }
+  if (sheet > 0) drawSheet(x, sheet);
+  if (back > 0) { x.globalAlpha = back; x.drawImage(F.home, 0, 0); x.globalAlpha = 1; }
 }
+const SEQ = { app: [drawAppSeq, 9.2, 2], auto: [drawChat, 13.6, 9], ads: [drawSearch, 12, 8] }[SHOT];   // painter, loop length, frame used for the still image
+function drawShot(x, key) {                          // a real screenshot (own project), or black until it has loaded
+  const im = CASE && CASE[key]; x.fillStyle = '#0b0b0f'; x.fillRect(0, 0, x.canvas.width, x.canvas.height);
+  if (!im || !im.complete || !im.naturalWidth) return;
+  if (key === 'd') { drawChrome(x); x.drawImage(im, 0, CH, SW_PX, SW_PX * im.naturalHeight / im.naturalWidth); }
+  else x.drawImage(im, 0, 0, PW_PX, PW_PX * im.naturalHeight / im.naturalWidth);
+}
+const tex = {};
+if (LAP) {
+  if (CASE) tex.site = ctex(SW_PX, VH, x => drawShot(x, 'd'));
+  else if (SHOT === 'ads') tex.site = ctex(SW_PX, VH, drawDash);
+  else { tex.site = ctex(SW_PX, SITE_H, drawSite); tex.site.repeat.set(1, VH / SITE_H); }
+  if (!CASE) tex.chrome = ctex(SW_PX, VH, drawChrome);
+  if (HERO) tex.dash = ctex(SW_PX, VH, drawDash);
+}
+if (PHONE) {
+  tex.app = ctex(PW_PX, PH_PX, CASE ? x => drawShot(x, 'm') : SEQ ? (x, a) => SEQ[0](x, a || 0) : drawApp);
+  if (HERO) tex.ad = ctex(PW_PX, PH_PX, drawAd);
+}
+const SITE_TOP = 1 - VH / SITE_H, SCROLLS = LAP && !CASE && SHOT !== 'ads';
+if (SCROLLS) tex.site.offset.y = SITE_TOP;
+const repaint = () => { frames = null; Object.keys(tex).forEach(k => tex[k].userData.paint(seqT)); };
+let seqT = SEQ ? SEQ[2] : 0, ready = false, pending = 1;
+const settle = () => { if (--pending <= 0) { repaint(); ready = true; } };
+if (CASE) ['d', 'm'].forEach(k => { const im = CASE[k]; if (im && !im.complete) { pending++; im.addEventListener('load', settle); im.addEventListener('error', settle); } });
+if (document.fonts && document.fonts.load) Promise.all(['400', '500', '600', '700'].map(w => document.fonts.load(w + ' 24px Inter'))).then(settle, settle); else settle();
 
 /* ---------- materials ---------- */
 const decal = (m, n) => { m.polygonOffset = true; m.polygonOffsetFactor = -n; m.polygonOffsetUnits = -n * 4; return m; };
@@ -239,9 +396,9 @@ const M = {
   back: decal(new T.MeshPhysicalMaterial({ color: 0x1b1c21, metalness: 0.25, roughness: 0.36, clearcoat: 0.5, clearcoatRoughness: 0.25 }), 1),
   island: new T.MeshPhysicalMaterial({ color: 0x232429, metalness: 0.3, roughness: 0.3, clearcoat: 0.6 }),
   lens: decal(new T.MeshPhysicalMaterial({ color: 0x04050a, metalness: 0.4, roughness: 0.04, clearcoat: 1 }), 4),
-  siteA: lit(tex.site, 2), siteB: lit(tex.dash, 3, true),
-  chrome: decal(new T.MeshBasicMaterial({ map: tex.chrome, transparent: true, toneMapped: false, depthWrite: false }), 4),
-  appA: lit(tex.app, 2), appB: lit(tex.ad, 3, true)
+  siteA: lit(tex.site || null, 2), siteB: lit(tex.dash || null, 3, true),
+  chrome: decal(new T.MeshBasicMaterial({ map: tex.chrome || null, transparent: true, toneMapped: false, depthWrite: false }), 4),
+  appA: lit(tex.app || null, 2), appB: lit(tex.ad || null, 3, true)
 };
 
 /* ---------- models ---------- */
@@ -320,12 +477,6 @@ const halo = new T.Mesh(new T.PlaneGeometry(11, 6), new T.MeshBasicMaterial({ ma
 halo.position.set(0, 2.1, -2.2); halo.renderOrder = 2; scene.add(halo);
 
 /* ---------- animation ---------- */
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-const seg = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
-const lerp = (a, b, t) => a + (b - a) * t;
-const smooth = t => t * t * (3 - 2 * t);
-const io = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-const out = t => 1 - Math.pow(1 - t, 3);
 function kf(p, K) { if (p <= K[0][0]) return K[0][1]; for (let i = 1; i < K.length; i++) if (p <= K[i][0]) { const a = K[i - 1], b = K[i]; return a[1] + (b[1] - a[1]) * smooth((p - a[0]) / (b[0] - a[0])); } return K[K.length - 1][1]; }
 const V = new T.Vector3();
 let t0 = -1, shown = false;
@@ -337,7 +488,16 @@ function resize() {
   camera.fov = Math.max(28, 2 * Math.atan(Math.tan(10 * Math.PI / 180) / camera.aspect) * 180 / Math.PI);
   camera.updateProjectionMatrix();
 }
-function update(p, t) {
+function frame(cx, ty, drop, pitch, fitW, fitH) {    // place the camera so a box of fitW x fitH around the target fills the view
+  const A = camera.aspect, th = Math.tan(camera.fov * Math.PI / 360), tw = th * A, d = Math.max(fitW / (2 * tw), fitH / (2 * th));
+  V.set(cx, ty + drop * 2 * d * th, 0);
+  camera.position.set(cx, V.y + d * Math.sin(pitch), d * Math.cos(pitch));
+  camera.lookAt(V);
+  camera.near = Math.max(0.2, d * 0.25); camera.far = d * 2.5 + 30; camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+  if (!shown) { shown = true; canvas.classList.add('on'); if (!HERO) sceneEl.classList.add('live'); }
+}
+function updateHero(p, t) {
   if (t0 < 0) t0 = t;
   const A = camera.aspect, port = A < 0.9;
   const tease = reduce ? 1 : out(clamp((t - t0 - 0.3) / 1.8, 0, 1));
@@ -362,22 +522,60 @@ function update(p, t) {
   glowLight.intensity = k * 1.8;
   pool.material.opacity = k * 0.5; pool.position.x = lx; halo.material.opacity = k * 0.55; halo.position.x = lx * 0.5;
   tex.site.offset.y = SITE_TOP - io(seg(p, 0.38, 0.58)) * SITE_TOP * 0.82;
-
-  const th = Math.tan(camera.fov * Math.PI / 360), tw = th * A;
   const fitW = port ? kf(p, [[0, 4.4], [0.36, 3.9], [0.5, 3.5], [0.58, 3.6], [0.76, 4.0], [1, 3.8]]) : kf(p, [[0, 6.9], [0.36, 5.4], [0.5, 5.0], [0.58, 5.2], [0.76, 6.5], [1, 6.2]]);
   const fitH = port ? 3 : kf(p, [[0, 3.5], [0.36, 4.3], [0.5, 4.2], [0.76, 4.4], [1, 4.3]]);
-  const d = Math.max(fitW / (2 * tw), fitH / (2 * th));
   const pitch = kf(p, [[0, 0.27], [0.36, 0.17], [0.5, 0.1], [0.76, 0.15], [1, 0.13]]);
   const ty = kf(p, [[0, 0.2], [0.36, 0.95], [0.5, 1.05], [1, 0.98]]);
   const cx = kf(p, [[0.56, 0], [0.76, port ? 0 : 0.2]]);
   const drop = port ? kf(p, [[0, 0.2], [0.14, 0.1], [0.36, -0.08], [1, -0.08]]) : kf(p, [[0, 0.2], [0.14, 0.12], [0.36, -0.1], [1, -0.1]]);
-  V.set(cx, ty + drop * 2 * d * th, 0);
-  camera.position.set(cx, V.y + d * Math.sin(pitch), d * Math.cos(pitch));
-  camera.lookAt(V);
-  camera.near = Math.max(0.2, d * 0.25); camera.far = d * 2.5 + 30; camera.updateProjectionMatrix();
-  renderer.render(scene, camera);
-  if (!shown) { shown = true; canvas.classList.add('on'); }
+  frame(cx, ty, drop, pitch, fitW, fitH);
 }
+
+/* ---------- one device per service page ----------
+   p: how far the figure has travelled through the viewport (0 enters at the bottom, 0.5 centred, 1 gone at the top)
+   px, py: pointer or finger inside the figure, -1..1, already damped by the page */
+function pose(port) {
+  const phone = { ph: [0, 1.2, 0, 1.5], fitW: 1.62, fitH: 2.9, ty: 1.1, pitch: 0.05, drop: 0, cx: 0 };
+  if (SHOT === 'web') return { lap: [0, -0.28], fitW: port ? 3.7 : 4.3, fitH: port ? 3 : 2.95, ty: 0.95, pitch: 0.15, drop: -0.03, cx: 0 };
+  if (SHOT === 'local') return { lap: [0, 0.28], fitW: port ? 3.7 : 4.3, fitH: port ? 3 : 2.95, ty: 0.95, pitch: 0.15, drop: -0.03, cx: 0 };
+  if (SHOT === 'app') return Object.assign({ pyaw: -0.3 }, phone);
+  if (SHOT === 'auto') return Object.assign({ pyaw: 0.3 }, phone);
+  if (SHOT === 'ads' && port) return Object.assign({ pyaw: -0.28 }, phone);
+  return { lap: [port ? -0.22 : -0.95, 0.22], ph: port ? [0.98, 0.86, 1.3, 1] : [1.62, 1.1, 0.6, 1.36], pyaw: port ? -0.4 : -0.52, fitW: port ? 4.0 : 6.3, fitH: port ? 3 : 3.7, ty: 0.98, pitch: 0.14, drop: -0.06, cx: port ? 0 : 0.2 };
+}
+/* the moments inside each loop when the screen is moving; in between it is repainted once and left alone */
+const BUSY = { app: [[3, 3.5], [4.2, 4.5], [5, 5.3], [5.35, 5.85], [8.7, 9.2]], auto: [[0.5, 0.85], [1.3, 2.85], [4.3, 4.65], [5, 6.35], [7.2, 7.65], [12.5, 13.25]], ads: [[0, 3], [4.6, 5.05], [5.3, 5.85], [10.8, 11.65]] }[SHOT] || [];
+let seqKey = '';
+function updateShot(p, t, px, py) {
+  if (!ready) return;
+  if (POSTER) { p = 0.5; t = 0; px = py = 0; }
+  if (t0 < 0) t0 = t;
+  px = px || 0; py = py || 0;
+  const port = camera.aspect < 0.9, P = pose(port), still = reduce || POSTER;
+  const e = io(seg(p, 0.02, 0.4)), leave = seg(p, 0.62, 1);                      // arriving, leaving
+  const sway = still ? 0 : Math.sin(t * 0.6) * 0.014, bob = still ? 0 : Math.sin(t * 1.2) * 0.02;
+  const turn = (e - 1) * 0.5 + leave * 0.22 + sway + px * 0.3;
+  sets.forEach(s => {
+    s.lap.visible = !!P.lap; s.ph.visible = !!P.ph; s.sB.visible = s.pB.visible = false; s.sC.visible = !!tex.chrome;
+    if (P.lap) { s.pivot.rotation.x = -lerp(1.0, 1.9, e); s.lap.position.x = P.lap[0]; s.lap.rotation.y = P.lap[1] + turn * (P.ph ? 0.5 : 1); }
+    if (P.ph) { s.ph.position.set(P.ph[0], P.ph[1] + bob - (1 - e) * 0.18, P.ph[2]); s.ph.rotation.set((1 - e) * 0.16 - py * 0.05, P.pyaw + turn * 1.25, (1 - e) * 0.08); s.ph.scale.setScalar(P.ph[3]); }
+  });
+  M.siteA.emissiveIntensity = 1; M.chrome.color.setScalar(1);
+  glowLight.intensity = P.lap ? 1.8 : 0;
+  pool.material.opacity = P.lap ? 0.5 : 0.28; pool.position.x = P.lap ? P.lap[0] : 0; halo.material.opacity = 0.5; halo.position.x = P.lap ? P.lap[0] * 0.5 : 0;
+  if (SCROLLS) {                                     // the sample site scrolls by itself: down, pause, back up
+    const c = POSTER ? 0 : ((t - t0) % 15) / 15, sc = SHOT === 'local' ? 0.7 + (still ? 0 : Math.sin(t * 0.35) * 0.1) : c < 0.2 ? 0 : c < 0.47 ? io((c - 0.2) / 0.27) : c < 0.67 ? 1 : c < 0.94 ? 1 - io((c - 0.67) / 0.27) : 0;
+    tex.site.offset.y = SITE_TOP - sc * SITE_TOP * 0.82;
+  }
+  if (SEQ) {                                         // the phone screen plays its loop; repaint only when the picture changes
+    const tt = still ? SEQ[2] : (SEQ[2] + (t - t0)) % SEQ[1], busy = BUSY.some(w => tt >= w[0] && tt <= w[1]);
+    const key = busy ? 'b' + Math.floor(tt * 24) : 'i' + BUSY.filter(w => tt > w[1]).length;
+    if (key !== seqKey) { seqKey = key; seqT = tt; tex.app.userData.paint(tt); }
+  }
+  frame(P.cx, P.ty, P.drop, P.pitch - py * 0.035, P.fitW, P.fitH);
+  if (POSTER) window.__posterReady = true;
+}
+const update = HERO ? updateHero : updateShot;
 resize();
 if (window.ResizeObserver) new ResizeObserver(resize).observe(stage); else addEventListener('resize', resize);
 window.__scene = { update, resize };

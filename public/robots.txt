@@ -3,7 +3,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /site/
-Disallow: /secret-game
 
 # Search and answer engines are welcome
 User-agent: Googlebot
@@ -20,6 +19,5 @@ User-agent: Applebot-Extended
 Allow: /
 Disallow: /api/
 Disallow: /site/
-Disallow: /secret-game
 
 Sitemap: https://www.vincialmedia.com/sitemap.xml

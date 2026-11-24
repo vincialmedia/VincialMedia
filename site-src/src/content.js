@@ -24,7 +24,8 @@ window.C = {
    "sub": "Sie sagen, was Sie brauchen. Innert zwei Arbeitstagen haben Sie eine Offerte mit Preis und Datum.",
    "cta": "Offerte anfordern",
    "link": "Pakete ansehen ›",
-   "hint": "Scrollen"
+   "hint": "Scrollen",
+   "skip": "Paket zusammenstellen ›"
   },
   "caps": [
    {
@@ -35,7 +36,7 @@ window.C = {
    {
     "k": "Apps",
     "h": "Von der Skizze in den App Store.",
-    "p": "iOS, Android und Web. Nach einer Woche klicken Sie sich durch einen Prototyp."
+    "p": "iOS und Android aus einer Entwicklung. Nach einer Woche klicken Sie sich durch einen Prototyp."
    },
    {
     "k": "Werbung",
@@ -128,7 +129,10 @@ window.C = {
     "sending": "Wird gesendet …",
     "err": "Das hat nicht geklappt. Schreiben Sie mir direkt an vincent@vincialmedia.com, ich antworte genauso schnell.",
     "bad": "Bitte prüfen Sie Name und E-Mail-Adresse.",
-    "note": "Ich melde mich innert zwei Arbeitstagen. Was mit Ihren Angaben geschieht, steht im Datenschutz."
+    "note": "Ich melde mich innert zwei Arbeitstagen. Was mit Ihren Angaben geschieht, steht im Datenschutz.",
+    "badName": "Bitte geben Sie Ihren Namen an.",
+    "badEmail": "Bitte prüfen Sie die E-Mail-Adresse.",
+    "again": "Weitere Anfrage stellen"
    },
    "once": "Einmalig",
    "monthly": "Pro Monat",
@@ -193,7 +197,7 @@ window.C = {
   },
   "who": {
    "h": "Eine Person. Kein Projektleiter dazwischen.",
-   "p1": "VincialMedia bin ich, Vincent Hänggi. Seit rund zehn Jahren baue ich CRM-Systeme und Marketing-Automation, unter anderem bei Crowdhouse, Kreis 1 Consulting und Demodia. Für HubSpot und Salesforce Pardot bin ich zertifiziert.",
+   "p1": "VincialMedia ist eine KI-Agentur in Schlieren bei Zürich und besteht aus einer Person: mir, Vincent Hänggi. Seit rund zehn Jahren baue ich CRM-Systeme und Marketing-Automation, unter anderem bei Crowdhouse, Kreis 1 Consulting und Demodia. Für HubSpot und Salesforce Pardot bin ich zertifiziert.",
    "p2": "Mit BuyAuto betreibe ich selbst einen Marktplatz für Leasingübernahmen. Website, Werbung und Automationen dafür stammen von mir. Die Fleissarbeit erledigt bei mir KI. Was zu Ihnen rausgeht, habe ich vorher selbst gelesen und getestet.",
    "facts": [
     [
@@ -208,7 +212,9 @@ window.C = {
      "2",
      "Arbeitstage bis zur schriftlichen Offerte"
     ]
-   ]
+   ],
+   "alt": "Vincent Hänggi, Inhaber von VincialMedia",
+   "role": "Inhaber, VincialMedia"
   },
   "how": {
    "h": "So läuft es ab.",
@@ -231,13 +237,13 @@ window.C = {
    "h": "Häufige Fragen.",
    "items": [
     [
-     "Was kostet eine Website für ein KMU?",
+     "Was kostet eine Website bei VincialMedia?",
      "Bei VincialMedia ab CHF 1’900 für bis zu acht Seiten, inklusive Texte, SEO-Grundlagen und Analytics. Den genauen Preis erhalten Sie schriftlich, bevor Sie etwas unterschreiben.",
-     "webdesign"
+     "preise"
     ],
     [
-     "Was kostet eine App in der Schweiz?",
-     "Eine App für iOS und Android mit Login, Zahlungen und Admin-Bereich kostet bei VincialMedia ab CHF 9’800. Grössere Projekte mit Anbindung an bestehende Software liegen zwischen CHF 19’500 und CHF 39’000.",
+     "Was kostet eine App bei VincialMedia?",
+     "Ab CHF 9’800 für iOS und Android mit Login, Zahlungen und Admin-Bereich. Mit mehreren Funktionen CHF 19’500, mit Anbindung an Ihre bestehende Software CHF 39’000.",
      "app-entwicklung"
     ],
     [
@@ -271,7 +277,8 @@ window.C = {
    "c1": "Leistungen",
    "c2": "Region",
    "c3": "Kontakt",
-   "place": "Schlieren, Kanton Zürich"
+   "place": "Schlieren, Kanton Zürich",
+   "addr": "Brandstrasse 21, 8952 Schlieren"
   },
   "page": {
    "inc": "Das ist im Preis drin",
@@ -287,7 +294,9 @@ window.C = {
     "Preis"
    ],
    "svc": "Leistung",
-   "src": "Quellen"
+   "src": "Quellen",
+   "region": "Websites für Betriebe in der Region",
+   "regionP": "Für Betriebe im Limmattal gibt es eigene Seiten mit dem, was vor Ort zählt:"
   },
   "pages": {
    "app-entwicklung": {
@@ -301,7 +310,7 @@ window.C = {
     "title": "App entwickeln lassen in Zürich zum Fixpreis | VincialMedia",
     "desc": "iOS- und Android-Apps für KMU und Startups aus Zürich. Klickbarer Prototyp nach einer Woche, Fixpreis ab CHF 9’800, im Store nach 6 bis 16 Wochen.",
     "h1": "App entwickeln lassen in Zürich",
-    "lead": "VincialMedia baut Apps für iOS, Android und Web zum Fixpreis ab CHF 9’800. Nach einer Woche klicken Sie sich auf Ihrem eigenen Handy durch einen Prototyp. Die fertige App steht je nach Umfang nach 6 bis 16 Wochen im App Store und bei Google Play.",
+    "lead": "VincialMedia aus Schlieren bei Zürich baut Apps für iOS und Android zum Fixpreis ab CHF 9’800. Nach einer Woche klicken Sie sich auf Ihrem eigenen Handy durch einen Prototyp. Die fertige App steht je nach Umfang nach 6 bis 16 Wochen im App Store und bei Google Play.",
     "facts": [
      [
       "Preis",
@@ -341,7 +350,7 @@ window.C = {
     "faq": [
      [
       "Was kostet eine App in der Schweiz?",
-      "Bei VincialMedia ab CHF 9’800 für eine App mit Login, Zahlungen und Admin-Bereich. Mit Anbindung an Ihre bestehende Software liegt der Preis zwischen CHF 19’500 und CHF 39’000. Sie erhalten die Zahl schriftlich, bevor Sie unterschreiben."
+      "Bei VincialMedia ab CHF 9’800 für eine App mit Login, Zahlungen und Admin-Bereich. Mit mehreren Funktionen, Push-Nachrichten und Abos kostet sie CHF 19’500, mit Anbindung an Ihre bestehende Software CHF 39’000. Sie erhalten die Zahl schriftlich, bevor Sie unterschreiben."
      ],
      [
       "Wie lange dauert die Entwicklung?",
@@ -368,7 +377,7 @@ window.C = {
     "title": "Webdesign Zürich: KMU-Website zum Fixpreis | VincialMedia",
     "desc": "Website erstellen lassen in Zürich: bis zu acht Seiten inklusive Texte und SEO, ab CHF 1’900, live in zwei bis sechs Wochen. Gebaut für Google und ChatGPT.",
     "h1": "Website erstellen lassen in Zürich",
-    "lead": "VincialMedia baut Websites für KMU zum Fixpreis ab CHF 1’900, inklusive Texte, SEO-Grundlagen und Analytics. Ihre Seite ist nach zwei bis sechs Wochen live und so aufgebaut, dass Google und KI-Assistenten wie ChatGPT sie lesen und zitieren können.",
+    "lead": "VincialMedia baut Websites für KMU in Zürich und im Limmattal zum Fixpreis ab CHF 1’900, inklusive Texte, SEO-Grundlagen und Analytics. Ihre Seite ist nach zwei bis sechs Wochen live und so aufgebaut, dass Google und KI-Assistenten wie ChatGPT sie lesen und zitieren können.",
     "facts": [
      [
       "Preis",
@@ -393,8 +402,8 @@ window.C = {
       "Kurze Ladezeit, saubere Überschriften, strukturierte Daten und eine Antwort auf jede Frage, die Ihre Kundschaft stellt."
      ],
      [
-      "Zweisprachig, wenn Sie wollen",
-      "Deutsch und Englisch aus einer Hand. Weitere Sprachen auf Anfrage."
+      "Zweisprachig ab Stufe Mittel",
+      "Deutsch und Englisch aus einer Hand, ab der Stufe Mittel im Preis. Weitere Sprachen auf Anfrage."
      ],
      [
       "Google-Unternehmensprofil inklusive",
@@ -407,8 +416,9 @@ window.C = {
     ],
     "faq": [
      [
-      "Was kostet eine Website für ein KMU in der Schweiz?",
-      "Bei VincialMedia ab CHF 1’900 für bis zu acht Seiten. Eine grössere Seite mit Buchungssystem, Shop oder mehreren Sprachen kostet zwischen CHF 3’900 und CHF 7’900. Hosting und Domain sind im ersten Jahr dabei."
+      "Was kostet eine KMU-Website bei VincialMedia?",
+      "Bei VincialMedia ab CHF 1’900 für bis zu acht Seiten. Eine grössere Seite mit Buchungssystem, Shop oder mehreren Sprachen kostet zwischen CHF 3’900 und CHF 7’900. Hosting und Domain sind im ersten Jahr dabei.",
+      "preise"
      ],
      [
       "Wie lange dauert es bis zum Launch?",
@@ -416,7 +426,7 @@ window.C = {
      ],
      [
       "Kann ich die Seite später selbst anpassen?",
-      "Ja. Texte, Bilder und Preise ändern Sie über eine einfache Oberfläche. Für alles andere bin ich da."
+      "Ja. Texte, Bilder und Preise ändern Sie über eine einfache Oberfläche. Eine Video-Einführung dazu gehört zur Stufe Gross. Für alles andere bin ich da."
      ],
      [
       "Was passiert mit meiner alten Website?",
@@ -435,7 +445,7 @@ window.C = {
     "title": "Google Ads Agentur Zürich für KMU | VincialMedia",
     "desc": "Google Ads und Meta Ads für KMU in Zürich: Einrichtung, Anzeigen und Betreuung ab CHF 590 pro Monat. Erste Kampagne nach sieben bis vierzehn Tagen live.",
     "h1": "Google Ads und Meta Ads für KMU in Zürich",
-    "lead": "VincialMedia richtet Ihre Kampagnen auf Google und Meta ein und betreut sie ab CHF 590 pro Monat, Anzeigen inklusive. Die erste Kampagne läuft nach sieben bis vierzehn Tagen. Ihr Werbebudget zahlen Sie direkt an Google und Meta, ohne Aufschlag.",
+    "lead": "VincialMedia aus Schlieren bei Zürich richtet Ihre Kampagnen auf Google und Meta ein und betreut sie ab CHF 590 pro Monat, Anzeigen inklusive. Die erste Kampagne läuft nach sieben bis vierzehn Tagen. Ihr Werbebudget zahlen Sie direkt an Google und Meta, ohne Aufschlag.",
     "facts": [
      [
       "Preis",
@@ -502,7 +512,7 @@ window.C = {
     "title": "KI-Automation für KMU in Zürich | VincialMedia",
     "desc": "KI-Assistent für WhatsApp und E-Mail, CRM und automatisches Nachfassen für KMU. Einrichtung ab CHF 1’900, nach zwei bis fünf Wochen im Einsatz.",
     "h1": "KI-Automation für KMU",
-    "lead": "VincialMedia richtet für KMU einen KI-Assistenten ein, der Anfragen auf WhatsApp und per E-Mail in Sekunden beantwortet, Termine vorschlägt und alles im CRM festhält. Die Einrichtung kostet ab CHF 1’900 und dauert zwei bis fünf Wochen. Der Betrieb kostet danach ab CHF 149 pro Monat.",
+    "lead": "VincialMedia richtet für KMU in Zürich und im Limmattal einen KI-Assistenten ein, der Anfragen auf WhatsApp und per E-Mail in Sekunden beantwortet, Termine vorschlägt und alles im CRM festhält. Die Einrichtung kostet ab CHF 1’900 und dauert zwei bis fünf Wochen. Der Betrieb kostet danach ab CHF 149 pro Monat.",
     "facts": [
      [
       "Preis",
@@ -612,8 +622,9 @@ window.C = {
       "Selten nötig. Das meiste läuft schriftlich, per Sprachnachricht oder Video. Das spart Ihnen den Termin. Wenn es vor Ort einfacher ist, bin ich von Schlieren aus schnell bei Ihnen."
      ],
      [
-      "Was kostet eine Website für einen kleinen Betrieb?",
-      "Ab CHF 1’900 für bis zu acht Seiten, inklusive Texte und Google-Eintrag. Hosting und Domain sind im ersten Jahr dabei."
+      "Was kostet eine Website für einen Betrieb in Schlieren?",
+      "Ab CHF 1’900 für bis zu acht Seiten, inklusive Texte und Google-Eintrag. Hosting und Domain sind im ersten Jahr dabei.",
+      "preise"
      ],
      [
       "Ich habe schon eine Website. Lohnt sich eine neue?",
@@ -636,7 +647,7 @@ window.C = {
     "title": "Webdesign Dietikon: Website ab CHF 1’900 | VincialMedia",
     "desc": "Webdesign für Betriebe in Dietikon: neue Website ab CHF 1’900 zum Fixpreis, inklusive Texte und Google-Eintrag. Aus Schlieren, eine Viertelstunde entfernt.",
     "h1": "Webdesign in Dietikon",
-    "lead": "Dietikon ist Bezirkshauptort und mit über 28’000 Einwohnern die fünftgrösste Gemeinde im Kanton Zürich. Wer hier einen Maler, eine Garage oder eine Praxis sucht, hat Auswahl. VincialMedia baut Websites für Dietiker Betriebe ab CHF 1’900, damit Sie zu denen gehören, die gefunden werden.",
+    "lead": "Dietikon ist Bezirkshauptort und nach Angaben der Stadt mit rund 28’000 Einwohnern die fünftgrösste Gemeinde im Kanton Zürich. Wer hier einen Maler, eine Garage oder eine Praxis sucht, hat Auswahl. VincialMedia baut Websites für Dietiker Betriebe ab CHF 1’900, damit Sie zu denen gehören, die gefunden werden.",
     "facts": [
      [
       "Preis",
@@ -662,7 +673,7 @@ window.C = {
      ],
      [
       "Zweisprachig, wenn Ihre Kundschaft es ist",
-      "Deutsch und Englisch mache ich selbst. Weitere Sprachen auf Anfrage."
+      "Deutsch und Englisch mache ich selbst, im Preis ab der Stufe Mittel. Weitere Sprachen auf Anfrage."
      ],
      [
       "Ein Tipp, und der Kunde ruft an",
@@ -704,7 +715,7 @@ window.C = {
     "title": "Webdesign Urdorf: Website ab CHF 1’900 | VincialMedia",
     "desc": "Webdesign für Betriebe in Urdorf: kleine Website ab CHF 1’900 zum Fixpreis, inklusive Texte und Google-Eintrag. Gebaut im Nachbarort Schlieren.",
     "h1": "Webdesign in Urdorf",
-    "lead": "Urdorf hat rund 10’500 Einwohner und liegt direkt neben Schlieren. Viele Betriebe hier leben von Stammkunden und Empfehlungen. VincialMedia baut ab CHF 1’900 die Website, die dazukommt, wenn jemand Neues nach Ihnen sucht.",
+    "lead": "Urdorf hat rund 10’500 Einwohner (Bundesamt für Statistik, 2024) und liegt direkt neben Schlieren. Viele Betriebe hier leben von Stammkunden und Empfehlungen. VincialMedia baut ab CHF 1’900 die Website, die dazukommt, wenn jemand Neues nach Ihnen sucht.",
     "facts": [
      [
       "Preis",
@@ -785,10 +796,10 @@ window.C = {
   "docs": {
    "preise": {
     "nav": "Preise",
-    "title": "Preise 2026: Website, App und Google Ads | VincialMedia",
-    "desc": "Alle Preise von VincialMedia mit Leistungsumfang je Stufe: Website ab CHF 1’900, App ab CHF 9’800, Google Ads ab CHF 590 pro Monat. Mit Marktvergleich.",
-    "h1": "Alle Preise. Kein «auf Anfrage».",
-    "lead": "Eine KMU-Website kostet bei Schweizer Agenturen CHF 5’000 bis 15’000. Bei VincialMedia kostet sie ab CHF 1’900. Auf dieser Seite steht jeder Preis, was jede Stufe enthält, woher der Unterschied kommt und was nicht inbegriffen ist.",
+    "title": "Website Kosten Schweiz 2026: alle Preise | VincialMedia",
+    "desc": "Was kostet eine Website in der Schweiz? Agenturen CHF 5’000 bis 15’000, VincialMedia ab CHF 1’900. Dazu App ab CHF 9’800, Google Ads ab CHF 590 pro Monat.",
+    "h1": "Was kosten Website, App und Werbung in der Schweiz?",
+    "lead": "Alle Preise, kein «auf Anfrage». Eine KMU-Website kostet bei Schweizer Agenturen CHF 5’000 bis 15’000. Bei VincialMedia kostet sie ab CHF 1’900. Auf dieser Seite steht jeder Preis, was jede Stufe enthält, woher der Unterschied kommt und was nicht inbegriffen ist.",
     "sections": [
      {
       "h": "Preisliste",
@@ -877,6 +888,7 @@ window.C = {
        "WhatsApp-Gebühren von Meta beim KI-Assistenten: Die ersten 1’000 Antworten pro Monat sind gratis. Danach, und für Erinnerungen nach mehr als 24 Stunden, verlangt Meta 2 bis 7 Rappen pro Nachricht. Ich verrechne das ohne Aufschlag weiter.",
        "Hosting und Domain ab dem zweiten Jahr: CHF 25 pro Monat, oder Sie ziehen zu einem Anbieter Ihrer Wahl.",
        "App-Store-Gebühren: Apple verlangt USD 99 pro Jahr, Google einmalig USD 25.",
+       "Server und Wartung einer App nach dem Start: als eigener Posten in der Offerte.",
        "Fotos vom Fotografen und Übersetzungen in weitere Sprachen."
       ]
      },
@@ -889,6 +901,10 @@ window.C = {
     ],
     "faq": [
      [
+      "Was kostet eine Website in der Schweiz?",
+      "Schweizer Agenturen verlangen für eine KMU-Website mit 5 bis 10 Seiten CHF 5’000 bis 15’000. Der Median der öffentlich ausgeschriebenen Fixpreis-Pakete liegt bei CHF 2’500. Bei VincialMedia kostet sie ab CHF 1’900, inklusive Texte, SEO-Grundlagen und Hosting im ersten Jahr. Die Quellen stehen unten auf dieser Seite."
+     ],
+     [
       "Warum sind Sie günstiger als eine Agentur?",
       "KI übernimmt einen grossen Teil der Stunden, die eine Agentur verrechnet, und ich bezahle weder Büro noch Projektleitung. Eine KMU-Website kostet bei Schweizer Agenturen CHF 5’000 bis 15’000, bei VincialMedia ab CHF 1’900."
      ],
@@ -898,7 +914,7 @@ window.C = {
      ],
      [
       "Ist günstiger nicht schlechter?",
-      "Sie sehen jede Woche einen Stand, den Sie selbst durchklicken. So merken Sie früh, ob die Arbeit stimmt, und nicht erst bei der Rechnung."
+      "Nein. KI schreibt den ersten Entwurf, ich lese und teste alles selbst, und Sie sehen jede Woche einen Stand, den Sie selbst durchklicken. So merken Sie früh, ob die Arbeit stimmt, und nicht erst bei der Rechnung."
      ],
      [
       "Kommen noch Kosten dazu?",
@@ -1032,6 +1048,11 @@ window.C = {
         [
          "Vercel",
          "Hosting der Website",
+         "USA"
+        ],
+        [
+         "Resend",
+         "Versand der E-Mails aus dem Offertformular",
          "USA"
         ],
         [
@@ -1278,6 +1299,237 @@ window.C = {
    "title": "Seite nicht gefunden | VincialMedia",
    "h1": "Diese Seite gibt es nicht.",
    "p": "Vielleicht hat sich die Adresse geändert. Hier geht es weiter:"
+  },
+  "vis": {
+   "tag": "Beispiel",
+   "live": "Live in 3D. Mit Maus oder Finger drehen.",
+   "web": {
+    "alt": "3D-Ansicht eines Laptops mit einer Beispiel-Website für ein KMU: Titel, Bild und Speed Score 100",
+    "cap": "Eine Beispiel-Website, wie ich sie für KMU baue."
+   },
+   "app": {
+    "alt": "3D-Ansicht eines Smartphones mit einer Beispiel-App: nächster Termin, Schnellzugriff und Terminbuchung",
+    "cap": "Eine Beispiel-App mit Terminbuchung."
+   },
+   "ads": {
+    "alt": "3D-Ansicht eines Smartphones mit einer Suchanzeige und eines Laptops mit einem Kampagnenbericht aus Beispieldaten",
+    "cap": "Ihre Anzeige erscheint, wenn jemand in der Nähe sucht.",
+    "cap2": "Daneben der Wochenbericht mit Beispieldaten."
+   },
+   "auto": {
+    "alt": "3D-Ansicht eines Smartphones mit einem Chat: Eine Kundin fragt um 22:47 Uhr nach einem Termin, der KI-Assistent schlägt zwei Zeiten vor und bestätigt die Buchung",
+    "cap": "Ein Beispiel-Dialog: Der KI-Assistent antwortet um 22:47 Uhr und trägt den Termin ein.",
+    "tr": "Dialog als Text lesen",
+    "who": {
+     "u": "Kundin",
+     "a": "KI-Assistent"
+    }
+   },
+   "local": {
+    "alt": "3D-Ansicht eines Laptops mit einer Beispiel-Website für einen Betrieb im Limmattal",
+    "cap": "Eine Beispiel-Website, wie ich sie für Betriebe im Limmattal baue."
+   }
+  },
+  "scene": {
+   "brand": "ihrbetrieb",
+   "url": "ihrbetrieb.ch",
+   "nav": [
+    "Angebot",
+    "Über uns",
+    "Standorte",
+    "Kontakt"
+   ],
+   "shop": "Jetzt kaufen",
+   "kicker": "Neu diese Saison",
+   "h1": [
+    "Gemacht für Menschen,",
+    "die hinsehen."
+   ],
+   "sub": [
+    "Ruhiges Design, ehrliche Materialien und",
+    "Lieferung in der ganzen Schweiz in 48 Stunden."
+   ],
+   "story": "Unsere Geschichte  ›",
+   "speed": "Speed Score",
+   "feat": "Beliebt",
+   "all": "Alle ansehen  ›",
+   "items": [
+    [
+     "Reiseflasche",
+     "CHF 49"
+    ],
+    [
+     "Tischlampe",
+     "CHF 129"
+    ],
+    [
+     "Leinendecke",
+     "CHF 89"
+    ]
+   ],
+   "foot": [
+    "Gebaut für Jahre.",
+    "Gemacht in der Nähe."
+   ],
+   "store": "Laden finden",
+   "dash": {
+    "nav": [
+     "Übersicht",
+     "Kampagnen",
+     "Anzeigen",
+     "Zielgruppen",
+     "Berichte"
+    ],
+    "h": "Kampagnen",
+    "sample": "Beispieldaten",
+    "kpi": [
+     [
+      "Anfragen",
+      "248",
+      "+18%"
+     ],
+     [
+      "Kosten pro Anfrage",
+      "CHF 21",
+      "−12%"
+     ],
+     [
+      "Klickrate",
+      "4,6%",
+      "+0,8"
+     ],
+     [
+      "Budget",
+      "CHF 5’210",
+      "im Plan"
+     ]
+    ],
+    "chart": "Anfragen pro Woche",
+    "best": "Beste Anzeige",
+    "bars": [
+     "Video A",
+     "Karussell B",
+     "Bild C"
+    ]
+   },
+   "app": {
+    "hello": "Guten Morgen",
+    "next": "Nächster Termin",
+    "today": "Heute · 14:30",
+    "place": "Studio Zürich West",
+    "checkin": "Einchecken",
+    "quick": "Schnellzugriff",
+    "acts": [
+     "Buchen",
+     "Zahlen",
+     "Chat",
+     "Prämien"
+    ],
+    "recent": "Zuletzt",
+    "rows": [
+     [
+      "Yoga Flow · 60 Min",
+      "Gestern"
+     ],
+     [
+      "Sauna-Pass",
+      "Sonntag"
+     ]
+    ],
+    "tabs": [
+     "Start",
+     "Kurse",
+     "Wallet",
+     "Profil"
+    ],
+    "book": {
+     "h": "Termin buchen",
+     "sub": "Yoga Flow · 60 Min",
+     "days": [
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr"
+     ],
+     "slots": [
+      "09:00",
+      "10:30",
+      "14:30",
+      "16:00",
+      "17:30",
+      "19:00"
+     ],
+     "cta": "Buchen",
+     "done": "Gebucht",
+     "doneSub": "Do · 14:30 · Studio Zürich West"
+    }
+   },
+   "ad": {
+    "feed": "Für dich",
+    "spons": "Gesponsert",
+    "h": "Frühlingsfarben",
+    "off": "−20% diese Woche",
+    "shop": "Jetzt kaufen",
+    "likes": "Gefällt 1’204 Mal",
+    "cap": "Neue Farben, in kleinen Serien."
+   },
+   "search": {
+    "q": "maler dietikon",
+    "spons": "Gesponsert",
+    "dom": "ihrbetrieb.ch",
+    "h": [
+     "Maler in Dietikon:",
+     "Offerte in 24 Stunden"
+    ],
+    "d": [
+     "Innen und aussen, saubere Arbeit",
+     "zum Fixpreis. Rückruf noch heute."
+    ],
+    "call": "Anrufen",
+    "quote": "Offerte",
+    "other": [
+     "Malergeschäfte in der Region",
+     "Was kostet ein Maler pro Stunde?"
+    ],
+    "toast": "Neue Anfrage",
+    "toastSub": "über Ihre Anzeige · gerade eben"
+   },
+   "chat": {
+    "name": "Ihr Betrieb",
+    "role": "KI-Assistent · antwortet sofort",
+    "time": "22:47",
+    "input": "Nachricht",
+    "msgs": [
+     [
+      "u",
+      "Guten Abend. Haben Sie diese Woche noch einen Termin frei?"
+     ],
+     [
+      "a",
+      "Guten Abend! Ja, Donnerstag um 16:30 oder Freitag um 10:00. Was passt Ihnen besser?"
+     ],
+     [
+      "u",
+      "Donnerstag, 16:30."
+     ],
+     [
+      "a",
+      "Ist eingetragen. Die Bestätigung kommt gleich per E-Mail. Bis Donnerstag!"
+     ]
+    ],
+    "done": [
+     "Termin eingetragen · Do 16:30",
+     "Kontakt im CRM gespeichert"
+    ]
+   }
+  },
+  "cs": {
+   "k": "Eigenes Projekt",
+   "h": "BuyAuto: von mir gebaut, von mir betrieben.",
+   "p": "BuyAuto ist mein Marktplatz für Leasingübernahmen in der Schweiz. Website, Werbung und die Automationen dahinter stammen von mir. Was ich Ihnen anbiete, läuft dort jeden Tag.",
+   "link": "buyauto.ch ansehen",
+   "alt": "Die Website buyauto.ch auf einem Laptop und einem Smartphone, in 3D dargestellt"
   }
  },
  "en": {
@@ -1302,7 +1554,8 @@ window.C = {
    "sub": "Tell me what you need. Within two working days you have a written quote with a price and a launch date.",
    "cta": "Get a quote",
    "link": "See packages ›",
-   "hint": "Scroll"
+   "hint": "Scroll",
+   "skip": "Build your package ›"
   },
   "caps": [
    {
@@ -1313,7 +1566,7 @@ window.C = {
    {
     "k": "Apps",
     "h": "From sketch to App Store.",
-    "p": "iOS, Android and web. After one week you click through a prototype."
+    "p": "iOS and Android from one build. After one week you click through a prototype."
    },
    {
     "k": "Ads",
@@ -1406,7 +1659,10 @@ window.C = {
     "sending": "Sending …",
     "err": "That didn’t work. Email me directly at vincent@vincialmedia.com and I’ll answer just as fast.",
     "bad": "Please check your name and email address.",
-    "note": "I’ll get back to you within two working days. What happens to your details is in the privacy policy."
+    "note": "I’ll get back to you within two working days. What happens to your details is in the privacy policy.",
+    "badName": "Please enter your name.",
+    "badEmail": "Please check the email address.",
+    "again": "Send another request"
    },
    "once": "One-off",
    "monthly": "Per month",
@@ -1471,7 +1727,7 @@ window.C = {
   },
   "who": {
    "h": "One person. No project manager in between.",
-   "p1": "VincialMedia is me, Vincent Hänggi. For about ten years I’ve built CRM systems and marketing automation, at Crowdhouse, Kreis 1 Consulting and Demodia among others. I’m certified for HubSpot and Salesforce Pardot.",
+   "p1": "VincialMedia is an AI agency in Schlieren near Zurich, and it is one person: me, Vincent Hänggi. For about ten years I’ve built CRM systems and marketing automation, at Crowdhouse, Kreis 1 Consulting and Demodia among others. I’m certified for HubSpot and Salesforce Pardot.",
    "p2": "With BuyAuto I run my own marketplace for lease takeovers. Its website, ads and automations are my work. AI does the legwork for me. Whatever reaches you, I’ve read and tested myself first.",
    "facts": [
     [
@@ -1486,7 +1742,9 @@ window.C = {
      "2",
      "working days until your written quote"
     ]
-   ]
+   ],
+   "alt": "Vincent Hänggi, founder of VincialMedia",
+   "role": "Founder, VincialMedia"
   },
   "how": {
    "h": "How it works.",
@@ -1509,13 +1767,13 @@ window.C = {
    "h": "Questions people ask.",
    "items": [
     [
-     "How much does a website cost for a small business?",
+     "How much does a website cost at VincialMedia?",
      "At VincialMedia from CHF 1’900 for up to eight pages, including copy, SEO basics and analytics. You get the exact price in writing before you sign anything.",
-     "webdesign"
+     "preise"
     ],
     [
-     "How much does an app cost in Switzerland?",
-     "An app for iOS and Android with login, payments and an admin area costs from CHF 9’800 at VincialMedia. Larger projects that connect to existing software run between CHF 19’500 and CHF 39’000.",
+     "How much does an app cost at VincialMedia?",
+     "From CHF 9’800 for iOS and Android with login, payments and an admin area. With several features CHF 19’500, connected to your existing software CHF 39’000.",
      "app-entwicklung"
     ],
     [
@@ -1549,7 +1807,8 @@ window.C = {
    "c1": "Services",
    "c2": "Region",
    "c3": "Contact",
-   "place": "Schlieren, Canton of Zurich"
+   "place": "Schlieren, Canton of Zurich",
+   "addr": "Brandstrasse 21, 8952 Schlieren, Switzerland"
   },
   "page": {
    "inc": "What the price includes",
@@ -1565,7 +1824,9 @@ window.C = {
     "Price"
    ],
    "svc": "Service",
-   "src": "Sources"
+   "src": "Sources",
+   "region": "Websites for businesses in the region",
+   "regionP": "Businesses in the Limmattal have their own pages with what matters locally:"
   },
   "pages": {
    "app-entwicklung": {
@@ -1579,7 +1840,7 @@ window.C = {
     "title": "App Development Zurich at a Fixed Price | VincialMedia",
     "desc": "iOS and Android apps for small businesses and startups in Zurich. Clickable prototype after a week, fixed price from CHF 9’800, in the store in 6 to 16 weeks.",
     "h1": "App development in Zurich",
-    "lead": "VincialMedia builds apps for iOS, Android and web at a fixed price from CHF 9’800. After one week you click through a prototype on your own phone. Depending on scope, the finished app is in the App Store and on Google Play after 6 to 16 weeks.",
+    "lead": "VincialMedia, based in Schlieren near Zurich, builds apps for iOS and Android at a fixed price from CHF 9’800. After one week you click through a prototype on your own phone. Depending on scope, the finished app is in the App Store and on Google Play after 6 to 16 weeks.",
     "facts": [
      [
       "Price",
@@ -1619,7 +1880,7 @@ window.C = {
     "faq": [
      [
       "How much does an app cost in Switzerland?",
-      "At VincialMedia from CHF 9’800 for an app with login, payments and an admin area. Connected to your existing software, the price runs between CHF 19’500 and CHF 39’000. You get the figure in writing before you sign."
+      "At VincialMedia from CHF 9’800 for an app with login, payments and an admin area. With several features, push notifications and subscriptions it costs CHF 19’500, connected to your existing software CHF 39’000. You get the figure in writing before you sign."
      ],
      [
       "How long does development take?",
@@ -1646,7 +1907,7 @@ window.C = {
     "title": "Web Design Zurich: Fixed-Price Business Sites | VincialMedia",
     "desc": "Website design in Zurich: up to eight pages including copy and SEO, from CHF 1’900, live in two to six weeks. Built for Google and ChatGPT.",
     "h1": "Website design in Zurich",
-    "lead": "VincialMedia builds websites for small businesses at a fixed price from CHF 1’900, including copy, SEO basics and analytics. Your site is live after two to six weeks and structured so Google and AI assistants like ChatGPT can read and cite it.",
+    "lead": "VincialMedia builds websites for small businesses in Zurich and the Limmattal at a fixed price from CHF 1’900, including copy, SEO basics and analytics. Your site is live after two to six weeks and structured so Google and AI assistants like ChatGPT can read and cite it.",
     "facts": [
      [
       "Price",
@@ -1671,8 +1932,8 @@ window.C = {
       "Short load times, clean headings, structured data and an answer to every question your customers ask."
      ],
      [
-      "Two languages if you want",
-      "German and English, done by the same person. Other languages on request."
+      "Two languages from the Medium level",
+      "German and English, done by the same person and included from the Medium level. Other languages on request."
      ],
      [
       "Google Business Profile included",
@@ -1685,8 +1946,9 @@ window.C = {
     ],
     "faq": [
      [
-      "How much does a website cost for a small business in Switzerland?",
-      "At VincialMedia from CHF 1’900 for up to eight pages. A larger site with booking, a shop or several languages costs between CHF 3’900 and CHF 7’900. Hosting and domain are included in year one."
+      "How much does a small-business website cost at VincialMedia?",
+      "At VincialMedia from CHF 1’900 for up to eight pages. A larger site with booking, a shop or several languages costs between CHF 3’900 and CHF 7’900. Hosting and domain are included in year one.",
+      "preise"
      ],
      [
       "How long until launch?",
@@ -1694,7 +1956,7 @@ window.C = {
      ],
      [
       "Can I edit the site myself later?",
-      "Yes. You change copy, images and prices through a simple editor. For anything else I’m there."
+      "Yes. You change copy, images and prices through a simple editor. A video walkthrough of it is part of the Large level. For anything else I’m there."
      ],
      [
       "What happens to my old website?",
@@ -1713,7 +1975,7 @@ window.C = {
     "title": "Google Ads Agency Zurich for Small Business | VincialMedia",
     "desc": "Google Ads and Meta Ads for small businesses in Zurich: setup, creative and management from CHF 590 a month. First campaign live after seven to fourteen days.",
     "h1": "Google Ads and Meta Ads for small businesses in Zurich",
-    "lead": "VincialMedia sets up and manages your campaigns on Google and Meta from CHF 590 a month, ad creative included. The first campaign runs after seven to fourteen days. You pay your ad budget straight to Google and Meta, with no markup.",
+    "lead": "VincialMedia, based in Schlieren near Zurich, sets up and manages your campaigns on Google and Meta from CHF 590 a month, ad creative included. The first campaign runs after seven to fourteen days. You pay your ad budget straight to Google and Meta, with no markup.",
     "facts": [
      [
       "Price",
@@ -1780,7 +2042,7 @@ window.C = {
     "title": "AI Automation for Small Businesses in Zurich | VincialMedia",
     "desc": "An AI assistant for WhatsApp and email, CRM and automatic follow-up for small businesses. Setup from CHF 1’900, in use after two to five weeks.",
     "h1": "AI automation for small businesses",
-    "lead": "VincialMedia sets up an AI assistant for small businesses that answers enquiries on WhatsApp and email within seconds, suggests appointments and logs everything in the CRM. Setup costs from CHF 1’900 and takes two to five weeks. Running it then costs from CHF 149 a month.",
+    "lead": "VincialMedia sets up an AI assistant for small businesses in Zurich and the Limmattal that answers enquiries on WhatsApp and email within seconds, suggests appointments and logs everything in the CRM. Setup costs from CHF 1’900 and takes two to five weeks. Running it then costs from CHF 149 a month.",
     "facts": [
      [
       "Price",
@@ -1820,7 +2082,7 @@ window.C = {
     "faq": [
      [
       "How much does an AI assistant cost for my business?",
-      "Setup at VincialMedia costs from CHF 1’900, one-off. Running it costs from CHF 149 a month. That covers the software, the AI usage and small changes. On WhatsApp the first 1’000 replies a month are free. After that Meta charges 2 to 7 Swiss cents a message."
+      "Setup at VincialMedia costs from CHF 1’900, one-off. Running it costs from CHF 149 a month. That covers the software, the AI usage and small changes. On WhatsApp the first 1’000 replies a month are free. After that Meta charges CHF 0.02 to 0.07 a message."
      ],
      [
       "Do customers notice they’re writing with an AI?",
@@ -1847,7 +2109,7 @@ window.C = {
     "title": "Web Design Schlieren and Limmattal | VincialMedia",
     "desc": "Web design from Schlieren for Limmattal businesses: a new website from CHF 1’900, copy and Google listing included. For Schlieren, Dietikon and Urdorf.",
     "h1": "Web design in Schlieren and the Limmattal",
-    "lead": "VincialMedia is based in Schlieren and builds websites for businesses in the Limmattal: from CHF 1’900, in two to six weeks, including copy and Google listing. Made for tradespeople, practices, garages and fiduciaries whose site is showing its age.",
+    "lead": "VincialMedia is based in Schlieren and builds websites for businesses in the Limmattal: from CHF 1’900, in two to six weeks, including copy and Google listing. Made for tradespeople, practices, garages, accountants and trust companies whose site is showing its age.",
     "facts": [
      [
       "Price",
@@ -1890,8 +2152,9 @@ window.C = {
       "Rarely needed. Most of it happens in writing, by voice message or on video. That saves you the appointment. If it’s easier on site, I can be with you quickly from Schlieren."
      ],
      [
-      "How much does a website cost for a small business?",
-      "From CHF 1’900 for up to eight pages, including copy and Google listing. Hosting and domain are included in year one."
+      "How much does a website cost for a business in Schlieren?",
+      "From CHF 1’900 for up to eight pages, including copy and Google listing. Hosting and domain are included in year one.",
+      "preise"
      ],
      [
       "I already have a website. Is a new one worth it?",
@@ -1899,7 +2162,7 @@ window.C = {
      ],
      [
       "Which sectors do you work for?",
-      "Businesses that live on enquiries from the region: trades, garages, practices, fiduciaries, restaurants."
+      "Businesses that live on enquiries from the region: trades, garages, practices, accountants, restaurants."
      ]
     ]
    },
@@ -1914,7 +2177,7 @@ window.C = {
     "title": "Web design Dietikon: website from CHF 1’900 | VincialMedia",
     "desc": "Web design for businesses in Dietikon: a new website from CHF 1’900 at a fixed price, copy and Google listing included. Built in Schlieren, 15 minutes away.",
     "h1": "Web design in Dietikon",
-    "lead": "Dietikon is the district capital and, with more than 28’000 residents, the fifth-largest municipality in the canton of Zurich. Anyone looking for a painter, a garage or a practice here has plenty to choose from. VincialMedia builds websites for Dietikon businesses from CHF 1’900, so that you’re one of the businesses they find.",
+    "lead": "Dietikon is the district capital and, with about 28’000 residents according to the city, the fifth-largest municipality in the canton of Zurich. Anyone looking for a painter, a garage or a practice here has plenty to choose from. VincialMedia builds websites for Dietikon businesses from CHF 1’900, so that you’re one of the businesses they find.",
     "facts": [
      [
       "Price",
@@ -1940,7 +2203,7 @@ window.C = {
      ],
      [
       "Two languages, if your customers have two",
-      "I do German and English myself. Other languages on request."
+      "I do German and English myself, included from the Medium level. Other languages on request."
      ],
      [
       "One tap and the customer calls",
@@ -1982,7 +2245,7 @@ window.C = {
     "title": "Web design Urdorf: website from CHF 1’900 | VincialMedia",
     "desc": "Web design for businesses in Urdorf: a small website from CHF 1’900 at a fixed price, copy and Google listing included. Built next door in Schlieren.",
     "h1": "Web design in Urdorf",
-    "lead": "Urdorf has about 10’500 residents and sits right next to Schlieren. Many businesses here live on regulars and word of mouth. From CHF 1’900, VincialMedia builds the website that does the rest when someone new looks for you.",
+    "lead": "Urdorf has about 10’500 residents (Federal Statistical Office, 2024) and sits right next to Schlieren. Many businesses here live on regulars and word of mouth. From CHF 1’900, VincialMedia builds the website that does the rest when someone new looks for you.",
     "facts": [
      [
       "Price",
@@ -2063,10 +2326,10 @@ window.C = {
   "docs": {
    "preise": {
     "nav": "Prices",
-    "title": "Prices 2026: Website, App and Google Ads | VincialMedia",
-    "desc": "Every VincialMedia price with the scope of each level: website from CHF 1’900, app from CHF 9’800, Google Ads from CHF 590 a month. With a market comparison.",
-    "h1": "Every price. No “on request”.",
-    "lead": "A small-business website costs CHF 5’000 to 15’000 at Swiss agencies. At VincialMedia it starts at CHF 1’900. This page lists every price, what each level includes, where the difference comes from and what isn’t included.",
+    "title": "Website cost in Switzerland 2026: all prices | VincialMedia",
+    "desc": "What does a website cost in Switzerland? Agencies charge CHF 5’000 to 15’000, VincialMedia from CHF 1’900. Apps from CHF 9’800, Google Ads from CHF 590 a month.",
+    "h1": "What do a website, an app and ads cost in Switzerland?",
+    "lead": "Every price, no “on request”. A small-business website costs CHF 5’000 to 15’000 at Swiss agencies. At VincialMedia it starts at CHF 1’900. This page lists every price, what each level includes, where the difference comes from and what isn’t included.",
     "sections": [
      {
       "h": "Price list",
@@ -2152,9 +2415,10 @@ window.C = {
       "h": "What the price doesn’t include",
       "list": [
        "Ad budget: you pay it straight to Google and Meta, with no markup.",
-       "WhatsApp fees from Meta for the AI assistant: the first 1’000 replies a month are free. After that, and for reminders sent more than 24 hours later, Meta charges 2 to 7 Swiss cents a message. I pass that on with no markup.",
+       "WhatsApp fees from Meta for the AI assistant: the first 1’000 replies a month are free. After that, and for reminders sent more than 24 hours later, Meta charges CHF 0.02 to 0.07 a message. I pass that on with no markup.",
        "Hosting and domain from year two: CHF 25 a month, or you move to a provider of your choice.",
        "App store fees: Apple charges USD 99 a year, Google a one-off USD 25.",
+       "Servers and maintenance for an app after launch: a separate line in the quote.",
        "Photos by a photographer and translations into further languages."
       ]
      },
@@ -2167,6 +2431,10 @@ window.C = {
     ],
     "faq": [
      [
+      "How much does a website cost in Switzerland?",
+      "Swiss agencies charge CHF 5’000 to 15’000 for a small-business website with 5 to 10 pages. The median of publicly listed fixed-price packages is CHF 2’500. At VincialMedia it costs from CHF 1’900, including copy, SEO basics and hosting in year one. The sources are at the bottom of this page."
+     ],
+     [
       "Why are you cheaper than an agency?",
       "AI takes over a large share of the hours an agency bills, and I pay for neither an office nor a project manager. A small-business website costs CHF 5’000 to 15’000 at Swiss agencies and from CHF 1’900 at VincialMedia."
      ],
@@ -2176,7 +2444,7 @@ window.C = {
      ],
      [
       "Doesn’t cheaper mean worse?",
-      "Every week you see a version you click through yourself. So you notice early whether the work is right, well before the invoice."
+      "No. AI writes the first draft, I read and test all of it myself, and every week you see a version you click through yourself. So you notice early whether the work is right, well before the invoice."
      ],
      [
       "Are there extra costs?",
@@ -2310,6 +2578,11 @@ window.C = {
         [
          "Vercel",
          "Hosting the website",
+         "USA"
+        ],
+        [
+         "Resend",
+         "Sending the emails from the quote form",
          "USA"
         ],
         [
@@ -2556,6 +2829,237 @@ window.C = {
    "title": "Page not found | VincialMedia",
    "h1": "This page doesn’t exist.",
    "p": "The address may have changed. Carry on here:"
+  },
+  "vis": {
+   "tag": "Example",
+   "live": "Live in 3D. Turn it with your mouse or finger.",
+   "web": {
+    "alt": "3D view of a laptop showing a sample small-business website: headline, image and a speed score of 100",
+    "cap": "A sample website of the kind I build for small businesses."
+   },
+   "app": {
+    "alt": "3D view of a smartphone showing a sample app: next appointment, quick actions and booking",
+    "cap": "A sample app with appointment booking."
+   },
+   "ads": {
+    "alt": "3D view of a smartphone showing a search ad and a laptop showing a campaign report with sample data",
+    "cap": "Your ad shows up when someone nearby searches.",
+    "cap2": "Next to it, the weekly report with sample data."
+   },
+   "auto": {
+    "alt": "3D view of a smartphone showing a chat: a customer asks for an appointment at 10:47 pm, the AI assistant offers two times and confirms the booking",
+    "cap": "A sample conversation: the AI assistant replies at 10:47 pm and books the appointment.",
+    "tr": "Read the conversation as text",
+    "who": {
+     "u": "Customer",
+     "a": "AI assistant"
+    }
+   },
+   "local": {
+    "alt": "3D view of a laptop showing a sample website for a business in the Limmattal",
+    "cap": "A sample website of the kind I build for businesses in the Limmattal."
+   }
+  },
+  "scene": {
+   "brand": "yourbrand",
+   "url": "yourbrand.ch",
+   "nav": [
+    "Collection",
+    "Stories",
+    "Stores",
+    "Contact"
+   ],
+   "shop": "Shop now",
+   "kicker": "New this season",
+   "h1": [
+    "Made for people",
+    "who notice."
+   ],
+   "sub": [
+    "Quiet design, honest materials and",
+    "delivery across Switzerland in 48 hours."
+   ],
+   "story": "Our story  ›",
+   "speed": "Speed score",
+   "feat": "Featured",
+   "all": "View all  ›",
+   "items": [
+    [
+     "Travel flask",
+     "CHF 49"
+    ],
+    [
+     "Table lamp",
+     "CHF 129"
+    ],
+    [
+     "Linen throw",
+     "CHF 89"
+    ]
+   ],
+   "foot": [
+    "Built to last.",
+    "Made nearby."
+   ],
+   "store": "Find a store",
+   "dash": {
+    "nav": [
+     "Overview",
+     "Campaigns",
+     "Creatives",
+     "Audiences",
+     "Reports"
+    ],
+    "h": "Campaigns",
+    "sample": "Sample data",
+    "kpi": [
+     [
+      "Leads",
+      "248",
+      "+18%"
+     ],
+     [
+      "Cost per lead",
+      "CHF 21",
+      "−12%"
+     ],
+     [
+      "Click rate",
+      "4.6%",
+      "+0.8"
+     ],
+     [
+      "Spend",
+      "CHF 5’210",
+      "on plan"
+     ]
+    ],
+    "chart": "Leads per week",
+    "best": "Best creative",
+    "bars": [
+     "Video A",
+     "Carousel B",
+     "Static C"
+    ]
+   },
+   "app": {
+    "hello": "Good morning",
+    "next": "Next booking",
+    "today": "Today · 14:30",
+    "place": "Studio Zürich West",
+    "checkin": "Check in",
+    "quick": "Quick actions",
+    "acts": [
+     "Book",
+     "Pay",
+     "Chat",
+     "Rewards"
+    ],
+    "recent": "Recent",
+    "rows": [
+     [
+      "Yoga flow · 60 min",
+      "Yesterday"
+     ],
+     [
+      "Sauna pass",
+      "Sunday"
+     ]
+    ],
+    "tabs": [
+     "Home",
+     "Classes",
+     "Wallet",
+     "Profile"
+    ],
+    "book": {
+     "h": "Book a session",
+     "sub": "Yoga flow · 60 min",
+     "days": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri"
+     ],
+     "slots": [
+      "09:00",
+      "10:30",
+      "14:30",
+      "16:00",
+      "17:30",
+      "19:00"
+     ],
+     "cta": "Book",
+     "done": "Booked",
+     "doneSub": "Thu · 14:30 · Studio Zürich West"
+    }
+   },
+   "ad": {
+    "feed": "For you",
+    "spons": "Sponsored",
+    "h": "Spring drop",
+    "off": "−20% this week",
+    "shop": "Shop now",
+    "likes": "1’204 likes",
+    "cap": "New colours, made in small batches."
+   },
+   "search": {
+    "q": "painter dietikon",
+    "spons": "Sponsored",
+    "dom": "yourbrand.ch",
+    "h": [
+     "Painter in Dietikon:",
+     "quote within 24 hours"
+    ],
+    "d": [
+     "Inside and outside, clean work",
+     "at a fixed price. Call back today."
+    ],
+    "call": "Call",
+    "quote": "Get a quote",
+    "other": [
+     "Painters in the region",
+     "What does a painter cost per hour?"
+    ],
+    "toast": "New enquiry",
+    "toastSub": "from your ad · just now"
+   },
+   "chat": {
+    "name": "Your business",
+    "role": "AI assistant · replies at once",
+    "time": "22:47",
+    "input": "Message",
+    "msgs": [
+     [
+      "u",
+      "Good evening. Do you still have an appointment free this week?"
+     ],
+     [
+      "a",
+      "Good evening! Yes, Thursday at 4:30 pm or Friday at 10:00 am. Which suits you better?"
+     ],
+     [
+      "u",
+      "Thursday, 4:30 pm."
+     ],
+     [
+      "a",
+      "It’s booked. The confirmation is on its way by email. See you Thursday!"
+     ]
+    ],
+    "done": [
+     "Appointment booked · Thu 4:30 pm",
+     "Contact saved in the CRM"
+    ]
+   }
+  },
+  "cs": {
+   "k": "Own project",
+   "h": "BuyAuto: built by me, run by me.",
+   "p": "BuyAuto is my marketplace for lease takeovers in Switzerland. Its website, its ads and the automations behind it are my work. What I offer you runs there every day.",
+   "link": "Visit buyauto.ch",
+   "alt": "The buyauto.ch website on a laptop and a smartphone, shown in 3D"
   }
  }
 };

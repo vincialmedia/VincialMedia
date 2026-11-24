@@ -3,13 +3,18 @@ import { ORDER, SVCS, chipsHtml, rowsHtml, totals, fmt } from './shared.js';
 
 const $ = id => document.getElementById(id);
 const html = document.documentElement, lang = html.lang === 'en' ? 'en' : 'de';
+/* false when the safety timer in <head> gave up on this script and showed the plain page */
+const live = html.classList.contains('js');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* menu */
 const burger = $('burger'), nav = $('nav');
-const closeMenu = () => { burger.setAttribute('aria-expanded', 'false'); nav.classList.remove('open'); };
-burger.addEventListener('click', () => { const o = burger.getAttribute('aria-expanded') !== 'true'; burger.setAttribute('aria-expanded', o); nav.classList.toggle('open', o); });
+const setMenu = o => { burger.setAttribute('aria-expanded', o); nav.classList.toggle('open', o); html.classList.toggle('menu', o); };
+const closeMenu = () => setMenu(false);
+burger.addEventListener('click', () => setMenu(burger.getAttribute('aria-expanded') !== 'true'));
 nav.addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) { closeMenu(); burger.focus(); } });
+matchMedia('(min-width:901px)').addEventListener('change', closeMenu);
 
 /* FAQ accordion and in-page jumps */
 document.addEventListener('click', e => {
@@ -65,6 +70,45 @@ $('cset').addEventListener('click', () => { cb.hidden = false; $('cno').focus();
 if (consent() === 'yes') loadGA(); else if (!consent()) cb.hidden = false;
 const track = (name, params) => { if (window.gtag) gtag('event', name, params || {}); };
 
+/* 3D only where it runs well: a real GPU, no data saver, motion allowed. Everyone else keeps the still version. */
+let weakMemo = null;
+const weakGL = () => {
+  if (weakMemo !== null) return weakMemo;
+  if (/[?&]gl=1/.test(location.search)) return (weakMemo = false);
+  if (!live || reduce || !window.WebGLRenderingContext || (navigator.connection && navigator.connection.saveData)) return (weakMemo = true);
+  try {
+    const g = document.createElement('canvas').getContext('webgl'); if (!g) return (weakMemo = true);
+    const x = g.getExtension('WEBGL_debug_renderer_info'), r = x ? String(g.getParameter(x.UNMASKED_RENDERER_WEBGL)) : '';
+    const l = g.getExtension('WEBGL_lose_context'); if (l) l.loseContext();
+    return (weakMemo = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(r));
+  } catch (e) { return (weakMemo = true); }
+};
+const loadScene = (src, fail) => { const s = document.createElement('script'); s.src = src; s.async = true; s.onerror = fail; document.head.appendChild(s); };
+
+/* service pages: the still image of the device becomes a live 3D model you can turn */
+const vis = document.querySelector('.shot[data-src]');
+if (vis && !weakGL()) {
+  const box = vis.querySelector('.vs'), poster = /[?&]poster/.test(location.search);
+  let on = false, raf = 0, drawn = 0, moved = 0, tx = 0, ty = 0, px = 0, py = 0, last = 0;
+  const aim = e => { const r = box.getBoundingClientRect(); tx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - .5) * 2)); ty = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height - .5) * 2)); moved = performance.now(); };
+  box.addEventListener('pointermove', aim, { passive: true });
+  box.addEventListener('pointerdown', aim, { passive: true });
+  box.addEventListener('pointerleave', () => { tx = ty = 0; moved = performance.now(); }, { passive: true });
+  const tick = now => {
+    raf = 0; if (!on) return;
+    const dt = Math.min(.05, (now - last) / 1000 || .016), k = 1 - Math.exp(-dt * 6); last = now;
+    px += (tx - px) * k; py += (ty - py) * k;
+    const r = box.getBoundingClientRect(), p = Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight + r.height)));
+    /* full frame rate while it is being turned or scrolled, about 30 fps for the idle motion */
+    if (window.__scene && (now - moved < 1500 || Math.abs(p - tick.p) > .0005 || now - drawn > 30)) { drawn = now; tick.p = p; window.__scene.update(p, now / 1000, px, py); }
+    raf = requestAnimationFrame(tick);
+  };
+  new IntersectionObserver(es => { on = es[0].isIntersecting; if (on && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }).observe(box);
+  const start = () => loadScene(vis.dataset.src, () => vis.classList.add('still'));
+  if (poster) afterLoad(start);
+  else new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { o.disconnect(); afterLoad(start); } }, { rootMargin: '500px 0px' }).observe(box);
+}
+
 /* everything below exists on the homepage only */
 const finder = $('finder');
 if (finder) {
@@ -97,21 +141,28 @@ if (finder) {
   let opened = 0, busy = false;
   const status = (el, on) => { $('qdone').hidden = el !== 'done' || !on; $('qerr').hidden = el !== 'err' || !on; };
   $('go').addEventListener('click', () => { $('go').hidden = true; qf.hidden = false; opened = Date.now(); qf.elements.name.focus(); track('form_start'); });
-  qf.addEventListener('input', () => { if (!$('qerr').hidden && !$('qerr').querySelector('a')) status('err', false); });
+  const fieldErr = (n, msg) => { const el = qf.elements[n], m = $('e-' + n); el.setAttribute('aria-invalid', msg ? 'true' : 'false'); m.textContent = msg; m.hidden = !msg; };
+  qf.addEventListener('input', e => { const n = e.target.name; if ((n === 'name' || n === 'email') && !$('e-' + n).hidden) fieldErr(n, ''); });
   qf.addEventListener('submit', async e => {
     e.preventDefault(); if (busy) return;
     const fd = new FormData(qf), name = String(fd.get('name') || '').trim(), email = String(fd.get('email') || '').trim();
     const services = SVCS.filter(k => sel[k]).map(k => ({ k, size: sel[k] }));
-    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { const er = $('qerr'); er.textContent = F.form.bad; status('err', true); (name ? qf.elements.email : qf.elements.name).focus(); return; }
+    const okMail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    fieldErr('name', name ? '' : F.form.badName); fieldErr('email', okMail ? '' : F.form.badEmail);
+    if (!name || !okMail) { status(null); (name ? qf.elements.email : qf.elements.name).focus(); return; }
     const btn = qf.querySelector('[type=submit]'), label = btn.textContent;
     busy = true; btn.disabled = true; btn.textContent = F.form.sending; status(null);
+    /* the server ignores forms sent within 2.5 s of opening (bots); a fast person with autofill just waits a moment */
+    const wait = 2700 - (Date.now() - opened); if (wait > 0) await new Promise(r => setTimeout(r, wait));
     const body = { name, email, phone: String(fd.get('phone') || '').trim(), msg: String(fd.get('msg') || '').trim(), website: String(fd.get('website') || ''), services, lang, page: location.pathname, ms: Date.now() - opened };
     try {
-      const r = await fetch('/api/offerte', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 15000);
+      const r = await fetch('/api/offerte', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal }).finally(() => clearTimeout(timer));
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.ok) throw new Error(j.error || r.status);
       qf.querySelector('.qg').hidden = true; btn.hidden = true; qf.querySelector('.qnote').hidden = true;
       $('qdone').textContent = F.form.done; status('done', true); $('qdone').focus();
+      finder.classList.add('sent'); finder.querySelectorAll('.box button').forEach(b => { b.disabled = true; }); $('qagain').hidden = false;
       const t = totals(F, sel);
       track('generate_lead', { currency: 'CHF', value: t.once + t.month * 12, services: services.map(s => s.k + '_' + s.size).join(',') });
     } catch (err) {
@@ -124,49 +175,51 @@ if (finder) {
     } finally { busy = false; }
   });
 
+  $('qagain').addEventListener('click', () => {
+    finder.classList.remove('sent'); $('qagain').hidden = true; status(null); render(false);
+    qf.querySelector('.qg').hidden = false; qf.querySelector('.qnote').hidden = false; const b = qf.querySelector('[type=submit]'); b.hidden = false; b.disabled = false; b.textContent = F.form.send;
+    qf.reset(); qf.hidden = true; $('go').hidden = false; $('svc').querySelector('button').focus();
+  });
+
   /* hero: damped scroll progress drives the captions and the 3D scene */
   const scene = $('scene'), stage = $('stage'), hc = $('herocopy'), hint = $('hint'), scrim = $('scrim');
   const caps = [...scene.querySelectorAll('.cap')];
-  const CAPT = [[.37, .43, .54, .58], [.72, .77, .81, .85], [.9, .95, 2, 3]];
+  const CAPT = [[.22, .29, .59, .63], [.66, .72, .81, .85], [.88, .93, 2, 3]];
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const seg = (p, a, b) => clamp((p - a) / (b - a), 0, 1);
   const prog = () => { const r = scene.getBoundingClientRect(); return clamp(-r.top / Math.max(1, r.height - stage.offsetHeight), 0, 1); };
   const dom = p => {
-    const h = 1 - seg(p, .012, .08);
+    const h = 1 - seg(p, .03, .12);
     hc.style.opacity = h; hc.style.transform = `translateY(${(h - 1) * 70}px)`; hc.style.pointerEvents = h < .5 ? 'none' : '';
     hint.style.opacity = 1 - seg(p, 0, .03);
     let m = 0;
     caps.forEach((c, i) => { const k = CAPT[i], o = Math.min(seg(p, k[0], k[1]), 1 - seg(p, k[2], k[3])); m = Math.max(m, o); c.style.opacity = o; c.style.transform = `translateY(${(1 - o) * 26}px)`; });
     scrim.style.opacity = m;
+    stage.classList.toggle('deep', p > .1 && p < .985);
   };
-  /* no GPU (software WebGL) or data saver: keep the static hero, decided before the user can scroll */
-  const weak = (() => {
-    if (!window.WebGLRenderingContext || (navigator.connection && navigator.connection.saveData)) return true;
-    try {
-      const g = document.createElement('canvas').getContext('webgl'); if (!g) return true;
-      const x = g.getExtension('WEBGL_debug_renderer_info'), r = x ? String(g.getParameter(x.UNMASKED_RENDERER_WEBGL)) : '';
-      const l = g.getExtension('WEBGL_lose_context'); if (l) l.loseContext();
-      return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(r);
-    } catch (e) { return true; }
-  })() && !/[?&]gl=1/.test(location.search);
+  /* no GPU, data saver or reduced motion: keep the static hero, decided before the user can scroll */
+  const weak = weakGL();
   if (weak) scene.classList.add('nogl');
-  let cur = prog(), last = 0, running = false, raf = 0;
+  let cur = prog(), last = 0, running = false, raf = 0, drawn = 0, first = true;
   const tick = now => {
     raf = 0; if (!running) return;
     const dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
     const target = prog();
     cur += (target - cur) * (1 - Math.exp(-dt * 8));
     if (Math.abs(target - cur) < .0002) cur = target;
-    if (!scene.classList.contains('nogl')) dom(cur);
-    if (window.__scene) window.__scene.update(cur, now / 1000);
+    const moving = cur !== target;
+    if ((moving || first) && !scene.classList.contains('nogl')) { dom(cur); first = false; }
+    /* full frame rate while scrolling, about 20 fps for the idle motion to save battery */
+    if (window.__scene && (moving || now - drawn > 48)) { drawn = now; window.__scene.update(cur, now / 1000); }
     raf = requestAnimationFrame(tick);
   };
   if (!weak) new IntersectionObserver(es => { running = es[0].isIntersecting; if (running && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }).observe(scene);
 
   /* the 3D engine loads after the page has finished loading, so text and layout come first */
   afterLoad(() => {
-    if (weak) return;
-    const s = document.createElement('script'); s.src = scene.dataset.src; s.async = true;
-    s.onerror = () => scene.classList.add('nogl'); document.head.appendChild(s);
+    if (!weak) loadScene(scene.dataset.src, () => scene.classList.add('nogl'));
   });
 }
+
+/* tells the safety timer in <head> that the page is wired up */
+window.__vm = 1;

@@ -1,4 +1,5 @@
 import asyncio, json, re, os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))   # screenshots land in tests/shots, which git ignores
 os.makedirs("shots", exist_ok=True)
 from playwright.async_api import async_playwright
 ARGS=["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader","--ignore-gpu-blocklist","--no-sandbox"]
@@ -27,6 +28,7 @@ async def main():
                       ld:(()=>{try{return JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent)['@graph'].map(x=>x['@type']).join(',')}catch(e){return 'ERR '+e}})(),
                       desc:document.querySelector('meta[name=description]')?.content.length, h1n:document.querySelectorAll('h1').length, ovf:document.documentElement.scrollWidth-innerWidth,
                       links:[...document.querySelectorAll('a[href^="#"]')].map(a=>a.getAttribute('href')).filter(h=>h.length>1&&!document.getElementById(h.slice(1))) })""")
+                    info["missing"]=await pg.evaluate("""async()=>{const u=[...new Set([...document.querySelectorAll('script[src],link[rel=preload],img[src],source[srcset],[data-src]')].map(e=>e.src||e.href||e.srcset||e.dataset.src).filter(x=>x&&x.includes('/assets/')))];const bad=[];for(const x of u){const r=await fetch(x,{method:'HEAD'});if(!r.ok)bad.push(x)}return bad}""")
                     await sweep(pg)
                     info["hidden"]=await pg.evaluate(HIDDEN); info["status"]=resp.status
                     out["pages"].setdefault(path,{})[name]=info
@@ -42,12 +44,15 @@ async def main():
             await pg.click("#go"); await pg.wait_for_timeout(200)
             r["formVisible"]=await pg.evaluate("!document.getElementById('qf').hidden && document.activeElement.name")
             await pg.click("#qf [type=submit]"); await pg.wait_for_timeout(200)
-            r["invalidMsg"]=await pg.evaluate("document.getElementById('qerr').hidden?null:document.getElementById('qerr').innerText")
+            r["invalidMsg"]=await pg.evaluate("[document.getElementById('e-name').innerText, document.getElementById('e-email').innerText, document.querySelector('#qf [name=name]').getAttribute('aria-invalid'), document.activeElement.name]")
             await pg.fill("#qf [name=name]","Test Person"); await pg.fill("#qf [name=email]","test@example.ch"); await pg.fill("#qf [name=phone]","+41 79 000 00 00"); await pg.fill("#qf [name=msg]","Maler in Dietikon, Website von 2014.")
             await pg.wait_for_timeout(900)
             await pg.screenshot(path=f"shots/e2e_form_{name}.png")
-            await pg.click("#qf [type=submit]"); await pg.wait_for_timeout(1200)
+            await pg.click("#qf [type=submit]")
+            try: await pg.wait_for_function("!document.getElementById('qdone').hidden || !document.getElementById('qerr').hidden", timeout=9000)
+            except Exception: pass
             r["doneMsg"]=await pg.evaluate("document.getElementById('qdone').hidden?null:document.getElementById('qdone').innerText")
+            r["locked"]=await pg.evaluate("[document.getElementById('finder').classList.contains('sent'), !document.getElementById('qagain').hidden, document.querySelector('#svc .chip').disabled]")
             r["errAfterSend"]=await pg.evaluate("document.getElementById('qerr').hidden?null:document.getElementById('qerr').innerText")
             await pg.screenshot(path=f"shots/e2e_done_{name}.png")
             # preselect from a service page

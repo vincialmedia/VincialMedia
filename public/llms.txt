@@ -2,15 +2,22 @@
 
 > KI-Agentur für KMU in Zürich und im Limmattal. Apps, Websites, Google und Meta Ads und KI-Automation zum Fixpreis. Einzelfirma von Vincent Hänggi, Brandstrasse 21, 8952 Schlieren. Kontakt: vincent@vincialmedia.com
 
-VincialMedia bin ich, Vincent Hänggi. Seit rund zehn Jahren baue ich CRM-Systeme und Marketing-Automation, unter anderem bei Crowdhouse, Kreis 1 Consulting und Demodia. Für HubSpot und Salesforce Pardot bin ich zertifiziert. KI nimmt mir einen grossen Teil dieser Stunden ab, und ich bezahle weder Büro noch Projektleitung. Darum kostet eine KMU-Website bei mir ab CHF 1’900.
+VincialMedia ist eine KI-Agentur in Schlieren bei Zürich und besteht aus einer Person: mir, Vincent Hänggi. Seit rund zehn Jahren baue ich CRM-Systeme und Marketing-Automation, unter anderem bei Crowdhouse, Kreis 1 Consulting und Demodia. Für HubSpot und Salesforce Pardot bin ich zertifiziert. KI nimmt mir einen grossen Teil dieser Stunden ab, und ich bezahle weder Büro noch Projektleitung. Darum kostet eine KMU-Website bei mir ab CHF 1’900.
 
-## Preise (CHF, Fixpreise, keine MWST, Stand 2026-11-24)
+## Preise (CHF, Fixpreise, VincialMedia ist nicht MWST-pflichtig, Stand 2026-11-24)
 - Website: Klein CHF 1’900, Mittel CHF 3’900, Gross CHF 7’900. https://www.vincialmedia.com/webdesign
 - App: Klein CHF 9’800, Mittel CHF 19’500, Gross CHF 39’000. https://www.vincialmedia.com/app-entwicklung
 - Werbung: Klein CHF 590 pro Monat, Mittel CHF 1’190 pro Monat, Gross CHF 2’400 pro Monat. https://www.vincialmedia.com/google-ads
 - KI-Automation: Klein CHF 1’900 + CHF 149 pro Monat, Mittel CHF 3’900 + CHF 249 pro Monat, Gross CHF 6’900 + CHF 399 pro Monat. https://www.vincialmedia.com/ki-automation
 
-Marktvergleich: Schweizer Agenturen verlangen für eine KMU-Website CHF 5’000 bis 15’000 (Quellen auf https://www.vincialmedia.com/preise).
+Konditionen: Hosting und Domain sind bei Websites im ersten Jahr inbegriffen, danach CHF 25 pro Monat. Zahlung je zur Hälfte bei Auftrag und bei Livegang. Monatliche Leistungen sind auf Ende Monat kündbar. Offerte innert zwei Arbeitstagen.
+
+Marktvergleich: Schweizer Agenturen verlangen für eine KMU-Website CHF 5’000 bis 15’000, der Median öffentlicher Fixpreis-Pakete liegt bei CHF 2’500. Quellen:
+- [beyondweb: Was kostet eine Webseite in der Schweiz? Preisvergleich 2026](https://www.beyondweb.ch/blog/was-kostet-eine-webseite-in-der-schweiz/)
+- [martini.DIGITAL: Was kostet eine Website in der Schweiz 2026? 87 Pakete von 26 Anbietern](https://martini.digital/blog/was-kostet-eine-website-in-der-schweiz)
+- [Devedis: Was kostet eine App?](https://devedis.ch/en/what-does-an-app-cost)
+- [Ostend Digital: Google Ads Agentur beauftragen](https://ostend.digital/google-ads-agentur-beauftragen/)
+- [StudioMeyer: KI-Chatbot für Unternehmen 2026](https://studiomeyer.io/de/blog/ai-chatbot-for-business)
 
 ## Seiten
 - [Startseite](https://www.vincialmedia.com/): Übersicht, Paket-Konfigurator, Offertanfrage
@@ -27,6 +34,8 @@ Marktvergleich: Schweizer Agenturen verlangen für eine KMU-Website CHF 5’000 
 
 ## English
 > Apps, websites and Google Ads for small businesses in Zurich and the Limmattal. Fixed price, fixed date, written quote in two working days. From Schlieren.
+
+Services: websites, apps, Google and Meta ads, and AI automation (an assistant that answers enquiries on WhatsApp and email, plus CRM setup). Fixed prices in CHF, VincialMedia is not liable for VAT. Website packages include hosting and domain in year one, then CHF 25 a month. Half is paid on order, half at launch.
 
 - Website: Small CHF 1’900, Medium CHF 3’900, Large CHF 7’900. https://www.vincialmedia.com/en/webdesign
 - App: Small CHF 9’800, Medium CHF 19’500, Large CHF 39’000. https://www.vincialmedia.com/en/app-entwicklung

@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
   Quote requests from the package builder on the homepage.
   Sends the lead to Vincent and a confirmation to the customer through Resend.
   Environment: RESEND_API_KEY (required), RESEND_FROM, LEAD_TO, LEAD_WEBHOOK_URL (all optional).
-  Prices must match site/src/shared.js.
+  Prices must match site-src/src/shared.js.
 */
 
 const PRICE: Record<string, number[]> = { app: [9800, 19500, 39000], web: [1900, 3900, 7900], ads: [590, 1190, 2400], auto: [1900, 3900, 6900] };
@@ -13,17 +13,22 @@ const RECUR: Record<string, boolean> = { ads: true };
 const SIZES = ["s", "m", "l"];
 const NAMES: Record<string, Record<string, string>> = {
   de: { web: "Website", app: "App", ads: "Werbung", auto: "KI-Automation", s: "Klein", m: "Mittel", l: "Gross", ops: "Betrieb KI-Assistent", per: " pro Monat" },
-  en: { web: "Website", app: "App", ads: "Ads", auto: "AI automation", s: "Small", m: "Medium", l: "Large", ops: "Running the AI assistant", per: " a month" },
+  en: { web: "Website", app: "App", ads: "Ads", auto: "AI automation", s: "Small", m: "Medium", l: "Large", ops: "Running the AI assistant", per: " per month" },
 };
 
 const fmt = (n: number) => "CHF " + String(n).replace(/\B(?=(\d{3})+$)/g, "’");
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
-const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+const str = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, " ").trim().slice(0, max) : "");
+const line = (v: unknown, max: number) => str(v, max).replace(/[\r\n]+/g, " ");
+const own = (o: object, k: unknown) => typeof k === "string" && Object.prototype.hasOwnProperty.call(o, k);
+/* a name we are willing to repeat in a mail to an unverified address: letters, spaces, dots, hyphens, apostrophes */
+const plainName = (n: string) => /^[\p{L}][\p{L}\p{M} .'’-]{0,59}$/u.test(n);
 
 /* best effort per instance: at most 5 requests per address in 10 minutes */
 const hits = new Map<string, number[]>();
 function limited(ip: string) {
   const now = Date.now(), list = (hits.get(ip) || []).filter((t) => now - t < 600_000);
+  if (hits.size > 5000) for (const [k, v] of hits) if (now - v[v.length - 1] > 600_000) hits.delete(k);
   list.push(now); hits.set(ip, list);
   return list.length > 5;
 }
@@ -33,6 +38,7 @@ async function send(payload: Record<string, unknown>) {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(8000),
   });
   if (!r.ok) throw new Error(`resend ${r.status} ${(await r.text()).slice(0, 200)}`);
   return r.json();
@@ -42,16 +48,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") { res.setHeader("Allow", "POST"); return res.status(405).json({ ok: false, error: "method" }); }
   const b = (typeof req.body === "object" && req.body) || {};
 
-  // bots: the hidden field is filled, or the form was sent faster than a person can type
-  if (str(b.website, 200) || (typeof b.ms === "number" && b.ms < 800)) return res.status(200).json({ ok: true });
+  // bots: the hidden field is filled, the timer is missing, or the form was sent faster than a person can type
+  if (str(b.website, 200) || typeof b.ms !== "number" || b.ms < 2500) return res.status(200).json({ ok: true });
 
   const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
   if (limited(ip)) return res.status(429).json({ ok: false, error: "rate" });
 
   const lang = b.lang === "en" ? "en" : "de", N = NAMES[lang];
-  const name = str(b.name, 100), email = str(b.email, 200), phone = str(b.phone, 40), msg = str(b.msg, 2000), page = str(b.page, 120);
+  const name = line(b.name, 100), email = line(b.email, 200), phone = line(b.phone, 40), msg = str(b.msg, 2000), page = line(b.page, 120);
   const services = (Array.isArray(b.services) ? b.services : [])
-    .filter((s: { k?: string; size?: string }) => s && PRICE[s.k as string] && SIZES.includes(s.size as string))
+    .filter((s: { k?: string; size?: string }) => s && own(PRICE, s.k) && SIZES.includes(s.size as string))
     .filter((s: { k: string }, i: number, a: { k: string }[]) => a.findIndex((x) => x.k === s.k) === i)
     .slice(0, 4) as { k: string; size: string }[];
   if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || !services.length) return res.status(400).json({ ok: false, error: "invalid" });
@@ -61,9 +67,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const lines: [string, string][] = [];
   for (const s of services) {
     const i = SIZES.indexOf(s.size), label = `${N[s.k]} · ${N[s.size]}`;
-    if (RECUR[s.k]) { month += PRICE[s.k][i]; lines.push([label, fmt(PRICE[s.k][i]) + N.per]); continue; }
+    if (own(RECUR, s.k)) { month += PRICE[s.k][i]; lines.push([label, fmt(PRICE[s.k][i]) + N.per]); continue; }
     once += PRICE[s.k][i]; lines.push([label, fmt(PRICE[s.k][i])]);
-    if (MONTHLY[s.k]) { month += MONTHLY[s.k][i]; lines.push([N.ops, fmt(MONTHLY[s.k][i]) + N.per]); }
+    if (own(MONTHLY, s.k)) { month += MONTHLY[s.k][i]; lines.push([N.ops, fmt(MONTHLY[s.k][i]) + N.per]); }
   }
   if (once) lines.push([lang === "en" ? "One-off" : "Einmalig", fmt(once)]);
   if (month) lines.push([lang === "en" ? "Per month" : "Pro Monat", fmt(month)]);
@@ -86,7 +92,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(502).json({ ok: false, error: "send" });
   }
 
-  const greet = lang === "en" ? `Hello ${name}` : `Guten Tag ${name}`;
+  const who = plainName(name) ? ` ${name}` : "";
+  const greet = lang === "en" ? `Hello${who}` : `Guten Tag${who}`;
   const body = lang === "en"
     ? ["Thanks for your request. Here is what you picked:", "You will have a written quote with price and launch date within two working days. If you want to add anything, just reply to this email."]
     : ["Danke für Ihre Anfrage. Das haben Sie gewählt:", "Innert zwei Arbeitstagen erhalten Sie eine schriftliche Offerte mit Preis und Termin. Wenn Sie etwas ergänzen möchten, antworten Sie einfach auf diese E-Mail."];

@@ -22,7 +22,7 @@ export function rowsHtml(F, sel, open) {
   const f = F.finder;
   return SVCS.filter(k => sel[k]).map(k => {
     const i = ORDER.indexOf(sel[k]);
-    return `<div class="frow"><div class="frh"><strong>${esc(f.svc[k])}</strong><span>${esc(f.time[k][i])}</span></div><div class="chips" role="group" aria-label="${esc(f.svc[k])}">${ORDER.map(s => `<button type="button" class="chip sm" data-svc="${k}" data-size="${s}" aria-pressed="${s === sel[k]}">${esc(f.size[s])}</button>`).join('')}</div><p>${esc(F.tiers[k][i])}</p><details class="fd" data-row="${k}"${open && open.has(k) ? ' open' : ''}><summary>${esc(F.lv.more)}</summary><ul>${F.lv[k][i].inc.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details></div>`;
+    return `<div class="frow"><div class="frh"><strong>${esc(f.svc[k])}</strong><span>${esc(priceText(F, k, i))} · ${esc(f.time[k][i])}</span></div><div class="chips" role="group" aria-label="${esc(f.svc[k])}">${ORDER.map(s => `<button type="button" class="chip sm" data-svc="${k}" data-size="${s}" aria-pressed="${s === sel[k]}">${esc(f.size[s])}</button>`).join('')}</div><p>${esc(F.tiers[k][i])}</p><details class="fd" data-row="${k}"${open && open.has(k) ? ' open' : ''}><summary>${esc(F.lv.more)}</summary><ul>${F.lv[k][i].inc.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details></div>`;
   }).join('') || `<p class="fempty">${esc(f.empty)}</p>`;
 }
 export function totals(F, sel) {

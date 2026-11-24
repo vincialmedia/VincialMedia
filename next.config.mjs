@@ -4,12 +4,8 @@ import siteRewrites from './site-rewrites.mjs';
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
+    // only local images are used; an open pattern turned /_next/image into a proxy for any site
+    remotePatterns: [],
   },
   allowedDevOrigins: ['*.daytona.work'],
   async rewrites() {

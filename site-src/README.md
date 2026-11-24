@@ -17,7 +17,23 @@ sh sync.sh    # writes public/site, public/assets, sitemap.xml, robots.txt, llms
 cd .. && git add -A && git commit -m "Update site"
 ```
 
-Bump `TODAY` in `build.mjs` when content changes, it feeds `lastmod` in the sitemap.
+`lastmod.json` remembers when each page's content last changed. The build updates it by itself and the sitemap and structured data read their dates from it, so commit it with the rest.
+
+A public phone number goes into `PHONE` at the top of `build.mjs`. It then shows in the footer and in the structured data.
+
+## 3D visuals
+
+The homepage hero and the device on each service page are drawn live by `src/scene.js` (three.js). Words on the device screens come from `scene` in `src/content.js`. Visitors without a graphics chip, with data saver or with reduced motion get a still image instead, and everyone sees that still until the 3D model has loaded.
+
+The stills live in `src/vis/` and are rendered from the same scene, so re-render them after changing `scene.js` or the screen texts:
+
+```sh
+npx next build && npx next start -p 3100   # in the repo root, in a second terminal
+python3 site-src/tests/posters.py          # all stills, or name some: posters.py web auto
+sh site-src/sync.sh
+```
+
+The BuyAuto still uses two real screenshots in `vis-src/` (1600x974 for the laptop, 720x1558 for the phone). Replace them and run `posters.py case` when the site changes.
 
 ## Forms
 
@@ -41,4 +57,4 @@ npx next build && RESEND_API_KEY=test NODE_OPTIONS="--require ./site-src/tests/m
 python3 site-src/tests/e2e.py   # needs playwright; mails land in /tmp/mails.jsonl
 ```
 
-Browsers without a GPU (and data-saver mode) get the static hero. Add `?gl=1` to force the 3D scene.
+Browsers without a GPU, with data saver or with reduced motion get the still versions. Add `?gl=1` to force the 3D scenes.

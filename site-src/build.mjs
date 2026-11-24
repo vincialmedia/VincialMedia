@@ -1,18 +1,21 @@
 // Static site generator for vincialmedia.com.
 // Reads the copy (content.js), writes finished HTML per page and language, hashed assets, sitemap, robots and llms.txt.
-// Output goes to out/, which deploy.sh copies into the Next.js repo.
+// Output goes to out/, which sync.sh copies into the Next.js app one folder up.
 import fs from 'fs';
 import path from 'path';
 import vm from 'vm';
 import crypto from 'crypto';
 import * as esbuild from 'esbuild';
-import { PRICE, ORDER, SVCS, SVCPAGE, esc, fmt, priceText, url, chipsHtml, rowsHtml, totals } from './src/shared.js';
+import { PRICE, MONTHLY, RECUR, ORDER, SVCS, SVCPAGE, esc, fmt, priceText, url, chipsHtml, rowsHtml, totals } from './src/shared.js';
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
 const SRC = p => path.join(ROOT, 'src', p);
 const OUT = path.join(ROOT, 'out');
 const ORIGIN = 'https://www.vincialmedia.com';
-const TODAY = '2026-11-24';
+/* lastmod per page: the date a page's content last changed, remembered in lastmod.json between builds */
+const NOW = new Date(), TODAY = `${NOW.getFullYear()}-${String(NOW.getMonth() + 1).padStart(2, '0')}-${String(NOW.getDate()).padStart(2, '0')}`;
+const MODFILE = path.join(ROOT, 'lastmod.json'), MOD = fs.existsSync(MODFILE) ? JSON.parse(fs.readFileSync(MODFILE, 'utf8')) : {};
+const PHONE = '';   // public phone number in international form, e.g. '+41 44 000 00 00'. Empty: no number is shown anywhere.
 const GSV = 'RxrhpDdeCiLf75Rizc6_TtQwKls1UCBaUVUGbqtKq8g';
 
 fs.rmSync(OUT, { recursive: true, force: true });
@@ -38,6 +41,10 @@ const FONT = asset('inter.woff2', fs.readFileSync(SRC('inter.woff2')));
 const LOGO = asset('logo.png', fs.readFileSync(SRC('logo.png')));
 const LOGO96 = asset('logo-96.png', fs.readFileSync(SRC('logo-96.png')));
 const OG = { de: asset('og-de.png', fs.readFileSync(SRC('og-de.png'))), en: asset('og-en.png', fs.readFileSync(SRC('og-en.png'))) };
+const PHOTO = fs.existsSync(SRC('vincent.jpg')) ? asset('vincent.jpg', fs.readFileSync(SRC('vincent.jpg'))) : '';
+/* still images of the 3D scenes, rendered by tests/posters.py: <shot>-<lang>-w (16:9), -t (small screens), -p (phone, 4:7) */
+const VIS = {};
+if (fs.existsSync(SRC('vis'))) for (const f of fs.readdirSync(SRC('vis')).filter(f => f.endsWith('.webp'))) VIS[f.replace('.webp', '')] = asset(f, fs.readFileSync(SRC('vis/' + f)));
 for (const f of ['favicon.ico', 'apple-touch-icon.png', 'icon-192.png']) fs.copyFileSync(SRC(f), outPub(f));
 const CSS = (await esbuild.transform(fs.readFileSync(SRC('styles.css'), 'utf8').replace('url(inter.woff2)', `url(${FONT})`), { loader: 'css', minify: true })).code.trim();
 
@@ -48,33 +55,54 @@ const finderData = T => ({ finder: T.finder, lv: T.lv, form: T.finder.form, tier
 const navOf = (T, s) => (T.pages[s] || T.docs[s]).nav;
 const linkify = (text, word, href) => { const i = text.lastIndexOf(word); return i < 0 ? esc(text) : esc(text.slice(0, i)) + `<a href="${href}">${esc(word)}</a>` + esc(text.slice(i + word.length)); };
 const rich = s => esc(s).replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, m => `<a href="mailto:${m}">${m}</a>`);
-const faqHtml = (T, lang, items, pre) => items.map((q, i) => `<div class="q"${st(i)}><h3><button type="button" aria-expanded="false" aria-controls="${pre}a${i}" id="${pre}q${i}">${esc(q[0])}<i aria-hidden="true">+</i></button></h3><div class="ans" id="${pre}a${i}" role="region" aria-labelledby="${pre}q${i}"><p>${esc(q[1])}</p>${q[2] ? `<a href="${url(q[2], lang)}">${esc(navOf(T, q[2]))} ›</a>` : ''}</div></div>`).join('');
+const faqHtml = (T, lang, items, pre) => items.map((q, i) => `<div class="q"${st(i)}><h3><button type="button" aria-expanded="false" aria-controls="${pre}a${i}" id="${pre}q${i}">${esc(q[0])}<i aria-hidden="true"></i></button></h3><div class="ans" id="${pre}a${i}" role="region" aria-labelledby="${pre}q${i}"><p>${esc(q[1])}</p>${q[2] ? `<a href="${url(q[2], lang)}">${esc(navOf(T, q[2]))} ›</a>` : ''}</div></div>`).join('');
 const stepsHtml = T => T.how.steps.map((s, i) => `<li${st(i)}><h3>${esc(s[0])}</h3><p>${esc(s[1])}</p></li>`).join('');
 const tiles = a => a.map((f, i) => `<div${st(i)}><b class="roll"><i data-v="${esc(f[0])}"${st(i)}>${esc(f[0])}</i></b><span>${esc(f[1])}</span></div>`).join('');
 const tierCards = (T, k) => `<div class="tg sg">${ORDER.map((s, i) => { const lv = T.lv[k][i]; return `<article class="tc"${st(i)}><h3>${esc(T.finder.size[s])}</h3><b>${esc(priceText(T, k, i))}</b><span>${esc(T.finder.time[k][i])}</span><p>${esc(lv.f)}</p><ul>${lv.inc.map(x => `<li>${esc(x)}</li>`).join('')}</ul></article>`; }).join('')}</div>`;
 const tab = (cols, rows, cls) => `<table class="ptab${cls || ''}"><thead><tr>${cols.map(c => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map((c, i) => i ? `<td data-l="${esc(cols[i])}">${c}</td>` : `<th scope="row">${c}</th>`).join('')}</tr>`).join('')}</tbody></table>`;
 
 /* ---------- structured data ---------- */
-function graph(T, lang, view) {
-  const p = view === 'home' ? null : (T.pages[view] || T.docs[view]);
-  const org = { '@type': 'ProfessionalService', '@id': ORIGIN + '/#org', name: 'VincialMedia', url: ORIGIN + '/', logo: ORIGIN + LOGO, image: ORIGIN + OG[lang], description: T.meta.desc, email: 'vincent@vincialmedia.com', priceRange: 'CHF 590–39’000', founder: { '@type': 'Person', name: 'Vincent Hänggi', jobTitle: lang === 'en' ? 'Founder' : 'Inhaber' }, address: { '@type': 'PostalAddress', streetAddress: 'Brandstrasse 21', addressLocality: 'Schlieren', postalCode: '8952', addressRegion: 'ZH', addressCountry: 'CH' }, areaServed: ['Zürich', 'Schlieren', 'Dietikon', 'Urdorf', 'Limmattal'].map(n => ({ '@type': 'Place', name: n })), knowsLanguage: ['de', 'en'] };
+function graph(T, lang, view, mod) {
+  const p = view === 'home' ? null : (T.pages[view] || T.docs[view]), en = lang === 'en';
+  const here = abs(url(view, lang)), ME = ORIGIN + '/#vincent', CAT = abs(url('preise', lang)) + '#catalog', per = en ? 'per month' : 'pro Monat';
+  const org = { '@type': 'ProfessionalService', '@id': ORIGIN + '/#org', name: 'VincialMedia', url: ORIGIN + '/', logo: ORIGIN + LOGO, image: ORIGIN + OG[lang], description: T.meta.desc, email: 'vincent@vincialmedia.com', ...(PHONE ? { telephone: PHONE.replace(/\s/g, '') } : {}), priceRange: 'CHF 590–39’000', founder: { '@id': ME }, address: { '@type': 'PostalAddress', streetAddress: 'Brandstrasse 21', addressLocality: 'Schlieren', postalCode: '8952', addressRegion: 'ZH', addressCountry: 'CH' }, areaServed: [...['Zürich', 'Schlieren', 'Dietikon', 'Urdorf'].map(n => ({ '@type': 'City', name: n })), { '@type': 'Place', name: 'Limmattal' }], knowsLanguage: ['de', 'en'], hasOfferCatalog: { '@id': CAT } };
+  const me = { '@type': 'Person', '@id': ME, name: 'Vincent Hänggi', jobTitle: en ? 'Founder' : 'Inhaber', worksFor: { '@id': ORIGIN + '/#org' }, url: ORIGIN + '/', ...(PHOTO ? { image: ORIGIN + PHOTO } : {}), knowsAbout: ['CRM', 'Marketing Automation', 'Webdesign', 'App-Entwicklung', 'Google Ads', 'KI-Automation'] };
+  /* a monthly price is marked as monthly; the AI assistant has a setup price plus a monthly running price */
+  const offer = (k, i, extra) => {
+    const o = { '@type': 'Offer', name: T.finder.svc[k] + ' ' + T.finder.size[ORDER[i]], price: PRICE[k][i], priceCurrency: 'CHF', ...extra };
+    if (RECUR[k]) o.priceSpecification = { '@type': 'UnitPriceSpecification', price: PRICE[k][i], priceCurrency: 'CHF', unitCode: 'MON', unitText: per };
+    else if (MONTHLY[k]) o.priceSpecification = { '@type': 'CompoundPriceSpecification', priceCurrency: 'CHF', priceComponent: [{ '@type': 'UnitPriceSpecification', name: en ? 'Setup, one-off' : 'Einrichtung, einmalig', price: PRICE[k][i], priceCurrency: 'CHF' }, { '@type': 'UnitPriceSpecification', name: en ? 'Running it' : 'Betrieb', price: MONTHLY[k][i], priceCurrency: 'CHF', unitCode: 'MON', unitText: per }] };
+    return o;
+  };
   const faq = items => ({ '@type': 'FAQPage', mainEntity: items.map(q => ({ '@type': 'Question', name: q[0], acceptedAnswer: { '@type': 'Answer', text: q[1] } })) });
-  const crumbs = () => ({ '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: T.nav.home, item: abs(url('home', lang)) }, { '@type': 'ListItem', position: 2, name: p.nav, item: abs(url(view, lang)) }] });
-  const page = { '@type': 'WebPage', '@id': abs(url(view, lang)) + '#page', url: abs(url(view, lang)), name: p ? p.title : T.meta.title, inLanguage: lang === 'en' ? 'en' : 'de-CH', isPartOf: { '@id': ORIGIN + '/#site' }, about: { '@id': ORIGIN + '/#org' }, dateModified: TODAY };
-  const g = [org, page];
+  const trail = p ? [['home', T.nav.home], ...(LOCAL.includes(view) ? [['webdesign', T.pages.webdesign.nav]] : []), [view, p.nav]] : [];
+  const crumbs = () => ({ '@type': 'BreadcrumbList', '@id': here + '#crumbs', itemListElement: trail.map(([v, n], i) => ({ '@type': 'ListItem', position: i + 1, name: n, item: abs(url(v, lang)) })) });
+  const page = { '@type': 'WebPage', '@id': here + '#page', url: here, name: p ? p.title : T.meta.title, description: p ? p.desc : T.meta.desc, inLanguage: en ? 'en' : 'de-CH', isPartOf: { '@id': ORIGIN + '/#site' }, about: { '@id': ORIGIN + '/#org' }, author: { '@id': ME }, dateModified: mod, ...(p ? { breadcrumb: { '@id': here + '#crumbs' } } : {}) };
+  const g = [org, me, page];
   if (!p) g.push({ '@type': 'WebSite', '@id': ORIGIN + '/#site', url: ORIGIN + '/', name: 'VincialMedia', inLanguage: ['de-CH', 'en'], publisher: { '@id': ORIGIN + '/#org' } }, faq(T.faq.items));
-  else if (p.svc) g.push(crumbs(), { '@type': 'Service', name: p.h1, description: p.lead, serviceType: T.finder.svc[p.svc], provider: { '@id': ORIGIN + '/#org' }, areaServed: LOCAL.includes(view) ? { '@type': 'Place', name: p.nav.split(' ').pop() } : { '@type': 'Place', name: 'Zürich' }, offers: ORDER.map((s, i) => ({ '@type': 'Offer', name: T.finder.svc[p.svc] + ' ' + T.finder.size[s], price: PRICE[p.svc][i], priceCurrency: 'CHF', description: T.lv[p.svc][i].f })) }, faq(p.faq));
-  else if (p.faq) g.push(crumbs(), { '@type': 'OfferCatalog', name: p.h1, itemListElement: SVCS.flatMap(k => ORDER.map((sz, i) => ({ '@type': 'Offer', name: T.finder.svc[k] + ' ' + T.finder.size[sz], description: T.lv[k][i].f + ' ' + T.lv[k][i].inc.join('. ') + '.', price: PRICE[k][i], priceCurrency: 'CHF', itemOffered: { '@type': 'Service', name: T.finder.svc[k] } }))) }, faq(p.faq));
+  else if (p.svc) g.push(crumbs(), { '@type': 'Service', name: p.h1, description: p.lead, serviceType: T.finder.svc[p.svc], provider: { '@id': ORIGIN + '/#org' }, areaServed: LOCAL.includes(view) ? { '@type': 'City', name: p.nav.split(' ').pop() } : { '@type': 'City', name: 'Zürich' }, offers: ORDER.map((s, i) => offer(p.svc, i, { description: `${T.lv[p.svc][i].f} ${priceText(T, p.svc, i)}.` })) }, faq(p.faq));
+  else if (p.faq) g.push(crumbs(), { '@type': 'OfferCatalog', '@id': CAT, name: (en ? 'VincialMedia price list ' : 'Preisliste VincialMedia ') + mod.slice(0, 4), itemListElement: SVCS.flatMap(k => ORDER.map((sz, i) => offer(k, i, { description: `${T.lv[k][i].f} ${T.lv[k][i].inc.join('. ')}. ${priceText(T, k, i)}.`, itemOffered: { '@type': 'Service', name: T.finder.svc[k] } }))) }, faq(p.faq));
   else g.push(crumbs());
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': g }).replace(/</g, '\\u003c');
 }
 
+/* still image of a 3D scene plus the canvas that takes over when the device can run it */
+function figure(T, lang, shot) {
+  const v = T.vis[shot], tall = shot === 'app' || shot === 'auto', key = `${shot}-${lang}`, W = VIS[key + '-w'], P = VIS[key + '-p'], S2 = VIS[key + '-t'];
+  const im = (src, w, h) => `<img src="${src}" width="${w}" height="${h}" alt="${esc(v.alt)}" loading="lazy" decoding="async">`;
+  const pic = tall ? (P ? im(P, 800, 1400) : '') : (W ? `<picture>${S2 ? `<source media="(max-width:699px)" srcset="${S2}" width="${shot === 'ads' ? 800 : 900}" height="${shot === 'ads' ? 1400 : 720}">` : ''}${im(W, 1600, 900)}</picture>` : '');
+  const tr = shot === 'auto' ? `<details class="tr"><summary>${esc(v.tr)}</summary><ol>${T.scene.chat.msgs.map(m => `<li><b>${esc(v.who[m[0]])}:</b> ${esc(m[1])}</li>`).join('')}${T.scene.chat.done.map(d => `<li>${esc(d)}</li>`).join('')}</ol></details>` : '';
+  return `<figure class="shot${tall ? ' tall' : ''}${shot === 'ads' ? ' mtall' : ''}" data-src="${SCENE}"><div class="vs">${pic}<canvas data-shot="${shot}" aria-hidden="true"></canvas></div><figcaption><b>${esc(T.vis.tag)}</b><span>${esc(v.cap)}${v.cap2 ? ` <span class="dk">${esc(v.cap2)}</span>` : ''}</span><i>${esc(T.vis.live)}</i></figcaption>${tr}</figure>`;
+}
+const sceneData = T => `<script id="sd" type="application/json">${JSON.stringify(T.scene).replace(/</g, '\\u003c')}</script>`;
+
 /* ---------- page parts ---------- */
-function head(T, lang, view) {
+function head(T, lang, view, mod) {
   const p = view === 'home' ? null : (T.pages[view] || T.docs[view]);
   const title = p ? p.title : T.meta.title, desc = p ? p.desc : T.meta.desc, here = url(view, lang);
+  const shot = p && p.svc ? (LOCAL.includes(view) ? 'local' : p.svc) : '', wide = shot !== 'app' && shot !== 'auto', poster = shot ? VIS[`${shot}-${lang}-${wide ? 'w' : 'p'}`] : '';
   return `<!doctype html>
-<html lang="${lang}">
+<html lang="${lang === 'en' ? 'en' : 'de-CH'}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -93,15 +121,16 @@ function head(T, lang, view) {
 <meta property="og:image" content="${ORIGIN + OG[lang]}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${esc(title)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000000">
 ${view === 'home' ? `<meta name="google-site-verification" content="${GSV}">\n` : ''}<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" href="${FONT}" as="font" type="font/woff2" crossorigin>
-<script>document.documentElement.classList.add('js')</script>
+<link rel="preload" href="${FONT}" as="font" type="font/woff2" crossorigin>${poster ? `\n<link rel="preload" as="image" href="${poster}" media="(min-width:${wide ? 700 : 1000}px)">` : ''}
+<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__vm)document.documentElement.classList.remove('js')},4000)</script>
 <style>${CSS}</style>
-<script type="application/ld+json">${graph(T, lang, view)}</script>
+<script type="application/ld+json">${graph(T, lang, view, mod)}</script>
 <script src="${APP}" defer></script>
 </head>`;
 }
@@ -132,7 +161,7 @@ function footer(T, lang, view) {
   <nav class="links" aria-label="Footer">
    <div><strong>${esc(T.foot.c1)}</strong><span class="fl">${links([...SERVICE, 'preise'])}</span></div>
    <div><strong>${esc(T.foot.c2)}</strong><span class="fl">${links(LOCAL)}</span></div>
-   <div><strong>${esc(T.foot.c3)}</strong><span>${esc(T.foot.place)}</span><a href="mailto:vincent@vincialmedia.com">vincent@vincialmedia.com</a><a href="${cta}">${esc(T.nav.cta)}</a></div>
+   <div><strong>${esc(T.foot.c3)}</strong><span>VincialMedia, ${esc(T.foot.addr)}</span>${PHONE ? `<a href="tel:${PHONE.replace(/\s/g, '')}">${PHONE}</a>` : ''}<a href="mailto:vincent@vincialmedia.com">vincent@vincialmedia.com</a><a href="${cta}">${esc(T.nav.cta)}</a></div>
   </nav>
   <div class="legal"><span>© 2026 VincialMedia</span><span class="lg"><span id="f3">${links(['impressum', 'datenschutz'])}</span><button type="button" class="cset" id="cset">${esc(T.consent.settings)}</button></span><span class="lng">${LANGS.map(l => `<a href="${url(view, l)}" hreflang="${l}" lang="${l}"${l === lang ? ' aria-current="true"' : ''}>${l.toUpperCase()}</a>`).join('·')}</span></div>
  </div>
@@ -145,18 +174,20 @@ function footer(T, lang, view) {
 
 function home(T, lang) {
   const F = finderData(T), sel = { web: 's' }, t = totals(F, sel), f = T.finder, fm = f.form, pk = T.pk;
-  const privacy = lang === 'en' ? 'privacy policy' : 'Datenschutz';
+  const privacy = lang === 'en' ? 'privacy policy' : 'Datenschutz', once = lang === 'en' ? 'one-off' : 'einmalig';
+  const csW = VIS['case-w'], csT = VIS['case-t'];
   return `<div id="home">
  <section class="scene" id="scene" data-src="${SCENE}">
   <div class="stage" id="stage">
    <canvas id="gl" aria-hidden="true"></canvas>
    <div class="scrim" id="scrim"></div>
    <div class="herocopy" id="herocopy">
-    <h1 class="in"><small>${esc(T.hero.eyebrow)}</small><span>${esc(T.hero.l1)}</span> <span>${esc(T.hero.l2)}</span></h1>
+    <h1 class="in"><small>${esc(T.hero.eyebrow)}</small> <span>${esc(T.hero.l1)}</span> <span>${esc(T.hero.l2)}</span></h1>
     <p class="sub in d2">${esc(T.hero.sub)}</p>
     <div class="ctas in d3"><a class="pill" href="#finder">${esc(T.hero.cta)}</a><a href="#packages">${esc(T.hero.link)}</a></div>
    </div>
    ${T.caps.map(c => `<div class="cap"><small>${esc(c.k)}</small><h2>${esc(c.h)}</h2><p>${esc(c.p)}</p></div>`).join('\n   ')}
+   <a class="skipf" href="#finder">${esc(T.hero.skip)}</a>
    <div class="hint" id="hint">${esc(T.hero.hint)}</div>
   </div>
  </section>
@@ -181,8 +212,8 @@ function home(T, lang) {
     <button type="button" class="go" id="go">${esc(f.go)}</button>
     <form class="qf" id="qf" hidden novalidate>
      <div class="qg">
-      <label><span>${esc(fm.name)}</span><input name="name" autocomplete="name" maxlength="100" required placeholder="${esc(fm.phName)}"></label>
-      <label><span>${esc(fm.email)}</span><input name="email" type="email" autocomplete="email" maxlength="200" required placeholder="${esc(fm.ph)}"></label>
+      <label><span>${esc(fm.name)}</span><input name="name" autocomplete="name" maxlength="100" required aria-describedby="e-name" placeholder="${esc(fm.phName)}"><span class="fe" id="e-name" role="alert" hidden></span></label>
+      <label><span>${esc(fm.email)}</span><input name="email" type="email" autocomplete="email" maxlength="200" required aria-describedby="e-email" placeholder="${esc(fm.ph)}"><span class="fe" id="e-email" role="alert" hidden></span></label>
       <label><span>${esc(fm.phone)} <small>(${esc(fm.opt)})</small></span><input name="phone" type="tel" autocomplete="tel" maxlength="40"></label>
       <label><span>${esc(fm.msg)} <small>(${esc(fm.opt)})</small></span><textarea name="msg" rows="3" maxlength="2000" placeholder="${esc(fm.phMsg)}"></textarea></label>
      </div>
@@ -192,6 +223,7 @@ function home(T, lang) {
      <p class="done" id="qdone" role="status" tabindex="-1" hidden></p>
      <p class="qerr" id="qerr" role="alert" hidden></p>
     </form>
+    <button type="button" class="again" id="qagain" hidden>${esc(fm.again)}</button>
    </div>
   </div>
   <p class="note">${esc(f.note)}</p>
@@ -199,7 +231,7 @@ function home(T, lang) {
 
  <section class="band wrap" id="packages">
   <div class="head rv"><div><h2>${esc(pk.h)}</h2><p>${esc(pk.p)}</p></div><a href="#finder">${esc(pk.link)}</a></div>
-  <div class="cards" id="cards">${pk.cards.map((c, i) => `<a href="${url(c.slug, lang)}" class="card rv" style="transition-delay:${i * 90}ms"><small>${esc(c.k)}</small><h3>${esc(c.t)}</h3><ul>${c.li.map(x => `<li>${esc(x)}</li>`).join('')}</ul><div class="pr"><b>${esc(c.price)}</b>${esc(c.unit)}</div><span class="ml">${esc(pk.more)}</span></a>`).join('')}</div>
+  <div class="cards" id="cards">${pk.cards.map((c, i) => `<a href="${url(c.slug, lang)}" class="card rv" style="transition-delay:${i * 90}ms"><small>${esc(c.k)}</small><h3>${esc(c.t)}</h3><ul>${c.li.map(x => `<li>${esc(x)}</li>`).join('')}</ul><div class="pr"><b><small>${esc(c.unit.split(', ')[0])}</small>${esc(c.price)}</b>${esc(c.unit.split(', ')[1] || once)}</div><span class="ml">${esc(pk.more)}</span></a>`).join('')}</div>
  </section>
 
  <section class="band wrap" id="why">
@@ -211,18 +243,25 @@ function home(T, lang) {
 
  <section class="band wrap" id="who">
   <div class="who rv">
-   <div><h2>${esc(T.who.h)}</h2><p>${esc(T.who.p1)}</p><p>${esc(T.who.p2)}</p></div>
+   <div><h2>${esc(T.who.h)}</h2>${PHOTO ? `<div class="me"><img src="${PHOTO}" width="84" height="84" alt="${esc(T.who.alt)}" loading="lazy" decoding="async"><div><strong>Vincent Hänggi</strong><span>${esc(T.who.role)}</span></div></div>` : ''}<p>${esc(T.who.p1)}</p><p>${esc(T.who.p2)}</p></div>
    <div class="wf sg" id="wf">${tiles(T.who.facts)}</div>
   </div>
  </section>
 
- <section class="band wrap" id="how">
+ ${csW ? `<section class="band wrap" id="case">
+  <div class="cs rv">
+   <div><small>${esc(T.cs.k)}</small><h2>${esc(T.cs.h)}</h2><p>${esc(T.cs.p)}</p><a class="tl" href="https://www.buyauto.ch/" target="_blank" rel="noopener">${esc(T.cs.link)} ›</a></div>
+   <div class="vs"><picture>${csT ? `<source media="(max-width:699px)" srcset="${csT}" width="900" height="720">` : ''}<img src="${csW}" width="1600" height="900" alt="${esc(T.cs.alt)}" loading="lazy" decoding="async"></picture></div>
+  </div>
+ </section>
+
+ ` : ''}<section class="band wrap" id="how">
   <div class="head rv"><h2>${esc(T.how.h)}</h2></div>
   <ol class="steps rv sg" id="steps">${stepsHtml(T)}</ol>
  </section>
 
  <section class="band wrap" id="faq">
-  <div class="head rv" style="justify-content:center"><h2>${esc(T.faq.h)}</h2></div>
+  <div class="head rv"><h2>${esc(T.faq.h)}</h2></div>
   <div class="faq rv sg" id="faqlist">${faqHtml(T, lang, T.faq.items, 'h')}</div>
  </section>
 
@@ -231,17 +270,22 @@ function home(T, lang) {
   <a class="pill big" href="#finder">${esc(T.cta.b)}</a>
  </section>
 </div>
-<script id="fd" type="application/json">${JSON.stringify(F).replace(/</g, '\\u003c')}</script>`;
+<script id="fd" type="application/json">${JSON.stringify(F).replace(/</g, '\\u003c')}</script>
+${sceneData(T)}`;
 }
 
 function servicePage(T, lang, slug) {
-  const p = T.pages[slug], H = url('home', lang), cta = `${H}${H.endsWith('/') ? '' : ''}?svc=${p.svc}#finder`;
+  const p = T.pages[slug], H = url('home', lang), cta = `${H}?svc=${p.svc}#finder`;
+  const local = LOCAL.includes(slug), shot = local ? 'local' : p.svc, duo = shot === 'app' || shot === 'auto';
+  const facts = `<dl class="facts rg">${p.facts.map((f, i) => `<div><dt>${esc(f[0])}</dt><dd class="roll"><i data-v="${esc(f[1])}"${st(i)}>${esc(f[1])}</i></dd></div>`).join('')}</dl>`;
+  const fig = figure(T, lang, shot);
   const top = [
-    `<nav class="crumb" aria-label="Breadcrumb"><a href="${H}">${esc(T.nav.home)}</a> › ${esc(p.nav)}</nav>`,
+    `<nav class="crumb" aria-label="Breadcrumb"><a href="${H}">${esc(T.nav.home)}</a> › ${local ? `<a href="${url('webdesign', lang)}">${esc(T.pages.webdesign.nav)}</a> › ` : ''}${esc(p.nav)}</nav>`,
     `<h1>${esc(p.h1)}</h1>`, `<p class="lead">${esc(p.lead)}</p>`, `<p class="by">${esc(T.page.by)}</p>`,
-    `<dl class="facts rg">${p.facts.map((f, i) => `<div><dt>${esc(f[0])}</dt><dd class="roll"><i data-v="${esc(f[1])}"${st(i)}>${esc(f[1])}</i></dd></div>`).join('')}</dl>`,
-    `<a class="pill big" href="${cta}">${esc(T.nav.cta)}</a>`
-  ].map((h, i) => h.replace(/^<(\w+)/, `<$1${st(Math.min(i, 6))}`));
+    `<a class="pill big ctop" href="${cta}">${esc(T.nav.cta)}</a>`,
+    duo ? `<div class="duo">${fig}${facts}</div>` : fig, duo ? '' : facts
+  ].filter(Boolean).map((h, i) => h.replace(/^<(\w+)/, `<$1${st(Math.min(i, 6))}`));
+  const region = slug === 'webdesign' ? `<section class="rv"><h2>${esc(T.page.region)}</h2><p>${esc(T.page.regionP)}</p><div class="more region">${LOCAL.map(s2 => `<a href="${url(s2, lang)}">${esc(navOf(T, s2))}</a>`).join('')}</div></section>\n  ` : '';
   const prices = LOCAL.includes(slug)
     ? `<table class="tiers"><thead><tr>${T.page.cols.map(c => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead><tbody>${ORDER.map((k, i) => `<tr><td>${esc(T.finder.size[k])}</td><td>${esc(p.tiers[i])}</td><td>${esc(T.finder.time[p.svc][i])}</td><td>${esc(priceText(T, p.svc, i))}</td></tr>`).join('')}</tbody></table><a class="tl" href="${url('preise', lang)}">${esc(T.lv.all)}</a>`
     : tierCards(T, p.svc);
@@ -252,9 +296,10 @@ function servicePage(T, lang, slug) {
   <section class="honest rv"><h2>${esc(p.honest[0])}</h2><p>${esc(p.honest[1])}</p></section>
   <section class="rv"><h2>${esc(T.how.h)}</h2><ol class="steps sg">${stepsHtml(T)}</ol></section>
   <section class="rv"><h2>${esc(T.page.faq)}</h2><div class="faq sg">${faqHtml(T, lang, p.faq, 'p')}</div></section>
-  <section class="rv"><h2>${esc(T.page.more)}</h2><div class="more">${[...SLUGS.filter(s => s !== slug), 'preise'].map(s => `<a href="${url(s, lang)}">${esc(navOf(T, s))}</a>`).join('')}</div></section>
+  ${region}<section class="rv"><h2>${esc(T.page.more)}</h2><div class="more">${[...SLUGS.filter(s => s !== slug), 'preise'].map(s => `<a href="${url(s, lang)}">${esc(navOf(T, s))}</a>`).join('')}</div></section>
   <section class="cta rv"><h2>${esc(T.page.cta)}</h2><a class="pill big" href="${cta}">${esc(T.nav.cta)}</a></section>
- </div></article>`;
+ </div></article>
+${sceneData(T)}`;
 }
 
 function docPage(T, lang, slug) {
@@ -279,12 +324,16 @@ for (const lang of LANGS) {
   const T = C[lang];
   for (const view of ['home', ...SLUGS, ...DOCS]) {
     const body = view === 'home' ? home(T, lang) : SLUGS.includes(view) ? servicePage(T, lang, view) : docPage(T, lang, view);
-    const htmlOut = `${head(T, lang, view)}\n<body>\n${header(T, lang, view)}\n<main id="main">\n${body}\n</main>\n${footer(T, lang, view)}\n</body>\n</html>\n`;
+    const id = `${lang}/${view}`, h = hash(Buffer.from(body.replace(/\/assets\/([\w-]+)\.[0-9a-f]{10}\./g, '/assets/$1.')));
+    if (!MOD[id] || MOD[id].h !== h) MOD[id] = { h, d: TODAY };
+    const htmlOut = `${head(T, lang, view, MOD[id].d)}\n<body>\n${header(T, lang, view)}\n<main id="main">\n${body}\n</main>\n${footer(T, lang, view)}\n</body>\n</html>\n`;
     const file = `site/${lang}/${view === 'home' ? 'index' : view}.html`;
     fs.writeFileSync(outPub(file), htmlOut);
     pages.push({ lang, view, file, path: url(view, lang), bytes: Buffer.byteLength(htmlOut) });
   }
 }
+fs.writeFileSync(MODFILE, JSON.stringify(Object.fromEntries(Object.keys(MOD).sort().map(k => [k, MOD[k]])), null, 1) + '\n');
+const LATEST = Object.values(MOD).map(m => m.d).sort().pop();
 
 /* ---------- routing for Next.js (rewrites from clean URLs to the static files) ---------- */
 const slugRe = [...SLUGS, ...DOCS].join('|');
@@ -301,7 +350,7 @@ const views = ['home', ...SLUGS, ...DOCS];
 const prio = v => v === 'home' ? '1.0' : v === 'preise' ? '0.9' : SLUGS.includes(v) ? '0.8' : '0.3';
 fs.writeFileSync(outPub('sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${LANGS.flatMap(lang => views.map(v => `<url><loc>${abs(url(v, lang))}</loc><lastmod>${TODAY}</lastmod><priority>${prio(v)}</priority><xhtml:link rel="alternate" hreflang="de-CH" href="${abs(url(v, 'de'))}"/><xhtml:link rel="alternate" hreflang="en" href="${abs(url(v, 'en'))}"/><xhtml:link rel="alternate" hreflang="x-default" href="${abs(url(v, 'de'))}"/></url>`)).join('\n')}
+${LANGS.flatMap(lang => views.map(v => `<url><loc>${abs(url(v, lang))}</loc><lastmod>${MOD[`${lang}/${v}`].d}</lastmod><priority>${prio(v)}</priority><xhtml:link rel="alternate" hreflang="de-CH" href="${abs(url(v, 'de'))}"/><xhtml:link rel="alternate" hreflang="en" href="${abs(url(v, 'en'))}"/><xhtml:link rel="alternate" hreflang="x-default" href="${abs(url(v, 'de'))}"/></url>`)).join('\n')}
 </urlset>
 `);
 fs.writeFileSync(outPub('robots.txt'), `# vincialmedia.com
@@ -309,7 +358,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /site/
-Disallow: /secret-game
 
 # Search and answer engines are welcome
 User-agent: Googlebot
@@ -326,7 +374,6 @@ User-agent: Applebot-Extended
 Allow: /
 Disallow: /api/
 Disallow: /site/
-Disallow: /secret-game
 
 Sitemap: ${ORIGIN}/sitemap.xml
 `);
@@ -338,10 +385,13 @@ fs.writeFileSync(outPub('llms.txt'), `# VincialMedia
 
 ${D.who.p1} ${D.why.p2}
 
-## Preise (CHF, Fixpreise, keine MWST, Stand ${TODAY})
+## Preise (CHF, Fixpreise, VincialMedia ist nicht MWST-pflichtig, Stand ${LATEST})
 ${priceLines(D)}
 
-Marktvergleich: Schweizer Agenturen verlangen für eine KMU-Website CHF 5’000 bis 15’000 (Quellen auf ${ORIGIN}/preise).
+Konditionen: Hosting und Domain sind bei Websites im ersten Jahr inbegriffen, danach CHF 25 pro Monat. Zahlung je zur Hälfte bei Auftrag und bei Livegang. Monatliche Leistungen sind auf Ende Monat kündbar. Offerte innert zwei Arbeitstagen.
+
+Marktvergleich: Schweizer Agenturen verlangen für eine KMU-Website CHF 5’000 bis 15’000, der Median öffentlicher Fixpreis-Pakete liegt bei CHF 2’500. Quellen:
+${D.docs.preise.sources.map(x => `- [${x[0]}](${x[1]})`).join('\n')}
 
 ## Seiten
 - [Startseite](${ORIGIN}/): Übersicht, Paket-Konfigurator, Offertanfrage
@@ -352,6 +402,8 @@ ${SLUGS.map(s => `- [${D.pages[s].h1}](${ORIGIN}/${s}): ${D.pages[s].desc}`).joi
 
 ## English
 > ${E.meta.desc}
+
+Services: websites, apps, Google and Meta ads, and AI automation (an assistant that answers enquiries on WhatsApp and email, plus CRM setup). Fixed prices in CHF, VincialMedia is not liable for VAT. Website packages include hosting and domain in year one, then CHF 25 a month. Half is paid on order, half at launch.
 
 ${priceLines(E)}
 

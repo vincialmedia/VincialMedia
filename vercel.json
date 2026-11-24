@@ -66,6 +66,15 @@
           "value": "no-referrer"
         }
       ]
+    },
+    {
+      "source": "/workout(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
     }
   ],
   "cleanUrls": true,
