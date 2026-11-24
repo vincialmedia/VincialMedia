@@ -37,15 +37,6 @@
       ]
     },
     {
-      "source": "/site/(.*)",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex"
-        }
-      ]
-    },
-    {
       "source": "/(robots.txt|sitemap.xml|llms.txt)",
       "headers": [
         {
