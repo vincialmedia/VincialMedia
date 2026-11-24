@@ -12,7 +12,7 @@ W, H, FPS = int(os.environ.get("CW", "1280")), int(os.environ.get("CH", "720")),
 ease = lambda x: 0.5 - 0.5 * math.cos(math.pi * max(0.0, min(1.0, x)))
 # page, seconds, start of the screen loop
 PARTS = [("/webdesign", 5.5, 0.0), ("/ki-automation", 8.2, 0.0), ("/app-entwicklung", 6.6, 2.2), ("/google-ads", 7.0, 0.0)]
-CSS = "header,footer,.cb,.skip,.svfg,.svtag,.pg{display:none!important}html,body{background:#000!important;overflow:hidden!important}.sv{margin:0!important}.svbg{position:fixed!important;inset:0!important;height:100vh!important}.svbg img{display:none!important}.svbg canvas{opacity:1!important;transition:none!important}"
+CSS = "header,footer,.cb,.skip,.pg,.svhero,.cap,.scrim,.hint,.skipf,.svtag,.svstill{display:none!important}html,body{background:#000!important;overflow:hidden!important}.sv{margin:0!important;height:100vh!important}.sv .stage{position:fixed!important;inset:0!important;height:100vh!important}.sv canvas{opacity:1!important;transition:none!important}"
 
 async def main():
     out = sys.argv[1] if len(sys.argv) > 1 else "clip.mp4"

@@ -94,7 +94,7 @@ const sceneData = T => `<script id="sd" type="application/json">${JSON.stringify
 function head(T, lang, view, mod) {
   const p = view === 'home' ? null : (T.pages[view] || T.docs[view]);
   const title = p ? p.title : T.meta.title, desc = p ? p.desc : T.meta.desc, here = url(view, lang);
-  const shot = p && p.svc ? (LOCAL.includes(view) ? 'local' : p.svc) : '', poster = shot ? VIS[`${shot}-${lang}-w`] : '';
+  const shot = p && p.svc ? (LOCAL.includes(view) ? 'local' : p.svc) : '', poster = shot ? VIS[`${shot}-${lang}-w`] : '', posterP = shot ? VIS[`${shot}-${lang}-p`] : '';
   return `<!doctype html>
 <html lang="${lang === 'en' ? 'en' : 'de-CH'}">
 <head>
@@ -121,7 +121,7 @@ function head(T, lang, view, mod) {
 ${view === 'home' ? `<meta name="google-site-verification" content="${GSV}">\n` : ''}<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preload" href="${FONT}" as="font" type="font/woff2" crossorigin>${poster ? `\n<link rel="preload" as="image" href="${poster}" media="${SIDE}">` : ''}
+<link rel="preload" href="${FONT}" as="font" type="font/woff2" crossorigin>${poster ? `\n<link rel="preload" as="image" href="${poster}" media="${SIDE}" fetchpriority="high">` : ''}${posterP ? `\n<link rel="preload" as="image" href="${posterP}" media="${CENTER}" fetchpriority="high">` : ''}
 <script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__vm)document.documentElement.classList.remove('js')},4000)</script>
 <style>${CSS}</style>
 <script type="application/ld+json">${graph(T, lang, view, mod)}</script>
@@ -272,37 +272,37 @@ function servicePage(T, lang, slug) {
   const p = T.pages[slug], H = url('home', lang), cta = `${H}?svc=${p.svc}#finder`;
   const local = LOCAL.includes(slug), shot = local ? 'local' : p.svc, v = T.vis[shot], W = VIS[`${shot}-${lang}-w`], P = VIS[`${shot}-${lang}-p`];
   const facts = `<dl class="facts rg">${p.facts.map((f, i) => `<div><dt>${esc(f[0])}</dt><dd class="roll"><i data-v="${esc(f[1])}"${st(i)}>${esc(f[1])}</i></dd></div>`).join('')}</dl>`;
-  const tr = shot === 'auto' ? `<details class="tr gc"><summary>${esc(v.tr)}</summary><ol>${T.scene.chat.msgs.map(m => `<li><b>${esc(v.who[m[0]])}:</b> ${esc(m[1])}</li>`).join('')}${T.scene.chat.done.map(d => `<li>${esc(d)}</li>`).join('')}</ol></details>` : '';
+  const tr = shot === 'auto' ? `<details class="tr"><summary>${esc(v.tr)}</summary><ol>${T.scene.chat.msgs.map(m => `<li><b>${esc(v.who[m[0]])}:</b> ${esc(m[1])}</li>`).join('')}${T.scene.chat.done.map(d => `<li>${esc(d)}</li>`).join('')}</ol></details>` : '';
   const region = slug === 'webdesign' ? `<section class="rv"><h2>${esc(T.page.region)}</h2><p>${esc(T.page.regionP)}</p><div class="more region">${LOCAL.map(s2 => `<a href="${url(s2, lang)}">${esc(navOf(T, s2))}</a>`).join('')}</div></section>\n  ` : '';
   const prices = LOCAL.includes(slug)
     ? `<table class="tiers"><thead><tr>${T.page.cols.map(c => `<th scope="col">${esc(c)}</th>`).join('')}</tr></thead><tbody>${ORDER.map((k, i) => `<tr><td>${esc(T.finder.size[k])}</td><td>${esc(p.tiers[i])}</td><td>${esc(T.finder.time[p.svc][i])}</td><td>${esc(priceText(T, p.svc, i))}</td></tr>`).join('')}</tbody></table><a class="tl" href="${url('preise', lang)}">${esc(T.lv.all)}</a>`
     : tierCards(T, p.svc);
-  /* the 3D device is a pinned background (a still image until the live scene has loaded); the text scrolls over it */
+  /* the same pinned stage as the homepage: the intro first, then one caption at a time while the 3D device stays in place.
+     Without a GPU or JavaScript the stage is an ordinary block: intro, still image, captions as a list. */
   return `<article id="page">
- <section class="sv" id="sv" data-src="${SCENE}">
-  <div class="svbg">
-   ${W ? `<picture>${P ? `<source media="${CENTER}" srcset="${P}" width="800" height="1400">` : ''}<img src="${W}" width="1600" height="900" alt="${esc(v.alt)}" decoding="async"></picture>` : ''}
+ <section class="scene sv" id="sv" data-src="${SCENE}">
+  <div class="stage">
+   ${W ? `<picture class="svstill">${P ? `<source media="${CENTER}" srcset="${P}" width="800" height="1400">` : ''}<img src="${W}" width="1600" height="900" alt="${esc(v.alt)}" fetchpriority="high"></picture>` : ''}
    <canvas data-shot="${shot}" aria-hidden="true"></canvas>
-   <p class="svtag"><b>${esc(T.vis.tag)}</b><span>${esc(v.cap)}${v.cap2 ? ` <span class="dk">${esc(v.cap2)}</span>` : ''}</span></p>
-  </div>
-  <div class="svfg wrap">
-   <div class="svhero">
+   <div class="scrim"></div>
+   <div class="svhero"><div class="wrap"><div class="svcol">
     <nav class="crumb in" aria-label="Breadcrumb"><a href="${H}">${esc(T.nav.home)}</a> › ${local ? `<a href="${url('webdesign', lang)}">${esc(T.pages.webdesign.nav)}</a> › ` : ''}${esc(p.nav)}</nav>
     <h1 class="in">${esc(p.h1)}</h1>
     <p class="lead in d2">${esc(p.lead)}</p>
     <p class="by in d2">${esc(T.page.by)}</p>
     <a class="pill big ctop in d3" href="${cta}">${esc(T.nav.cta)}</a>
-   </div>
-   <div class="gc gf rv">${facts}</div>
-   <h2 class="svh rv">${esc(T.page.inc)}</h2>
-   ${p.inc.map(x => `<div class="gc rv"><h3>${esc(x[0])}</h3><p>${esc(x[1])}</p></div>`).join('\n   ')}
-   ${tr}
+   </div></div></div>
+   <p class="svtag"><b>${esc(T.vis.tag)}</b><span>${esc(v.cap)}${v.cap2 ? ` <span class="dk">${esc(v.cap2)}</span>` : ''}</span></p>
+   <div class="cap capf">${facts}</div>
+   ${p.inc.map(x => `<div class="cap"><small>${esc(T.page.inc)}</small><h2>${esc(x[0])}</h2><p>${esc(x[1])}</p></div>`).join('\n   ')}
+   <a class="skipf" href="#stufen">${esc(T.page.tiers)} ›</a>
+   <div class="hint">${esc(T.hero.hint)}</div>
   </div>
  </section>
  <div class="pg wrap">
-  <section class="rv"><h2>${esc(T.page.tiers)}</h2>${prices}</section>
+  <section class="rv" id="stufen"><h2>${esc(T.page.tiers)}</h2>${prices}</section>
   <section class="honest rv"><h2>${esc(p.honest[0])}</h2><p>${esc(p.honest[1])}</p></section>
-  <section class="rv"><h2>${esc(T.how.h)}</h2><ol class="steps sg">${stepsHtml(T)}</ol></section>
+  ${tr ? `<section class="rv">${tr}</section>\n  ` : ''}<section class="rv"><h2>${esc(T.how.h)}</h2><ol class="steps sg">${stepsHtml(T)}</ol></section>
   <section class="rv"><h2>${esc(T.page.faq)}</h2><div class="faq sg">${faqHtml(T, lang, p.faq, 'p')}</div></section>
   ${region}<section class="rv"><h2>${esc(T.page.more)}</h2><div class="more">${[...SLUGS.filter(s => s !== slug), 'preise'].map(s => `<a href="${url(s, lang)}">${esc(navOf(T, s))}</a>`).join('')}</div></section>
   <section class="cta rv"><h2>${esc(T.page.cta)}</h2><a class="pill big" href="${cta}">${esc(T.nav.cta)}</a></section>

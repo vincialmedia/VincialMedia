@@ -349,41 +349,45 @@ footer{background:var(--panel);padding:48px 0 28px;font-size:14px}
 .nogl .skipf,html:not(.js) .skipf{display:none}
 @media(max-width:700px){.scene{height:360vh}}
 
-/* service pages: the 3D device is a pinned background, the text scrolls over it (wide screens: device beside the text) */
-.sv{position:relative;margin-top:-57px}
-.svbg{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;pointer-events:none}
-.svbg img,.svbg canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.svbg img{object-fit:cover;object-position:74% 50%;transition:opacity .6s .3s}
-.svbg canvas{opacity:0;transition:opacity .7s}
-.sv.live canvas{opacity:1}.sv.live .svbg img{opacity:0}
-.svtag{position:absolute;right:max(5vw,16px);bottom:16px;margin:0;display:flex;gap:10px;align-items:baseline;justify-content:flex-end;font-size:13px;color:var(--mute);max-width:min(520px,46vw);text-align:right;text-shadow:0 1px 8px #000}
-.svtag b{flex:none;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--link);border:1px solid rgba(41,151,255,.45);border-radius:999px;padding:2px 9px;background:rgba(0,0,0,.5)}
-.svfg{position:relative;z-index:1;margin-top:-100vh;margin-top:-100svh;padding-bottom:30vh}
-.svhero{padding-top:calc(57px + clamp(28px,5vw,64px));min-height:94vh;min-height:94svh;max-width:min(520px,38vw)}
+/* service pages: the same pinned stage as the homepage. The intro shows first, then one caption at a time appears, stays and
+   leaves while the 3D device stays in place. Nothing scrolls across the device. */
+.sv{height:440vh}
+@media(max-width:700px){.sv{height:410vh}}
+.sv canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .7s;pointer-events:none}
+.sv.live canvas{opacity:1}
+.svstill img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:74% 50%;transition:opacity .6s .3s}
+.sv.live .svstill img{opacity:0}
+.svhero{position:absolute;inset:0 0 auto 0;z-index:2;padding-top:calc(57px + clamp(24px,4.5vw,60px));will-change:transform,opacity}
+.svcol{max-width:min(520px,38vw)}
 .svhero h1{font-size:clamp(34px,4.3vw,60px);font-weight:700}
 .svhero .lead{font-size:clamp(17px,1.5vw,20px)}
-.gc{background:rgba(22,22,24,.6);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);border:1px solid rgba(255,255,255,.11);border-radius:24px;padding:24px 26px;max-width:min(470px,36vw);margin-bottom:22vh;box-shadow:0 24px 60px rgba(0,0,0,.35)}
-.gc h3{font-size:22px;line-height:1.15;margin-bottom:10px}
-.gc p{color:var(--soft)}
-.svh{display:inline-block;font-size:15px;font-weight:600;letter-spacing:0;line-height:1.3;color:var(--link);background:rgba(22,22,24,.6);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid rgba(41,151,255,.35);border-radius:999px;padding:8px 16px;margin-bottom:16px}
-.gf{padding:6px 26px}
-.gf .facts{display:block;margin:0;max-width:none;background:none;border:0;border-radius:0}
-.gf .facts div{background:none;padding:16px 0;border-top:1px solid rgba(255,255,255,.1)}
-.gf .facts div:first-child{border-top:0}
-.tr.gc{margin-bottom:0;padding:8px 22px;font-size:15px;color:var(--soft)}
-.tr summary{cursor:pointer;color:var(--link);min-height:44px;display:flex;align-items:center}
-.tr ol{list-style:none;margin:4px 0 14px;padding:0;display:grid;gap:8px}
+.capf .facts{margin:0 auto;max-width:780px;text-align:left}
+.svtag{position:absolute;top:78px;right:max(5vw,16px);z-index:3;margin:0;display:flex;gap:10px;align-items:baseline;justify-content:flex-end;font-size:13px;color:var(--mute);max-width:min(380px,30vw);text-align:right;text-shadow:0 1px 8px #000;opacity:0;transition:opacity .35s;pointer-events:none}
+.stage.deep .svtag{opacity:1}
+.svtag b{flex:none;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--link);border:1px solid rgba(41,151,255,.45);border-radius:999px;padding:2px 9px;background:rgba(0,0,0,.5)}
+.tr{font-size:15px;color:var(--soft)}
+.tr summary{cursor:pointer;color:var(--link);min-height:44px;display:inline-flex;align-items:center}
+.tr ol{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:8px}
 .tr b{color:var(--ink);font-weight:600}
+/* no GPU, reduced motion or no JavaScript: an ordinary block. Intro over the still image, then the captions as a list */
+.sv.nogl canvas,html:not(.js) .sv canvas{display:none}
+.sv.nogl .svhero,html:not(.js) .sv .svhero{position:relative;min-height:92vh;min-height:92svh;opacity:1!important;transform:none!important;visibility:visible!important;pointer-events:auto!important}
+.sv.nogl .svstill img,html:not(.js) .sv .svstill img{inset:0 0 auto 0;height:100vh;height:100svh;transform:none!important;-webkit-mask-image:linear-gradient(#000 74%,transparent);mask-image:linear-gradient(#000 74%,transparent)}
+.sv.nogl .svtag,html:not(.js) .sv .svtag{position:static;opacity:1;justify-content:center;text-align:center;max-width:none;padding:0 16px 44px}
 @media(max-width:899px),(max-aspect-ratio:21/20){
- .svbg img{object-position:50% 50%}
- .svtag{left:16px;right:16px;max-width:none;justify-content:center;text-align:center;font-size:12px}
- .svbg::after{content:"";position:absolute;inset:auto 0 0 0;height:110px;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.9) 70%)}
- .svtag{z-index:1}
+ .svstill img{object-position:50% 50%}
+ .svcol{max-width:none}
+ .svtag{top:80px;left:16px;right:auto;max-width:none}
+ .svtag>span{display:none}
+ .sv.nogl .svtag>span,html:not(.js) .sv .svtag>span{display:inline}
+ .sv .skipf{left:auto;right:16px;transform:none}
  .dk{display:none}
- /* the intro covers the device at first, then scrolls away and uncovers it */
- .svhero{max-width:none;min-height:0;margin:0 calc(-1*max(5vw,16px)) 34vh;padding-inline:max(5vw,16px);padding-bottom:96px;background:linear-gradient(#000 calc(100% - 96px),rgba(0,0,0,0))}
- .gc{max-width:none;margin-bottom:33vh}
- .tr.gc{margin-bottom:0}
+ .sv.nogl .stage,html:not(.js) .sv .stage{display:flex;flex-direction:column}
+ .sv.nogl .svhero,html:not(.js) .sv .svhero{order:1;min-height:0;padding-bottom:28px}
+ .sv.nogl .svstill,html:not(.js) .sv .svstill{order:2;display:block;position:relative;aspect-ratio:4/5}
+ .sv.nogl .svstill img,html:not(.js) .sv .svstill img{inset:0;height:100%;-webkit-mask-image:linear-gradient(transparent,#000 14%,#000 84%,transparent);mask-image:linear-gradient(transparent,#000 14%,#000 84%,transparent)}
+ .sv.nogl .svtag,html:not(.js) .sv .svtag{order:3;padding-top:12px}
+ .sv.nogl .cap,html:not(.js) .sv .cap{order:4}
 }
 .csv{position:relative;aspect-ratio:16/9;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 68%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 68%,transparent 100%)}
 .csv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}

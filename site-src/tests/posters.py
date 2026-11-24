@@ -24,7 +24,7 @@ JOBS = [
     ("case", "/webdesign", "case", {"w": W, "t": T}, False),
 ]
 
-ISO = "header,footer,.cb,.skip,.svfg,.svtag,.pg{display:none!important}html,body{background:#000!important;overflow:hidden!important}.sv{margin:0!important}.svbg{position:fixed!important;inset:0!important;height:100vh!important}.svbg img{display:none!important}.svbg canvas{opacity:1!important;transition:none!important}"
+ISO = "header,footer,.cb,.skip,.pg,.svhero,.cap,.scrim,.hint,.skipf,.svtag,.svstill{display:none!important}html,body{background:#000!important;overflow:hidden!important}.sv{margin:0!important;height:100vh!important}.sv .stage{position:fixed!important;inset:0!important;height:100vh!important}.sv canvas{opacity:1!important;transition:none!important}"
 
 def data_url(path):
     return "data:image/webp;base64," + base64.b64encode(open(path, "rb").read()).decode()
