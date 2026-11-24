@@ -1,0 +1,25 @@
+# vincialmedia.com
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /site/
+Disallow: /secret-game
+
+# Search and answer engines are welcome
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /site/
+Disallow: /secret-game
+
+Sitemap: https://www.vincialmedia.com/sitemap.xml

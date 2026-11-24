@@ -1,0 +1,44 @@
+# VincialMedia
+
+> KI-Agentur für KMU in Zürich und im Limmattal. Apps, Websites, Google und Meta Ads und KI-Automation zum Fixpreis. Einzelfirma von Vincent Hänggi, Brandstrasse 21, 8952 Schlieren. Kontakt: vincent@vincialmedia.com
+
+VincialMedia bin ich, Vincent Hänggi. Seit rund zehn Jahren baue ich CRM-Systeme und Marketing-Automation, unter anderem bei Crowdhouse, Kreis 1 Consulting und Demodia. Für HubSpot und Salesforce Pardot bin ich zertifiziert. KI nimmt mir einen grossen Teil dieser Stunden ab, und ich bezahle weder Büro noch Projektleitung. Darum kostet eine KMU-Website bei mir ab CHF 1’900.
+
+## Preise (CHF, Fixpreise, keine MWST, Stand 2026-11-24)
+- Website: Klein CHF 1’900, Mittel CHF 3’900, Gross CHF 7’900. https://www.vincialmedia.com/webdesign
+- App: Klein CHF 9’800, Mittel CHF 19’500, Gross CHF 39’000. https://www.vincialmedia.com/app-entwicklung
+- Werbung: Klein CHF 590 pro Monat, Mittel CHF 1’190 pro Monat, Gross CHF 2’400 pro Monat. https://www.vincialmedia.com/google-ads
+- KI-Automation: Klein CHF 1’900 + CHF 149 pro Monat, Mittel CHF 3’900 + CHF 249 pro Monat, Gross CHF 6’900 + CHF 399 pro Monat. https://www.vincialmedia.com/ki-automation
+
+Marktvergleich: Schweizer Agenturen verlangen für eine KMU-Website CHF 5’000 bis 15’000 (Quellen auf https://www.vincialmedia.com/preise).
+
+## Seiten
+- [Startseite](https://www.vincialmedia.com/): Übersicht, Paket-Konfigurator, Offertanfrage
+- [Preise](https://www.vincialmedia.com/preise): alle Preise, was jede Stufe enthält, Marktvergleich mit Quellen
+- [App entwickeln lassen in Zürich](https://www.vincialmedia.com/app-entwicklung): iOS- und Android-Apps für KMU und Startups aus Zürich. Klickbarer Prototyp nach einer Woche, Fixpreis ab CHF 9’800, im Store nach 6 bis 16 Wochen.
+- [Website erstellen lassen in Zürich](https://www.vincialmedia.com/webdesign): Website erstellen lassen in Zürich: bis zu acht Seiten inklusive Texte und SEO, ab CHF 1’900, live in zwei bis sechs Wochen. Gebaut für Google und ChatGPT.
+- [Google Ads und Meta Ads für KMU in Zürich](https://www.vincialmedia.com/google-ads): Google Ads und Meta Ads für KMU in Zürich: Einrichtung, Anzeigen und Betreuung ab CHF 590 pro Monat. Erste Kampagne nach sieben bis vierzehn Tagen live.
+- [KI-Automation für KMU](https://www.vincialmedia.com/ki-automation): KI-Assistent für WhatsApp und E-Mail, CRM und automatisches Nachfassen für KMU. Einrichtung ab CHF 1’900, nach zwei bis fünf Wochen im Einsatz.
+- [Webdesign in Schlieren und im Limmattal](https://www.vincialmedia.com/webdesign-schlieren): Webdesign aus Schlieren für Betriebe im Limmattal: neue Website ab CHF 1’900, inklusive Texte und Google-Eintrag. Für Schlieren, Dietikon, Urdorf und Umgebung.
+- [Webdesign in Dietikon](https://www.vincialmedia.com/webdesign-dietikon): Webdesign für Betriebe in Dietikon: neue Website ab CHF 1’900 zum Fixpreis, inklusive Texte und Google-Eintrag. Aus Schlieren, eine Viertelstunde entfernt.
+- [Webdesign in Urdorf](https://www.vincialmedia.com/webdesign-urdorf): Webdesign für Betriebe in Urdorf: kleine Website ab CHF 1’900 zum Fixpreis, inklusive Texte und Google-Eintrag. Gebaut im Nachbarort Schlieren.
+- [Impressum](https://www.vincialmedia.com/impressum)
+- [Datenschutz](https://www.vincialmedia.com/datenschutz)
+
+## English
+> Apps, websites and Google Ads for small businesses in Zurich and the Limmattal. Fixed price, fixed date, written quote in two working days. From Schlieren.
+
+- Website: Small CHF 1’900, Medium CHF 3’900, Large CHF 7’900. https://www.vincialmedia.com/en/webdesign
+- App: Small CHF 9’800, Medium CHF 19’500, Large CHF 39’000. https://www.vincialmedia.com/en/app-entwicklung
+- Ads: Small CHF 590 per month, Medium CHF 1’190 per month, Large CHF 2’400 per month. https://www.vincialmedia.com/en/google-ads
+- AI automation: Small CHF 1’900 + CHF 149 per month, Medium CHF 3’900 + CHF 249 per month, Large CHF 6’900 + CHF 399 per month. https://www.vincialmedia.com/en/ki-automation
+
+- [Home](https://www.vincialmedia.com/en)
+- [Prices](https://www.vincialmedia.com/en/preise)
+- [App development in Zurich](https://www.vincialmedia.com/en/app-entwicklung)
+- [Website design in Zurich](https://www.vincialmedia.com/en/webdesign)
+- [Google Ads and Meta Ads for small businesses in Zurich](https://www.vincialmedia.com/en/google-ads)
+- [AI automation for small businesses](https://www.vincialmedia.com/en/ki-automation)
+- [Web design in Schlieren and the Limmattal](https://www.vincialmedia.com/en/webdesign-schlieren)
+- [Web design in Dietikon](https://www.vincialmedia.com/en/webdesign-dietikon)
+- [Web design in Urdorf](https://www.vincialmedia.com/en/webdesign-urdorf)

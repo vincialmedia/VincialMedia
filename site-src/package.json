@@ -1,0 +1,13 @@
+{
+ "name": "vincialmedia-site",
+ "private": true,
+ "type": "module",
+ "description": "Generator for the static marketing pages served from public/site",
+ "scripts": {
+  "build": "sh sync.sh"
+ },
+ "dependencies": {
+  "esbuild": "^0.24.0",
+  "three": "^0.160.0"
+ }
+}
